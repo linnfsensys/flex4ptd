@@ -1,0 +1,20 @@
+# Operating System Related
+.DS_Store
+
+# IDE/Editor Related
+
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Log files
+
+# Environment configuration
+.env
+
+# Temporary files
+
+# Others

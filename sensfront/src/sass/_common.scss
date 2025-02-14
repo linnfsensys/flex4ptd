@@ -1,0 +1,204 @@
+.topbar {
+  height: 70px;
+  background-color: $bg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+
+  &-left,
+  &-right {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+
+    .brand {
+      img {
+        width: 162px;
+        height: auto;
+      }
+    }
+
+    .search-bar {
+      display: flex;
+      background-color: $bg-2;
+      width: 400px;
+      height: 44px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-radius: 2rem;
+      gap: 10px;
+      position: relative;
+
+      svg {
+        color: $text;
+        font-size: 24px;
+      }
+      &-input {
+        width: 100%;
+
+        input {
+          width: 100%;
+          background-color: transparent;
+          outline: none;
+          border: none;
+          font-size: 14px;
+          color: $white;
+        }
+      }
+      & > button {
+        background-color: transparent;
+        border: none;
+      }
+    }
+
+    .file-upload {
+      background-color: $bg-2;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: c;
+      padding: 8px 20px;
+      border-radius: 2rem;
+      color: $text;
+
+      input {
+        display: none;
+      }
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 14px;
+      }
+    }
+
+    & > button {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $text;
+      background-color: $bg-2;
+      border: none;
+      border-radius: 2rem;
+      font-size: 24px;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+
+      &-dropdown {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background-color: $bg-2-light;
+        width: 120px;
+        padding: 20px 10px;
+        border-radius: 4px;
+        display: none;
+        flex-direction: column;
+        gap: 4px;
+
+        a {
+          color: $bg-2;
+          text-decoration: none;
+        }
+
+        .logout {
+          display: flex;
+          background-color: $red;
+          padding: 8px 16px;
+          border-radius: 4px;
+          border: none;
+          color: $white;
+          text-transform: uppercase;
+        }
+      }
+
+      &:hover {
+        .profile-dropdown {
+          display: flex;
+        }
+      }
+
+      img {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+      }
+
+      span {
+        font-size: 16px;
+        color: $white;
+        font-family: "Lato", sans-serif;
+      }
+    }
+
+    .zoom {
+      font-family: "Lato", sans-serif;
+      font-size: 14px;
+      color: $white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      svg {
+        font-size: 24px;
+      }
+    }
+  }
+}
+
+.footer {
+  background-color: $primary;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+
+  &-left {
+    p,
+    a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #292929;
+
+      a {
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        margin-left: 10px;
+      }
+    }
+  }
+
+  &-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    color: $white;
+
+    svg {
+      font-size: 16px;
+    }
+
+    p {
+      background-color: #b67a32;
+      padding: 8px 16px;
+      border-radius: 2rem;
+      font-size: 14px;
+    }
+  }
+}

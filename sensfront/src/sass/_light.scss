@@ -1,0 +1,49 @@
+.light {
+  background-color: $white;
+
+  .topbar,
+  .main-pannel-top,
+  .right-pannel,
+  .right-pannel-top-wrp button:hover,
+  .right-pannel-top-wrp button.active,
+  .main-pannel-left,
+  .main-pannel-right-item {
+    background-color: $bg-light;
+  }
+
+  .right-pannel .inventory h4,
+  .right-pannel .inventory-table-item,
+  .topbar-left .search-bar-input input,
+  .topbar-right .search-bar-input input,
+  .right-pannel-top-wrp button,
+  .right-pannel .property-body h4,
+  .right-pannel .property-body-item label,
+  .property-body-item input,
+  .main-pannel-top .right button,
+  .main-pannel-top .left label span,
+  .topbar-left .profile span,
+  .topbar-right .profile span,
+  .topbar-right .zoom {
+    color: $text;
+  }
+
+  .main-pannel-top .right button.publish {
+    color: $white;
+  }
+  .search-bar,
+  .file-upload,
+  .topbar-left > button,
+  .topbar-right > button,
+  .main-pannel-top .left label,
+  .main-pannel-top .right button,
+  .main-pannel-top .right .separator,
+  .right-pannel-top-wrp,
+  .right-pannel .property-body-item input,
+  .right-pannel .property-bottom .warning,
+  .main-pannel-right-item .left-item,
+  .main-pannel-right-item .right-item,
+  .right-pannel .inventory-table-head,
+  .right-pannel .inventory-table-item {
+    background-color: $bg-2-light;
+  }
+}
