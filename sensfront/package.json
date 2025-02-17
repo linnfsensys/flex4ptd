@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
     "@react-pdf/renderer": "^4.1.6",
+    "@types/websocket": "^1.0.10",
     "axios": "^1.7.7",
     "file-saver": "^2.0.5",
     "firebase": "^10.14.1",

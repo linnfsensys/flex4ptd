@@ -7,6 +7,7 @@ import Range from "./Range";
 import SensorZone from "./SensorZone";
 import { PDFDocument } from 'pdf-lib';
 import { saveAs } from "file-saver";
+import { ENV } from '../utils/env';
 
 const MarkerMap = () => {
   const mapRef = useRef(null);
@@ -505,6 +506,8 @@ const MarkerMap = () => {
     }
   };
 
+  const apiKey = ENV.MAP_APIKEY;
+
   return (
     <div className="map">
       {!pdfUrl ? (
@@ -532,7 +535,7 @@ const MarkerMap = () => {
               onMove={(evt) => setViewState(evt.viewState)}
               style={{ width: "100%", height: "100%" }}
               mapStyle={mapStyle}
-              mapboxAccessToken={process.env.VITE_MAP_APIKEY}
+              mapboxAccessToken={apiKey}
             >
               {/* Render each line */}
               {lineCoordinates.map((line) => (
