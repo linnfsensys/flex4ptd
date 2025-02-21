@@ -1,0 +1,397 @@
+/* Styles for buttons in all states and colors.
+ * These styles are meant to imitate those of SNAPS.
+ */
+
+.buttonPane {
+    margin: 4px 0;
+}
+
+.buttonPane .button:first-child {
+    border-radius: 3px;
+}
+.buttonPane .option:first-child label.btn {
+    border-radius: 3px;
+    border-right-width: 0;
+}
+.buttonPane .button:last-child {
+    border-radius: 3px;
+}
+.buttonPane .option:last-child label.btn {
+    border-radius: 3px;
+    margin-right: 0;
+    border-left-width: 0;
+}
+.buttonPane .button:only-child,
+.buttonPane .option:only-child label.btn {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.buttonPane .button {
+    height: 32px;
+}
+
+.buttonPane .button,
+div#infoPanel .buttonPane.rbg label.btn {
+    color: #333;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+    min-width: 40px;
+    white-space: nowrap;
+    line-height: 16px;
+    vertical-align: bottom;
+    font-size: 12px;
+    font-weight: normal;
+    border-radius: 3px;
+    user-select: none;
+}
+.buttonPane .button {
+    margin: 5px;
+    border-width: 3px;
+    border-style: solid;
+}
+.buttonPane .button:active,
+.buttonPane .button:focus {
+    border-width: 3px;
+    border-style: solid;
+}
+.buttonPane.rbg label.btn {
+    margin: 0;
+}
+
+/* is this used?  i don't think it shows */
+.buttonPane .button:hover {
+    border-width: 3px;
+    border-style: solid;
+    border-color: #666;
+}
+.buttonPane label.btn:hover {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #666;
+}
+
+/* want hover, active states of disabled button to be 
+ * the same as the basic state, so there is no evidence
+ * that the button is pressable.
+ */
+.buttonPane .button.disabled,
+.buttonPane .button:disabled,
+.buttonPane .button[disabled],
+.buttonPane .button:disabled:hover,
+.buttonPane .button[disabled]:hover,
+.buttonPane .button.disabled:active,
+.buttonPane .button:disabled:active,
+.buttonPane .button[disabled]:active,
+.buttonPane .button.disabled:hover:active,
+.buttonPane .button[disabled]:hover:active {
+    border-style: solid;
+    border-width: 3px;
+    /*border-color: #cccccc;*/
+    /* use same border as when enabled, because otherwise, optical illusion of different width */
+    border-color: #d6d6d6 #888888 #888888 #d6d6d6;
+    background: #f2f2f2;
+    color: #bababa;
+    box-shadow: 2px 2px 3px rgba(179, 179, 179, 0.1) inset;
+    cursor: default;
+}
+
+div#infoPanel .buttonPane .option label.btn.disabled,
+div#infoPanel .buttonPane .option label.btn:disabled,
+div#infoPanel .buttonPane .option label.btn[disabled],
+div#infoPanel .buttonPane .option label.btn:disabled:hover,
+div#infoPanel .buttonPane .option label.btn[disabled]:hover,
+div#infoPanel .buttonPane .option label.btn.disabled:active,
+div#infoPanel .buttonPane .option label.btn:disabled:active,
+div#infoPanel .buttonPane .option label.btn[disabled]:active,
+div#infoPanel .buttonPane .option label.btn.disabled:hover:active,
+div#infoPanel .buttonPane .option label.btn[disabled]:hover:active{
+    border: solid 1px #b3b3b3;
+    background: #f2f2f2;
+    color: #bababa;
+    box-shadow: 2px 2px 3px rgba(179, 179, 179, 0.1) inset;
+    cursor: default;
+}
+
+.buttonPane .button:disabled img {
+    opacity: .3;
+}
+
+/* stuff for RadioButtonGroupField */
+.buttonPane.rbg .btn {
+    user-select: none;
+}
+/* fake radio button */
+.buttonPane.rbg span.fake-radio {
+    border-radius: 50%;
+    display: inline-block;
+    /*margin: 2px 2px 0 2px;*/
+    margin-top: 2px;
+    margin-right: 2px;
+    position: relative;
+    vertical-align: top;
+    width: 8px;
+    height: 8px;
+    border: #aaa 1px solid;
+    background: linear-gradient(90deg, #f5f5f5, #cccccc);
+}
+/* implement "checked" state of fake radio button */
+.buttonPane.rbg label.checked span.fake-radio:after {
+    content: " ";
+    background: #444;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 4px;
+    height: 4px;
+}
+
+
+/* colored buttons, and their states */
+.buttonPane .button.gray:not([disabled]),
+.buttonPane .button.grey:not([disabled]) {
+    border-style: solid;
+    border-width: 3px;
+    border-color: #d6d6d6 #888888 #888888 #d6d6d6;
+    background: -webkit-linear-gradient(90deg, #e6e6e6, #b3b3b3);
+    background: linear-gradient(90deg, #e6e6e6, #b3b3b3);
+}
+
+.buttonPane.rbg label.btn.gray:not([disabled]),
+.buttonPane.rbg label.btn.grey:not([disabled]) {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #d6d6d6 #888888 #888888 #d6d6d6;
+    background: -webkit-linear-gradient(90deg, #e6e6e6, #b3b3b3);
+    background: linear-gradient(90deg, #e6e6e6, #b3b3b3);
+}
+
+.buttonPane .button.gray:hover:not([disabled]),
+.buttonPane .button.grey:hover:not([disabled]),
+
+.buttonPane.rbg label.btn.gray:hover:not([disabled]),
+.buttonPane.rbg label.btn.grey:hover:not([disabled]) {
+    border-color: #ebebeb #999999 #999999 #ebebeb;
+    background: -webkit-linear-gradient(90deg, #ffffff, #cccccc);
+    background: linear-gradient(90deg, #ffffff, #cccccc);
+}
+
+.buttonPane .button.gray:active:not([disabled]),
+.buttonPane .button.gray:hover:active:not([disabled]),
+.buttonPane .button.grey:active:not([disabled]),
+.buttonPane .button.grey:hover:active:not([disabled]) {
+    border-color: #888888 #d6d6d6 #d6d6d6 #888888 ;
+    border-width: 3px;
+    border-style: solid;
+    background: -webkit-linear-gradient(90deg, #b3b3b3, #d9d9d9);
+    background: linear-gradient(90deg, #b3b3b3, #d9d9d9);
+}
+
+.buttonPane label.btn.gray:active:not([disabled]),
+.buttonPane label.btn.gray:hover:active:not([disabled]),
+.buttonPane label.btn.grey:active:not([disabled]),
+.buttonPane label.btn.grey:hover:active:not([disabled]) {
+    border-color: #888888 #d6d6d6 #d6d6d6 #888888;
+    background: -webkit-linear-gradient(90deg, #b3b3b3, #d9d9d9);
+    background: linear-gradient(90deg, #b3b3b3, #d9d9d9);
+}
+
+.buttonPane .button.gray.checked:not([disabled]),
+.buttonPane .button.grey.checked:not([disabled]),
+
+.buttonPane label.btn.gray.checked:not([disabled]),
+.buttonPane label.btn.grey.checked:not([disabled]) {
+    border: solid 1px #b3b3b3;
+    background: #cccccc;
+    background: -webkit-linear-gradient(90deg, #bfbfbf, #d9d9d9);
+    background: linear-gradient(90deg, #bfbfbf, #d9d9d9);
+}
+
+
+.buttonPane .button.green:not([disabled]) {
+    border-style: solid;
+    border-width: 3px;
+    border-color: #bdcd6d #738131 #738131 #bdcd6d;
+    background: -webkit-linear-gradient(90deg, #bece6f, #8fa037);
+    background: linear-gradient(90deg, #bece6f, #8fa037);
+}
+.buttonPane.rbg label.btn.green:not([disabled]) {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #bdcd6d #738131 #738131 #bdcd6d;
+    background: -webkit-linear-gradient(90deg, #bece6f, #8fa037);
+    background: linear-gradient(90deg, #bece6f, #8fa037);
+}
+
+.buttonPane .button.green:hover:not([disabled]),
+.buttonPane.rbg label.btn.green:hover:not([disabled]) {
+    border-color: #cbd88c #7f894a #7f894a #cbd88c;
+    background: -webkit-linear-gradient(90deg, #cfdb95, #adc149);
+    background: linear-gradient(90deg, #cfdb95, #adc149);
+}
+
+.buttonPane .button.green:active:not([disabled]),
+.buttonPane .button.green:hover:active:not([disabled]) {
+    border-color: #738131 #bdcd6d #bdcd6d #738131;
+    border-width: 3px;
+    border-style: solid;
+    background: -webkit-linear-gradient(90deg, #8fa037, #b6c75c);
+    background: linear-gradient(90deg, #8fa037, #b6c75c);
+}
+
+.buttonPane.rbg label.btn.green:active:not([disabled]),
+.buttonPane.rbg label.btn.green:hover:active:not([disabled]) {
+    border-color: #738131 #bdcd6d #bdcd6d #738131;
+    background: -webkit-linear-gradient(90deg, #8fa037, #b6c75c);
+    background: linear-gradient(90deg, #8fa037, #b6c75c);
+}
+
+.buttonPane .button.green.checked:not([disabled]),
+.buttonPane.rbg label.btn.green.checked:not([disabled]) {
+    border: solid 1px #8fa037;
+    background: #adc149;
+    background: -webkit-linear-gradient(90deg, #a0b33d, #b6c75c);
+    background: linear-gradient(90deg, #a0b33d, #b6c75c);
+    box-shadow: 2px 2px 3px rgba(143, 160, 55, 0.1) inset;
+}
+
+.buttonPane .button.yellow:not([disabled]) {
+    border-style: solid;
+    border-width: 3px;
+    border-color: #d0ce3e #dfd94e #c1ce45 #dfd94e;
+    background: -webkit-linear-gradient(90deg, #fdfb54, #f3f32a);
+    background: linear-gradient(90deg, #fdfb54, #f3f32a);
+}
+.buttonPane.rbg label.btn.yellow:not([disabled]) {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #bdcd6d #738131 #738131 #bdcd6d;
+    background: -webkit-linear-gradient(90deg, #bece6f, #8fa037);
+    background: linear-gradient(90deg, #bece6f, #8fa037);
+}
+
+.buttonPane .button.yellow:hover:not([disabled]),
+.buttonPane.rbg label.btn.yellow:hover:not([disabled]) {
+    border-color: #fbfa96 #fbfa96 #b8b520 #b8b520;
+    background: -webkit-linear-gradient(90deg, #cfcd44, #dbd810);
+    background: linear-gradient(90deg, #cfcd44, #dbd810);
+}
+
+.buttonPane .button.yellow:active:not([disabled]),
+.buttonPane .button.yellow:hover:active:not([disabled]) {
+    border-color: #738131 #bdcd6d #bdcd6d #738131;
+    border-width: 3px;
+    border-style: solid;
+    background: -webkit-linear-gradient(90deg, #8fa037, #b6c75c);
+    background: linear-gradient(90deg, #8fa037, #b6c75c);
+}
+
+.buttonPane.rbg label.btn.yellow:active:not([disabled]),
+.buttonPane.rbg label.btn.yellow:hover:active:not([disabled]) {
+    border-color: #738131 #bdcd6d #bdcd6d #738131;
+    background: -webkit-linear-gradient(90deg, #8fa037, #b6c75c);
+    background: linear-gradient(90deg, #8fa037, #b6c75c);
+}
+
+.buttonPane .button.yellow.checked:not([disabled]),
+.buttonPane.rbg label.btn.yellow.checked:not([disabled]) {
+    border: solid 1px #8fa037;
+    background: #adc149;
+    background: -webkit-linear-gradient(90deg, #a0b33d, #b6c75c);
+    background: linear-gradient(90deg, #a0b33d, #b6c75c);
+    box-shadow: 2px 2px 3px rgba(143, 160, 55, 0.1) inset;
+}
+
+.buttonPane .button.blue:not([disabled]) {
+    border-style: solid;
+    border-width: 3px;
+    border-color: #78aded #2f70c0 #497fc1 #6982a2;
+    background: -webkit-linear-gradient(90deg, #78aded, #4d92e7);
+    background: linear-gradient(90deg, #78aded, #4d92e7);
+}
+
+.buttonPane .button.blue:hover:not([disabled]) {
+    border-color: #78aded #4d92e7 #4d92e7 #78aded;
+    background: #4d92e7;
+    background: -webkit-linear-gradient(90deg, #9fbfea, #639be7);
+    background: linear-gradient(90deg, #9fbfea, #639be7);
+}
+
+.buttonPane .button.blue:active:not([disabled]),
+.buttonPane .button.blue:hover:active:not([disabled]) {
+    border-color: #4d92e7 #78aded #78aded #4d92e7;
+    border-width: 3px;
+    border-style: solid;
+    background: #45b3cb;
+    background: -webkit-linear-gradient(90deg, #3096ad, #59bbd1);
+    background: linear-gradient(90deg, #3096ad, #59bbd1);
+}
+
+.buttonPane .button.blue.checked:not([disabled]) {
+    border: solid 1px #3096ad;
+    background: #45b3cb;
+    background: -webkit-linear-gradient(90deg, #36a8c1, #59bbd1);
+    background: linear-gradient(90deg, #36a8c1, #59bbd1);
+    box-shadow: 2px 2px 3px rgba(48, 150, 173, 0.1) inset;
+}
+
+
+.buttonPane .button.red:not([disabled]) {
+    border-style: solid;
+    border-width: 3px;
+    border-color: #ff7183 #aa3343 #aa3343 #ff7183;
+    background: -webkit-linear-gradient(90deg, #ff8090, #ff1a38);
+    background: linear-gradient(90deg, #ff8090, #ff1a38);
+}
+.buttonPane .button.red:hover:not([disabled]) {
+    border-color: #ff99a7 #aa5560 #aa5560 #ff99a7;
+    background: -webkit-linear-gradient(90deg, #ffb3bd, #ff4d64);
+    background: linear-gradient(90deg, #ffb3bd, #ff4d64);
+}
+.buttonPane .button.red:active:not([disabled]),
+.buttonPane .button.red:hover:active:not([disabled]) {
+    border-color: #aa3343 #ff7183 #ff7183 #aa3343;
+    border-width: 3px;
+    border-style: solid;
+    background: linear-gradient(90deg, #ff1a38, #ff677a);
+}
+.buttonPane .button.red.checked:not([disabled]) {
+    border: solid 1px #ff1a38;
+    background: #ff4d64;
+    background: -webkit-linear-gradient(90deg, #ff334e, #ff677a);
+    background: linear-gradient(90deg, #ff334e, #ff677a);
+}
+
+/* hilighting buttons for Help mechanism */
+button.button.hilighted {
+    outline-color: blue;
+    outline-width: 5px;
+    outline-style: solid;
+    animation: hilightedButtonPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes hilightedButtonPulse {
+    from {
+        transform: scaleX(1) scaleY(1);
+        opacity: 0.8;
+    }
+    to {
+        transform: scaleX(1.05) scaleY(1.15);
+        opacity: 1.0;
+    }
+}
+
+
+/* not fleshing out yellow states because we do not use yellow
+.buttonPane .button.yellow {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #f7cd4b #a38014 #a38014 #f7cd4b;
+    background: linear-gradient(90deg, #f7ce4f, #d6a40a);
+}
+*/

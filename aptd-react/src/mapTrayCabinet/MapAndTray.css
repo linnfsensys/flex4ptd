@@ -1,0 +1,219 @@
+/* MapAndTray.css */
+
+
+/* disable pointer events on svg g elements when blockInput class is present above */
+#mapTrayInfoPanel.blockInput g {
+    pointer-events: none;
+}
+
+/** following makes g work as a mouse event target */
+g {
+    pointer-events: all;
+}
+
+div#mapCabinetTrayDiv {
+    display: inline-block;
+    /* following is a hack that prevents vertical gaps between inline-block elements.
+     * see https://stackoverflow.com/questions/19038799/why-is-there-an-unexplainable-gap-between-these-inline-block-div-elements
+     */
+    font-size: 0;
+    text-align:left;
+}
+
+div#mapCabinetTrayDiv svg {
+    font-size: 12px;
+}
+
+svg.mapCabinet {
+    background-color: lightgray;
+}
+
+svg.mapSvg {
+  background-color: mediumpurple;
+  display: inline-block;
+}
+
+rect#mapBgRect {
+    fill: #c2c0ae;
+}
+
+
+rect.sz {
+  fill: gray;
+  fill-opacity: .6;
+}
+
+rect.map {
+  fill: hsl(350, 100%, 88%);
+  fill-opacity: .3;
+  stroke: black;
+  stroke-width: 1px;
+}
+
+image.mapLegendImg {
+    pointer-events: none;
+}
+.deleteLegendCircle {
+    fill: white;
+    stroke: black;
+    stroke-width: 1px;
+}
+.deleteLegendCircle:hover {
+    fill: palegoldenrod;
+}
+.deleteLegendText {
+    fill: black;
+    pointer-events: none;
+}
+
+svg circle.sensor {
+    stroke-width: 0px;
+    stroke: black;
+}
+svg circle.sensor.selected {
+    stroke-width: 2px;
+}
+svg circle.sensor:focus {
+    stroke-width: 2px;
+    stroke: blue;
+}
+
+.mapSensorG text {
+  font-family: sans-serif;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+.mapSensorG text {
+    font-size: 9px;
+}
+
+rect.tray {
+  fill: #8a7c83;
+  stroke: black;
+  stroke-width: 1px;
+}
+
+g.trayG.validDropTarget rect.tray {
+    stroke-width: 5px;
+    stroke: green;
+}
+
+rect.helpGestureRect {
+    visibility: visible;
+    fill: #257ce7;
+    stroke: black;
+    stroke-width: 1.5px;
+}
+
+text.helpGestureRect {
+    font-size: 14px;
+    text-anchor: start;
+}
+
+text.helpGestureRect.invisible {
+    visibility: hidden;
+}
+
+rect.helpGestureRect.invisible {
+    visibility: hidden;
+}
+
+rect.cabinetRect {
+    fill: #999999;
+    stroke: black;
+    stroke-width: 1px;
+}
+
+rect.textFieldBody {
+    fill: #ffffff;
+    stroke: black;
+    stroke-width: 2px;
+    border-radius: 5px;
+}
+rect.textFieldBody.selected {
+    fill: #ffffff;
+    stroke: blue;
+    stroke-width: 2px;
+    border-radius: 5px;
+}
+rect.textFieldBody.invisible {
+    visibility: hidden;
+}
+text.textFieldBody {
+    font-size: 12px;
+    text-anchor: start;
+}
+text.textFieldBody.invisible {
+    visibility: hidden;
+}
+svg circle.deleteText {
+    visibility: hidden;
+    pointer-events: visible;
+}
+svg circle.deleteText.selected {
+    visibility: visible;
+    pointer-events: all;
+    /* fill: red; */
+    stroke: black;
+    stroke-width: 1px;
+}
+
+text.deleteX {
+    visibility: hidden;
+    pointer-events: visible;
+}
+text.deleteX.selected {
+    visibility: visible;
+    pointer-events: all;
+}
+
+rect.hoverRect {
+    display: none;
+    fill: #4d4d4d;
+    stroke: black;
+    stroke-width: 0.5px;
+}
+
+text.hoverText {
+    font-size: 12px;
+    fill: white;
+    text-anchor: start;
+    display: none;
+}
+
+g.deleteTextFieldG:hover > g.hoverTextG rect.hoverRect {
+    display: inherit;
+}
+
+g.deleteTextFieldG:hover > g.hoverTextG text.hoverText {
+    display: inherit;
+}
+
+g.apAndCcs text {
+  font-family: sans-serif;
+  font-size: 10px;
+  /*text-anchor: middle;*/
+  dominant-baseline: middle;
+}
+
+svg text {
+  user-select: none;
+}
+
+.draggable {
+    cursor: pointer;
+}
+
+.proxy {
+    /*cursor: crosshair;*/
+    cursor: pointer;
+}
+
+.nonDraggable {
+    cursor: not-allowed;
+}
+
+/* for debug only */
+circle.testing {
+    fill: purple;
+}

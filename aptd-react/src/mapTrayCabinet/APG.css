@@ -1,0 +1,22 @@
+text {
+    text-anchor: middle;
+    dominant-baseline: middle;
+    font-size: 10px;
+}
+
+rect.ap {
+    /*fill: lightgoldenrodyellow;*/
+    fill: none;
+}
+
+rect.ap.selected {
+    stroke: black;
+    stroke-width: 2px;
+}
+
+.apG text.validationError {
+    fill: red;
+    stroke: black;
+    stroke-width: .5px;
+    font-size:24px;
+}

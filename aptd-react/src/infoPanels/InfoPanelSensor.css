@@ -1,0 +1,12 @@
+/* following css is used for Battery Status, in both Sensor & Repeater Info Panels */
+
+#batteryStatusRof.green {
+    color: #437c00;
+}
+#batteryStatusRof.red {
+    color: #940101;
+}
+
+.replaceAnchor {
+    width: 140px;
+}

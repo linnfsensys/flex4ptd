@@ -1,0 +1,45 @@
+.allRepeaters text {
+    text-anchor: middle;
+    dominant-baseline: middle;
+    font-size: 10px;
+}
+
+rect.repeater {
+    /*fill: lightgoldenrodyellow;*/
+    fill: none;
+}
+
+rect.repeater.selected {
+    stroke: black;
+    stroke-width: 2px;
+}
+
+g.repeaterG.validDropTarget rect.repeater,
+g.repeaterG.validDropTarget rect.repeater.selected {
+    stroke: green;
+    stroke-width: 2px;
+}
+
+.repeaterG text.deficient {
+    fill: red;
+    stroke: black;
+    stroke-width: .5px;
+}
+
+circle.firmware.electron {
+    /*fill: #12e015;*/
+    fill: #BA12E0;
+}
+path.firmware.percent {
+    /*stroke: #12e015;*/
+    stroke: #BA12E0;
+}
+
+circle.rfChange.queued.electron {
+    /*fill: #db2518;*/
+    fill: #92c8b9;
+}
+circle.rfChange.started.electron {
+    /*fill: #db2518;*/
+    fill: cyan;
+}

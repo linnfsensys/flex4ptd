@@ -1,0 +1,31 @@
+
+tr.techSupportscrollable {
+    width: 340px;
+}
+
+th.techSupportLoggerName {
+    width: 203px;
+}
+
+th.techSupportPropName {
+    width: 215px;
+}
+
+thead.techSupportScrollable {
+    display: grid;
+    width: 340px;
+}
+
+tbody.techSupportLoggersScrollable {
+    display: block;
+    overflow-y: auto;
+    height: 64vh;
+    width: 340px;
+}
+
+tbody.techSupportPropsScrollable {
+    display: block;
+    overflow-y: auto;
+    height: 67vh;
+    width: 340px;
+}

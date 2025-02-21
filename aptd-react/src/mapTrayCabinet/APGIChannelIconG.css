@@ -1,0 +1,63 @@
+g.apgiChannelG {
+    pointer-events: all;
+}
+
+rect.apgiChannelRect {
+    fill: #e8e8e8;
+    stroke: black;
+    stroke-width: .5px;
+    pointer-events: all;
+}
+
+rect.apgiChannelRect.detected {
+    fill: black;
+    stroke: white;
+    stroke-width: .7px;
+}
+
+rect.apgiChannelRect.detected + text {
+    fill: white;
+}
+
+rect.apgiChannelRect.disabled {
+    stroke: lightgray;
+}
+rect.apgiChannelRect.disabled + text {
+    fill: #969696;
+}
+
+rect.apgiChannelRect.disabled.detected {
+    stroke: white;
+    fill: #696969;
+    stroke-width: .7px;
+}
+
+rect.apgiChannelRect.disabled.detected + text {
+    fill: #a4a4a4;
+}
+
+rect.apgiChannelRect:hover {
+    stroke: blue;
+    fill: palegoldenrod;
+    stroke-width: 1px;
+}
+
+rect.apgiChannelRect + text {
+    pointer-events: none;
+    fill: black;
+}
+
+g.disabled rect.apgiChannelRect {
+    stroke: gray;
+}
+
+g.apgiChannelG text {
+    font-size: 9px;
+    text-anchor: start;
+}
+
+g.apgiChannelG.validDropTarget rect.apgiChannelRect {
+    stroke: green;
+    fill: palegreen;
+    stroke-width: 4px;
+}

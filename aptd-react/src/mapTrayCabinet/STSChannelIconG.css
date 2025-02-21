@@ -1,0 +1,65 @@
+g.stsChannelG {
+    pointer-events: all;
+}
+
+rect.stsChannelRect {
+    fill: #e8e8e8;
+    stroke: black;
+    stroke-width: .5px;
+    pointer-events: all;
+
+    width: 56px;
+}
+
+rect.stsChannelRect.detected {
+    fill: black;
+    stroke: white;
+    stroke-width: .7px;
+}
+
+rect.stsChannelRect.detected + text {
+    fill: white;
+}
+
+rect.stsChannelRect.disabled {
+    stroke: lightgray;
+}
+rect.stsChannelRect.disabled + text {
+    fill: #969696;
+}
+
+rect.stsChannelRect.disabled.detected {
+    stroke: white;
+    fill: #696969;
+    stroke-width: .7px;
+}
+
+rect.stsChannelRect.disabled.detected + text {
+    fill: #a4a4a4;
+}
+
+rect.stsChannelRect:hover {
+    stroke: blue;
+    fill: palegoldenrod;
+    stroke-width: 1px;
+}
+
+rect.stsChannelRect + text {
+    pointer-events: none;
+    fill: black;
+}
+
+g.disabled rect.stsChannelRect {
+    stroke: gray;
+}
+
+g.stsChannelG text {
+    font-size: 9px;
+    text-anchor: start;
+}
+
+g.stsChannelG.validDropTarget rect.stsChannelRect {
+    stroke: green;
+    fill: palegreen;
+    stroke-width: 4px;
+}

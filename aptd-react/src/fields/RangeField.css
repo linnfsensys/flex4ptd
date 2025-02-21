@@ -1,0 +1,24 @@
+.rangeFieldReadout {
+    background-color: #e6e6e6;
+    width: 24px;
+    border: none;
+    color: initial;
+    margin-left: 10px;
+}
+
+tr.rangeField label {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.rangeFieldAndValue {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+div.moreLess {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

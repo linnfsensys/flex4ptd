@@ -1,0 +1,120 @@
+
+svg rect.szRect {
+    fill: gray;
+    fill-opacity: .7;
+}
+
+svg rect.szRect.selected {
+    stroke: black;
+    stroke-width: 2px;
+}
+
+svg g.szRectG.validDropTarget rect.szRect {
+    stroke-width: 2px;
+    stroke: green;
+}
+
+
+svg rect.rotateIconConnecton {
+    visibility: hidden;
+}
+
+svg rect.rotateIconConnecton.selected {
+    visibility: visible;
+    stroke: black;
+    stroke-width: 1px;
+}
+
+svg circle.rotateIcon {
+    visibility: hidden;
+}
+
+svg circle.rotateIcon.selected {
+    visibility: visible;
+    stroke: black;
+    stroke-width: 1px;
+}
+
+.szG text.validationError {
+    fill: red;
+    stroke: black;
+    stroke-width: .5px;
+}
+
+.szRectG>text.arrow {
+    font-size: 14px;
+}
+
+rect.rotationHelpGesture {
+    animation: szPulse 1.4s ease-in-out infinite;
+    x: -3px;
+    y: -3px;
+    width: 76px;
+    height: 31px;
+    fill: none;
+    stroke-width: 1.5px;
+    stroke: #2563e7;
+}
+
+@keyframes szPulse {
+    0% {
+        width: 76px;
+        height: 31px;
+        transform: translateX(0px) translateY(0px);
+    }
+    100% {
+        width: 82px;
+        height: 37px;
+        transform: translateX(-3px) translateY(-3px);
+    }
+}
+
+rect.rotationHelpGestureInner {
+    animation: szPulseInner 1.4s ease-in-out infinite;
+    x: 0px;
+    y: 0px;
+    width: 70px;
+    height: 25px;
+    fill: none;
+    stroke-width: 1.7px;
+    /* stroke: #2563e7; */
+    stroke: #2563e7;
+}
+ @keyframes szPulseInner {
+    0% {
+        width: 70px;
+        height: 25px;
+        transform: translateX(0px) translateY(0px);
+    }
+    100% {
+        width: 76px;
+        height: 31px;
+        transform: translateX(-3px) translateY(-3px);
+    }
+} 
+
+circle.rotationHelpGesture {
+    animation: rotationPulse 1.4s ease-in-out infinite;
+    r: 8px;
+    fill: none;
+    stroke-width: 1.7px;
+    stroke: #2563e7;
+}
+
+@keyframes rotationPulse {
+  0%   {r: 8px;}
+  100% {r: 11px;}
+}
+
+circle.rotationHelpGestureInner {
+    animation: rotationPulseInner 1.4s ease-in-out infinite;
+    r: 5px;
+    fill: none;
+    stroke-width: 1.5px;
+    stroke: #2563e7;
+}
+
+@keyframes rotationPulseInner {
+  0%   {r: 5px;}
+  100% {r: 8px;}
+}

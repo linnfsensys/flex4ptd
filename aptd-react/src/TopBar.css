@@ -1,0 +1,166 @@
+/* TopBar.css */
+
+div#topBar {
+    /*background: linear-gradient(#aaaaaa, #999999);*/
+    background-color: #666666;
+    box-shadow: 0px 6px 2px rgba(0,0,0,0.4);
+    padding: 0 5px 0 5px;
+    display: flex;
+    justify-content: space-around;
+    min-width: 900px;
+    color: white;
+    border-bottom: #bfcf76 solid 4px;
+}
+
+span#sensysLogoSpan {
+    padding-right: 5px;
+    padding-top: 5px;
+}
+a#sensysLogoA {
+    /*background: url('/assets/icons/sensys_logo_black.svg') no-repeat;*/
+    /*background-size: 124.3px, 36px;*/
+    width: 124.3px;
+    height: 36px;
+    pointer-events: none;
+    cursor: default;
+}
+a#sensysLogoA img#sensysLogo {
+    height: 47px;
+    cursor: default;
+}
+
+span.buttonBar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+span#helpGuide button{
+    background-color: #4d92e7;
+    width: 80px;
+    height: 27px;
+    margin-right: 2px;
+}
+
+span#pingScanAndProgress {
+    margin-top: 7px;
+}
+
+span#pingScanAndProgress button{
+    width: 131px;
+    margin-right: 2px;
+}
+span#pingScanAndProgress #helpButton{
+    width: 80px;
+}
+
+#topBar span#pingScanAndProgress img {
+    margin-left: 5px;
+    height: 35px;
+	    width: 35px;
+}
+
+#topBar span#pingScanAndProgress {
+    align-items: center;
+    display: inline-flex;
+    margin-right: 5px;
+    height: 27px;
+}
+
+span#pingScanAndProgress img.visible {
+    visibility: visible;
+}
+span#pingScanAndProgress img.invisible {
+    visibility: hidden;
+}
+span#pingScanAndProgress .progressDiv label {
+    width: 164px;
+}
+
+span#appLogo {
+    font-size: 20px;
+    font-family: Lato, Calibri, Helvetica, Arial, sans-serif;
+    letter-spacing: .15rem;
+    /*padding-top: 10px;*/
+    user-select: none;
+}
+#sensConfigLogoA {
+    cursor: default;
+}
+img#sensConfigLogo {
+    width: 175px;
+}
+
+#awaitingResolution {
+    padding-left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+
+#saveProgressDiv {
+    margin-right: 5px;
+    margin-top: 10px;
+}
+
+button#redo:disabled {
+    width: 66px;
+}
+button#redo {
+    width: 66px;
+}
+
+button#undo:disabled {
+    width: 66px;
+    margin-right: 2px;
+}
+button#undo {
+    width: 66px;
+    margin-right: 2px;
+}
+
+button#save {
+    width: 66px;
+    /*margin-left: 20px;*/
+}
+
+button#save.pink {
+    background-color: pink;
+    width: 66px;
+}
+button#save.pink:hover:not([disabled])  {
+    background-color: #eeb1bb;
+}
+
+button#save.yellow {
+    background-color: #fdfb54;
+    width: 66px;
+}
+button#save.yellow:hover {
+    background-color: #2c40f6;
+}
+button#save.yellow:active {
+    background-color: #3275f3;
+    border: 3px blue solid;
+}
+button#save.yellow:disabled {
+    background-color: #ceeece;
+    width: 66px;
+}
+
+/* css for help balloons */
+div.balloonOverlay {
+  position: fixed;
+  z-index: 3;
+  display: block;
+  height: 100px;
+  top: 39px;
+  pointer-events: none;
+}
+
+svg.balloonOverlay {
+    width: 612px;
+    height: 300px;
+    pointer-events: none;
+}
+

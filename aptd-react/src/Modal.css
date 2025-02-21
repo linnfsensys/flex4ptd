@@ -1,0 +1,119 @@
+.backdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    background-color: rgba(0,0,0,0.2);
+    padding: 50px;
+    overflow: auto;
+    cursor: not-allowed;
+}
+
+.noMsgBackdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    background-color: rgba(0,0,0,0.2);
+    padding: 1px;
+    overflow: auto;
+    cursor: wait;
+}
+
+.modalHeader {
+    height: 20px;
+    background-color: #8fa037;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    cursor: grab;  /* or move */
+}
+
+.modal {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 5px;
+    width: 400px;
+    max-width: 500px;
+    margin: 100px auto;
+    font-size: 1rem;
+    font-weight: 400;
+    white-space: pre-wrap;
+    color: black;
+    cursor: auto;
+}
+
+.modal.bottomModal {
+    width: 550px;
+    max-width: 550px;
+}
+
+.oneButtonErrorModal {
+    border-style: solid;
+    border-width: 2px;
+    border-color: #FF0000;
+}
+
+.modalContent {
+    padding: 30px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.modalContent .buttonPane {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
+
+.fullscreen-light-backdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    background-color: rgba(0,0,0,0.3);
+    padding: 50px;
+    overflow: auto;;
+}
+
+.fullscreen-dark-backdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    background-color: rgba(0,0,0,0.9);
+    padding: 20px;
+    padding-left: 60px;
+    overflow: auto;
+}
+
+.modal-confirm-dialog {
+    background-color: #fff;
+    border-radius: 5px;
+    max-width: 550px;
+    margin: 0px auto;
+    z-index: 4;
+    padding: 30px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.modal-link:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+div.modal-node {
+    padding: 10px;
+}

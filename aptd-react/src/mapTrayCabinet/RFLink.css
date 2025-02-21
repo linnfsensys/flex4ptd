@@ -1,0 +1,27 @@
+.rfLinkPolyline {
+    /*stroke: #c4e3ed;*/
+    stroke: #0046ff;
+    stroke-width: 5px;
+    fill: none;
+    pointer-events: none;
+}
+
+.rfLinkPolyline.selected {
+    /*stroke: #c4e3ed;*/
+    stroke: #e100ff;
+    stroke-width: 7px;
+    fill:none;
+    pointer-events: none;
+}
+
+.rfLinkPolylineBuffer {
+    stroke: none;
+    stroke-width: 7px;
+    fill: none;
+}
+
+
+rect.rfLinkPolylineBuffer.draggable.point:hover {
+    stroke-width: 1px;
+    stroke: black;
+}

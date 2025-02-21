@@ -1,0 +1,73 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    margin: 0;
+}
+
+body.waiting {
+    cursor: wait;
+}
+
+div#root {
+    height: 100vh;
+}
+
+div#mapTrayInfoPanel {
+    display: flex;
+}
+
+div#mapTrayInfoPanel.blockInput {
+    pointer-events: none;
+    opacity: 0.4;
+    cursor: wait;
+}
+
+div#mapTrayInfoPanel.showLoading {
+    cursor: wait;
+}
+
+div#apInitModal.showLoading {
+    cursor: wait;
+}
+
+#apInitModal .modalContent {
+    background-color: white;
+    width: 580px;
+    text-align: center;
+    padding: 10px;
+}
+#apInitModal .modalContent .buttonPane {
+    padding-top: 5px;
+}
+#apInitModal .backdrop {
+    background-color: rgba(0,0,0,0.8);
+}
+#apInitModal .modal.fullscreen-dark-backdrop {
+    width: 640px;
+    max-width: 650px;
+    height: 577px;
+    background-color: gray;
+    margin: auto;
+}
+#apInitModal .modalHeader {
+    display: none;
+}
+
+/*
+ * .noselect is currently used in BottomBar, but would be nice to use
+ * elsewhere to make text be non-selectable.
+ */
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Chrome and Opera */
+}
+
+#root #dummyImage {
+    display: none;
+}
+
+

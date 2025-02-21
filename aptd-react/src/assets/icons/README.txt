@@ -1,0 +1,1 @@
+icons for undo, redo, save are under creative commons license: https://creativecommons.org/licenses/by/3.0/legalcode .  They are from Stefan Taubert in Basic User Interface Elements. https://www.iconfinder.com/iconsets/basic-user-interface-elements

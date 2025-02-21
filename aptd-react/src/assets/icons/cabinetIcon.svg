@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="drawing4.svg"
+   inkscape:version="1.0beta2 (2b71d25, 2019-12-03)"
+   id="svg910"
+   version="1.1"
+   viewBox="0 0 223.38392 224.89584"
+   height="224.89584mm"
+   width="223.38393mm">
+  <defs
+     id="defs904" >
+    <linearGradient id="Gradient1">
+      <stop class="stop1" offset="0%"/>
+      <stop class="stop2" offset="100%"/>
+    </linearGradient>
+    <style type="text/css"><![CDATA[
+        #rect10 {
+          fill: url(#Gradient1);
+        }
+        .stop1 {
+          stop-color: #b3b3b3;
+        }
+        .stop2 {
+          stop-color: #d9d9d9;
+        }
+        rect, path {
+          stroke: gray;
+        }
+      ]]>
+    </style>
+  </defs>
+  <sodipodi:namedview
+     inkscape:window-maximized="0"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:window-height="880"
+     inkscape:window-width="1600"
+     fit-margin-bottom="0"
+     fit-margin-right="0"
+     fit-margin-left="0"
+     fit-margin-top="0"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="585.00001"
+     inkscape:cx="282.14284"
+     inkscape:zoom="0.35"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata907">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(5.1026751,6.6145859)"
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <!-- removed style from rect: fill:#ffffff; -->
+    <rect
+       style=";stroke-width:13.22916667;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect10"
+       width="210.15475"
+       height="211.66667"
+       x="1.5119084"
+       y="-2.4523054e-06" />
+    <path
+       style="fill:none;;stroke-width:13.22916667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 1.5119087,211.66665 C 211.66667,-2.5428572e-6 211.66667,-2.5428572e-6 211.66667,-2.5428572e-6"
+       id="path837"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;;stroke-width:13.22916667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 1.5119087,-2.5428572e-6 C 211.66667,211.66665 211.66667,211.66665 211.66667,211.66665"
+       id="path839"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

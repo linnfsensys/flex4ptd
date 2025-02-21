@@ -1,0 +1,43 @@
+#stsForm h4 {
+    margin-bottom: 4px;
+}
+
+table#configuredChannelsTable,
+table#configuredChannelsTable td,
+table#configuredChannelsTable th {
+    border: 1px dotted gray;
+}
+
+table#configuredChannelsTable td {
+    white-space: nowrap;
+}
+
+table#configuredChannelsTable {
+    border-collapse: collapse;
+    height: min-content;
+    width: min-content;
+    display: block;
+}
+
+#configuredChannelsTable td,
+#configuredChannelsTable th {
+    padding-left: 4px;
+    padding-right: 4px;
+    font-size: 12px;
+}
+
+#colHeaders th {
+    font-weight: bold;
+    background: lightgray;
+}
+
+#stsChannelGroup,
+#stsChannelChannel {
+    width: 200px;
+}
+
+span.duplicateChannelError {
+    align-items: center;
+    display: inline-flex;
+    color: red;
+}

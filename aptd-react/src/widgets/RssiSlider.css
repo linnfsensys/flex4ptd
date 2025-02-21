@@ -1,0 +1,89 @@
+div.rssiViewerDiv {
+    display: flex;
+    flex-direction: row;
+}
+
+img.wifiIcon {
+    padding-right: 10px;
+    padding-top: 7px;
+}
+
+.rssiViewerDiv .slider {
+    display: flex;
+    flex-direction: column;
+}
+
+.slider .minMaxNumbers {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+div.highRange {
+    /*background-image: linear-gradient(to right,#a3ff00, #0bd022);*/
+    background-color: #0bd022;
+    align-items: center;
+    display: inline-flex;
+    margin-bottom: 7px;
+    height: 5px;
+}
+
+div.medRange {
+    /*background-image: linear-gradient(to right, #f0ff00, #a3ff00);*/
+    background-color: #fdff00;
+    align-items: center;
+    display: inline-flex;
+    margin-bottom: 7px;
+    height: 5px;
+}
+
+div.lowRange {
+    /*background-image: linear-gradient(to right, #ff9a00, #fdff00);*/
+    background-color: #ff8100;
+    align-items: center;
+    display: inline-flex;
+    margin-bottom: 7px;
+    height: 5px;
+}
+
+div.alertRange {
+    /*background-image: linear-gradient(to right, #ff2700, #ff8100 );*/
+    background-color: #ff2700;
+    align-items: center;
+    display: inline-flex;
+    margin-bottom: 7px;
+    /*margin-left: 5px;*/
+    height: 5px;
+}
+
+span.rainbowSlider {
+    position: relative;
+    padding-bottom: 15px;
+}
+/*
+div.rainbowSlider {
+    background-image: linear-gradient(to right, red , yellow, green);
+    align-items: center;
+    display: inline-flex;
+    margin-bottom: 5px;
+    margin-left: 10px;
+    width: 300px;
+    height: 5px;
+}
+*/
+
+
+div.deviceStrength {
+    position: absolute;
+    top: 0px;
+    font-size: 10px;
+}
+
+div.section {
+    background-color: black;
+    align-items: center;
+    display: inline-flex;
+    margin-bottom: 6px;
+    width: 2px;
+    height: 7px;
+}

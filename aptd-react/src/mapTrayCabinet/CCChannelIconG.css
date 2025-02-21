@@ -1,0 +1,61 @@
+g.ccChannelG {
+    pointer-events: all;
+}
+
+rect.ccChannelRect {
+    fill: #e8e8e8;
+    stroke: black;
+    stroke-width: .5px;
+    pointer-events: all;
+}
+
+rect.ccChannelRect.detected {
+    fill: black;
+    stroke: white;
+    stroke-width: .7px;
+}
+
+rect.ccChannelRect.detected + text {
+    fill: white;
+}
+
+rect.ccChannelRect.disabled {
+    stroke: lightgray;
+}
+rect.ccChannelRect.disabled + text {
+    fill: #969696;
+}
+
+rect.ccChannelRect.disabled.detected {
+    stroke: white;
+    fill: #696969;
+    stroke-width: .7px;
+}
+
+rect.ccChannelRect.disabled.detected + text {
+    fill: #a4a4a4;
+}
+
+rect.ccChannelRect:hover {
+    stroke: blue;
+    fill: lightpink;
+    stroke-width: 4px;
+}
+
+text.channelText {
+    fill: black;
+}
+
+g.disabled rect.ccChannelRect {
+    stroke: gray;
+}
+
+g.sdlcChannelG text {
+    font-size: 9px;
+}
+
+g.ccChannelG.validDropTarget rect.ccChannelRect {
+    stroke: green;
+    fill: palegreen;
+    stroke-width: 4px;
+}

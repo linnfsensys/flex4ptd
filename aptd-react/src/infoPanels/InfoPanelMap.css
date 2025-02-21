@@ -1,0 +1,8 @@
+#textButtonAndNote {
+    display: flex;
+    align-items: center;
+}
+
+button#textButtonId {
+    width: 134px;
+}

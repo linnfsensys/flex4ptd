@@ -1,0 +1,18 @@
+table.betweenSensors {
+    background: #cecaca;
+}
+
+td.downArrow {
+    font-size: 21px;
+}
+
+table#szForm td.right,
+table.sensorForm td.right,
+table.betweenSensors td.right {
+    width: 120px;
+}
+
+table.betweenSensors td.right {
+    vertical-align: top;
+    padding-top: 5px;
+}

@@ -1,0 +1,80 @@
+table#notesTable {
+    font-size: 10px;
+}
+
+table#channelsTable,
+table#channelsTable th {
+    border: 1px solid black;
+}
+
+table#channelsTable td.cell {
+    white-space: nowrap;
+}
+
+table#channelsTable {
+    border-collapse: collapse;
+    height: min-content;
+    /*width: min-content;*/
+    /*overflow-y: auto;*/
+    /*overflow-x: hidden;*/
+    display: block;
+}
+
+#channelsTable tr.sensor-highlight {
+    background: gold;
+}
+
+#channelsTable td,
+#channelsTable td select,
+#channelsTable th {
+    padding-left: 2px;
+    padding-right: 2px;
+    font-size: 11px;
+}
+
+#channelsTable td {
+    border: 1px dotted black;
+}
+
+#channelsTable td.sensorInfo {
+    padding-left: 8px;
+    border: 1px solid black;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+#colHeaders th {
+    font-weight: bold;
+    background: lightgray;
+}
+
+#colNotes td {
+    font-size: 9px;
+}
+
+#ccBasicForm input[type='text'] {
+    width: 50px;
+}
+
+#chNums {
+    border: 1px solid black;
+    border-bottom: 0;
+}
+
+#chNums:last-child {
+    border-bottom: 1px solid black;
+}
+
+.sensor-row {
+    display: grid;
+    grid-template-columns: 48% 26% 26%;
+}
+
+.sensor-row .fsEnable {
+    display: inline;
+    vertical-align: middle;
+}
+
+.sensor-row .card-ss {
+    margin: auto;
+}

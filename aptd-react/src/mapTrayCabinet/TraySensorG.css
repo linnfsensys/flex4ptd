@@ -1,0 +1,54 @@
+.traySensorG text {
+    font-family: sans-serif;
+    font-size: 12px;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.traySensorG circle.sensor {
+    fill: palegoldenrod;
+    stroke: black;
+}
+
+.traySensorG circle.sensor.gray {
+    fill: #d0d0d0;
+}
+
+.traySensorG text.trayDotidText {
+    fill: black;
+}
+
+.traySensorG.detecting circle.sensor.detecting {
+    fill: black;
+    stroke: white;
+}
+
+.traySensorG.detecting text.trayDotidText {
+    fill: white;
+}
+
+circle.helpgesturecircle {
+    animation: pulse 1.4s ease-in-out infinite;
+    r: 24px;
+    fill: none;
+    stroke-width: 2px;
+    stroke: #2563e7;
+}
+
+@keyframes pulse {
+  0%   {r: 24px;}
+  100% {r: 27px;}
+}
+
+circle.innerhelpgesturecircle {
+    animation: pulseinner 1.4s ease-in-out infinite;
+    r: 21px;
+    fill: none;
+    stroke-width: 2px;
+    stroke: #2563e7;
+}
+
+@keyframes pulseinner {
+  0%   {r: 21px;}
+  100% {r: 24px;}
+}

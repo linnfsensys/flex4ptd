@@ -1,0 +1,47 @@
+div#bottomBar {
+    border: solid 1px dimgray;
+    /*background-image: linear-gradient(rgb(170, 170, 170), rgb(153, 153, 153));*/
+    background-color: #666666;
+    padding: 5px;
+    height: 35px;
+    /*width: 100vw;*/ /* does not work because causes a horiz scroll bar for entire page */
+    display: flex;
+    flex-direction: row;
+    border-top: #bfcf76 solid 4px;
+    color: white;
+}
+
+span#logoutSpan {
+    width: 100px;
+    height: 40px;
+    margin: 0;
+    margin-left: 5px;
+}
+#logoutSpan .button {
+    margin: 0;
+    height: 32px;
+}
+
+span#versionSpan {
+    width: 217px;
+    padding: 10px;
+}
+
+span#betaSpan {
+    font-weight: bold;
+    font-size: larger;
+    color: yellowgreen;
+}
+
+span#middleSpan {
+    padding: 5px;
+    flex: 1;
+}
+
+span#timeSpan {
+    padding: 10px;
+}
+
+span#connected {
+    font-weight: bold;
+}

@@ -1,0 +1,39 @@
+#infoAPInfo.disabled {
+    pointer-events: none;
+}
+
+tr#colorCodeRbgTr > td.cell.buttonGroup {
+    width: 26px;
+}
+
+tr#colorCodeTr > td:first-child {
+    /* width of 1st column for page */
+    width: 20px;
+}
+
+tr#colorCodeTr > td:nth-child(2) {
+    width: 20px;
+    vertical-align: top;
+    padding-left: 126px;
+}
+
+tr#colorCodeTr > td:nth-child(3) {
+    width: 33px;
+}
+
+tr#colorCodeTr > td {
+    vertical-align: top;
+}
+
+button.downloadDisabled {
+    cursor: wait;
+}
+
+
+/* TODO: following is handy for debugging purposes
+         and should be removed in production.
+         It puts a red box around each td and the table.
+table, th, td {
+    border: 1px red solid;
+}
+*/

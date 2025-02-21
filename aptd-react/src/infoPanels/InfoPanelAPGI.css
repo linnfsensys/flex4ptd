@@ -1,0 +1,16 @@
+h4 {
+    font-style: italic;
+}
+
+#apgiForm .buttonPane {
+    display: flex;
+    align-items: center;
+}
+
+#apgiForm #configuredChannelsTable td:nth-child(4) {
+    text-align: right;
+}
+
+button.deleteChannel {
+    margin-left: 5px;
+}

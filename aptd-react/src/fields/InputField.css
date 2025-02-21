@@ -1,0 +1,16 @@
+.inputField .inputLabel {
+    font-weight: bold;
+}
+
+.inputText {
+    border-style: groove;
+}
+
+/* following should be red, but for debugging, could set it to purple.
+         Using purple would distinguish onChange errors from (ValidationManager) onBlur errors.
+         But to the user, the distinction is meaningless, so there should not be a color
+         difference in production.
+ */
+.changeErrorMsg {
+    color: red;
+}

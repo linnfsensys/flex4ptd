@@ -1,0 +1,32 @@
+rect.bgBankRect {
+    fill: white;
+    stroke: none;
+}
+rect.bgBankRect.selected {
+    stroke: black;
+    stroke-width: 4px;
+}
+/* rect.sdlcBankRect {
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+} */
+/* rect.sdlcBankRect.selected {
+    stroke-width: 2px;
+    fill: #b3c7b7;
+    fill-opacity: .2;
+} */
+
+g.bankG {
+    fill: white;
+}
+
+g.bankG text.bankText {
+    fill: black;
+    text-anchor: start;
+}
+
+rect.bankDivider {
+    fill: #5e5e5e;
+    stroke: none;
+}

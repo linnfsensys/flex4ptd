@@ -1,0 +1,10 @@
+.readOnlyField .readOnlyLabel {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.readOnlyField .readOnlyInput {
+    background-color: #f3f3f3;
+    border-style: none;
+    color: initial;
+}

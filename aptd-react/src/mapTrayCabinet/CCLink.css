@@ -1,0 +1,41 @@
+.ccLinkPolyline {
+    stroke: #cb9602;
+    stroke-width: 5px;
+    fill: none;
+    pointer-events: none;
+}
+
+.ccLinkPolyline.NON_CRITICAL {
+    stroke-dasharray: 8 4 2 4;
+}
+
+.ccLinkPolyline.selected {
+    stroke: #dc702d;
+    stroke-width: 7px;
+    fill: none;
+    pointer-events: none;
+}
+
+.ccLinkPolyline.detected {
+    stroke: black;
+    stroke-width: 5px;
+    fill: none;
+}
+
+.ccLinkPolyline.detected.selected {
+    stroke-width: 7px;
+    stroke: #0c6b71;
+}
+
+.ccLinkPolylineBuffer {
+    pointer-events: stroke;
+    visibility: hidden;
+    stroke: blue;
+    stroke-width: 7px;
+    fill: none
+}
+
+rect.ccLinkPolylineBuffer.draggable.point:hover {
+    stroke-width: 1px;
+    stroke: black;
+}

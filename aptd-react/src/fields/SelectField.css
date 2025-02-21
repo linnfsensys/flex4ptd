@@ -1,0 +1,12 @@
+.selectLabel {
+    font-weight: bold;
+}
+
+.selectLabel.disabled {
+    color: rgb(170, 170, 170);
+}
+
+/* make the disabled select options lioghter than the default */
+.cell option:disabled {
+    color: lightgray;
+}

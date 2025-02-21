@@ -1,0 +1,18 @@
+.progressDiv {
+    margin-left: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.progressDiv label {
+    font-weight: normal;
+    font-size: 10px;
+    cursor: inherit;
+}
+
+.progressDiv.visible {
+    visibility: visible;
+}
+.progressDiv.invisible {
+    display: none;
+}
