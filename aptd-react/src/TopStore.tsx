@@ -269,7 +269,7 @@ export default class TopStore extends Component<{}, TopStoreState> {
      */
     enact(actionGroup: ActionGroup, callBack?: ()=>void):void {
         // could use console.debug() here to skip stack trace on each action which makes logs long.
-        console.trace('enact(): actionGroup=', actionGroup);
+        // console.trace('enact(): actionGroup=', actionGroup);
         for (let index = 0; index < actionGroup.actions.length; index++) {
             const action = actionGroup.actions[index];
             if (index === actionGroup.actions.length - 1) {
@@ -1188,7 +1188,7 @@ export default class TopStore extends Component<{}, TopStoreState> {
                 const updateTs:boolean = true;
 
                 if (updateTs) {
-                    console.debug('TopStore.dispatchApTimeAction(): updating time state');
+                    // console.debug('TopStore.dispatchApTimeAction(): updating time state');
                     // we want to reflect time at server, not update it.
                     //const currentTs = (new Date()).getTime();
                     //const timeDiff = clientTimeMs - apTimeMs;
@@ -1202,7 +1202,7 @@ export default class TopStore extends Component<{}, TopStoreState> {
                     return null;
                 }
             } else {
-                console.error('dispatchApTimeAction.setStateFn(): invalid time string: ', newDateData);
+                // console.error('dispatchApTimeAction.setStateFn(): invalid time string: ', newDateData);
                 return null;
             }
         }, callBack);
@@ -2319,7 +2319,7 @@ export default class TopStore extends Component<{}, TopStoreState> {
             if (modalClass !== undefined && modalClass.includes(ModalClass.VALIDATE_CREDENTIALS)) {
                 let newCredentialValidationModalStack: ModalInfo[] = cloneDeep(prevState.credentialValidationModalStack);
                 newCredentialValidationModalStack.push(newModalInfo);
-                console.trace('showModal(): after push, credentialValidationnModalStack=', newCredentialValidationModalStack);
+                // console.trace('showModal(): after push, credentialValidationnModalStack=', newCredentialValidationModalStack);
                 return {
                     credentialValidationModalStack: newCredentialValidationModalStack
                 };
@@ -2404,7 +2404,7 @@ export default class TopStore extends Component<{}, TopStoreState> {
         this.appSetState((prevState: TopStoreState) => {
             let newModalStack: ModalInfo[] = cloneDeep(prevState.modalStack);
             if (newModalStack.length === 0) {
-                console.trace('dismissModal.appSetState(): modalStack already empty');
+                // console.trace('dismissModal.appSetState(): modalStack already empty');
                 return null;
             }
             newModalStack.forEach((modalInfo: ModalInfo, index: number) => {
@@ -2414,7 +2414,7 @@ export default class TopStore extends Component<{}, TopStoreState> {
                     newModalStack.splice(index, 1);
                 }
             });
-            console.trace('dismissAnyModal.appSetState(): about to return stack. newModalStack=', newModalStack, 'classToMatch=', classToMatch);
+            // console.trace('dismissAnyModal.appSetState(): about to return stack. newModalStack=', newModalStack, 'classToMatch=', classToMatch);
             return {modalStack: newModalStack};
         });
     }

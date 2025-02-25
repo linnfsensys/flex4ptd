@@ -450,8 +450,8 @@ export default class WebSocketManager {
         const data: ServerMessage = JSON.parse(msg.data);
         //if (data.otype !== 'GUITime') {
         //console.debug('onMessage: raw msg.data=', msg.data);
-        console.info("received a message: (" + this.nServerMsgs + ") otype=",
-            data.otype, "msg.data=", data);
+        // console.info("received a message: (" + this.nServerMsgs + ") otype=",
+        //     data.otype, "msg.data=", data);
         //}
 
         switch (data.otype) {
@@ -2120,9 +2120,6 @@ export default class WebSocketManager {
             } else {
                 console.error('checkLastGuiTime(): websocket is null');
             }
-        } else {
-            console.debug('checkLastGuiTime(): GUITime arrived in time (' +
-                          timeSinceLastGuiTime + 'ms). doing nothing');
         }
     }
 

@@ -34,6 +34,8 @@ import './AptdApp.css';
 import './button.css';
 
 
+import ZustandBridge from './store/ZustandBridge';
+import ZustandApp from './ZustandApp';
 interface LogManager {
     enableLogging: Function;
     disableLogging: Function;
@@ -150,6 +152,26 @@ export class AptdApp extends React.Component<AptdAppProps, AptdAppState> {
         return (
             <div id='aptdApp'
                  onMouseMove={this.onMouseMove}>
+                {process.env.NODE_ENV === 'development' && <ZustandBridge topStore={this.props.topStore} />}
+
+                {/* add Zustand testing UI, controlled by development flag */}
+                {process.env.NODE_ENV === 'development' && (
+                <div className="zustand-test-container" style={{
+                    position: 'fixed',
+                    right: 10,
+                    top: 10,
+                    zIndex: 9999,
+                    background: 'rgba(255,255,255,0.9)',
+                    padding: 10,
+                    border: '1px solid #ccc',
+                    borderRadius: 5,
+                    maxWidth: 400,
+                    maxHeight: 600,
+                    overflow: 'auto'
+                }}>
+                    <ZustandApp />
+                </div>
+                )}
                 <TopBar undoEnabled={undoManager.hasUndoableXacts() &&
                                      ! undoManager.isBelowSaveLevel()}
                         redoEnabled={undoManager.hasRedoableXacts()}

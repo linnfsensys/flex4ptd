@@ -121,7 +121,7 @@ export default class MapImagesManager {
                 imageType: imageType,
                 label: label,
             };
-            console.debug('mapDatum=', mapDatum);
+            // console.debug('mapDatum=', mapDatum);
             return mapDatum;
         } else {
             console.error('cannot parse fileName: ', fileName);
