@@ -150,122 +150,158 @@ export class AptdApp extends React.Component<AptdAppProps, AptdAppState> {
         body.className = (this.props.topStore.getTopState().ap === null && !navigator.userAgent.includes("Firefox/")) ? 'waiting' : '';
 
         return (
-            <div id='aptdApp'
-                 onMouseMove={this.onMouseMove}>
-                {process.env.NODE_ENV === 'development' && <ZustandBridge topStore={this.props.topStore} />}
+          <div id="aptdApp" onMouseMove={this.onMouseMove}>
+            {process.env.NODE_ENV === "development" && (
+              <ZustandBridge topStore={this.props.topStore} />
+            )}
 
-                {/* add Zustand testing UI, controlled by development flag */}
-                {process.env.NODE_ENV === 'development' && (
-                <div className="zustand-test-container" style={{
-                    position: 'fixed',
+            {/* add Zustand testing UI, controlled by development flag */}
+            {process.env.NODE_ENV === "development" &&
+              process.env.REACT_APP_SHOW_ZUSTAND === "true" && (
+                <div
+                  className="zustand-test-container"
+                  style={{
+                    position: "fixed",
                     right: 10,
                     top: 10,
                     zIndex: 9999,
-                    background: 'rgba(255,255,255,0.9)',
+                    background: "rgba(255,255,255,0.9)",
                     padding: 10,
-                    border: '1px solid #ccc',
+                    border: "1px solid #ccc",
                     borderRadius: 5,
                     maxWidth: 400,
                     maxHeight: 600,
-                    overflow: 'auto'
-                }}>
-                    <ZustandApp />
-                </div>
-                )}
-                <TopBar undoEnabled={undoManager.hasUndoableXacts() &&
-                                     ! undoManager.isBelowSaveLevel()}
-                        redoEnabled={undoManager.hasRedoableXacts()}
-                        doUndo={undoManager.onUndoClicked}
-                        doRedo={undoManager.onRedoClicked}
-                        undoLabel={undoManager.getUndoLabel()}
-                        redoLabel={undoManager.getRedoLabel()}
-                        saveEnabled={AptdApp.isSaveEnabled(this.props.topStore, this.state.undoManager)}
-                        saveColor={this.getSaveColor()}
-                        savePctComplete={topState.savePctComplete}
-                        pingScanStatus={topState.pingScanStatus}
-                        pingScanSecsLeft={topState.pingScanSecsLeft}
-                        showModal={this.props.topStore.showModal}
-                        websocketManager={this.webSocketManager}
-                        topStore={this.props.topStore}
-                        undoManager={undoManager}
-                        helpEngine={this.state.helpEngine}
-                        onHelpGuideClicked={this.onHelpGuideClicked}
-                />
-                <div id={'mapTrayInfoPanel'}
-                     className={topState.downloadInProgress || topState.ap === null ?
-                                "blockInput" :
-                                ((topState.uploadInProgress || topState.loading) ? "showLoading" : "")}
+                    overflow: "auto"
+                  }}
                 >
-                    <MapAndTray scale={topState.ap !== null ? topState.ap.zoomLevel : 1.0}
-                                pan={topState.ap !== null ? topState.ap.pan : {x:0, y:0}}
-                                mapCabinetTrayWidth={this.mapCabinetTrayWidth}
-                                mapCabinetTrayHeight={this.mapCabinetTrayHeight}
-                                trayHeight={this.trayHeight}
-                                mapHeight={this.mapHeight}
-                                mapSensors={topState.mapSensors}
-                                trayDevices={topState.trayDevices}
-                                sensorZones={topState.sensorZones}
-                                ap={topState.ap}
-                                radios={topState.radios}
-                                mapRepeaters={topState.mapRepeaters}
-                                ccCards={topState.ccCards}
-                                sensorDotidToSzId={topState.sensorDotidToSzId}
-                                selectedDotid={selected !== undefined && selected !== null ? selected.selectedDotid : null}
-                                selectedSzId={selected !== undefined && selected !== null ? selected.selectedSzId : null}
-                                selected={selected}
-                                topStore={this.props.topStore}
-                                undoManager={undoManager}
-                                getMapSensorsForSz={this.getMapSensorsForSz}
-                                helpEngine={this.state.helpEngine}
-                                mapImagesManager={this.state.mapImagesManager}
-                                onHelpGuideClicked={this.onHelpGuideClicked}
-                    />
-
-                    <InfoPanel
-                        mapCabinetTrayHeight={this.mapCabinetTrayHeight}
-                        selected={selected}
-                        topStore={this.props.topStore}
-                        undoManager={undoManager}
-                        webSocketManager={this.webSocketManager}
-                        httpManager={this.state.httpManager}
-                        onRequireLoginChanged={this.onRequireLoginChanged}
-                        mapImagesManager={this.state.mapImagesManager!}
-                    />
+                  <ZustandApp />
                 </div>
-                <BottomBar
-                    currentApTime={topState.currentApTime}
-                    currentApTimezone={topState.currentApTimezone}
-                    clientTimeMsAtLastServerUpdate={topState.clientTimeMsAtLastServerUpdate}
-                    connected={this.webSocketManager !== undefined &&
-                               this.webSocketManager !== null &&
-                               this.webSocketManager.connected}
-                    webSocketManager={this.webSocketManager}
-                    topStore={this.props.topStore}
-                />
+              )}
+            <TopBar
+              undoEnabled={
+                undoManager.hasUndoableXacts() &&
+                !undoManager.isBelowSaveLevel()
+              }
+              redoEnabled={undoManager.hasRedoableXacts()}
+              doUndo={undoManager.onUndoClicked}
+              doRedo={undoManager.onRedoClicked}
+              undoLabel={undoManager.getUndoLabel()}
+              redoLabel={undoManager.getRedoLabel()}
+              saveEnabled={AptdApp.isSaveEnabled(
+                this.props.topStore,
+                this.state.undoManager
+              )}
+              saveColor={this.getSaveColor()}
+              savePctComplete={topState.savePctComplete}
+              pingScanStatus={topState.pingScanStatus}
+              pingScanSecsLeft={topState.pingScanSecsLeft}
+              showModal={this.props.topStore.showModal}
+              websocketManager={this.webSocketManager}
+              topStore={this.props.topStore}
+              undoManager={undoManager}
+              helpEngine={this.state.helpEngine}
+              onHelpGuideClicked={this.onHelpGuideClicked}
+            />
+            <div
+              id={"mapTrayInfoPanel"}
+              className={
+                topState.downloadInProgress || topState.ap === null
+                  ? "blockInput"
+                  : topState.uploadInProgress || topState.loading
+                  ? "showLoading"
+                  : ""
+              }
+            >
+              <MapAndTray
+                scale={topState.ap !== null ? topState.ap.zoomLevel : 1.0}
+                pan={topState.ap !== null ? topState.ap.pan : { x: 0, y: 0 }}
+                mapCabinetTrayWidth={this.mapCabinetTrayWidth}
+                mapCabinetTrayHeight={this.mapCabinetTrayHeight}
+                trayHeight={this.trayHeight}
+                mapHeight={this.mapHeight}
+                mapSensors={topState.mapSensors}
+                trayDevices={topState.trayDevices}
+                sensorZones={topState.sensorZones}
+                ap={topState.ap}
+                radios={topState.radios}
+                mapRepeaters={topState.mapRepeaters}
+                ccCards={topState.ccCards}
+                sensorDotidToSzId={topState.sensorDotidToSzId}
+                selectedDotid={
+                  selected !== undefined && selected !== null
+                    ? selected.selectedDotid
+                    : null
+                }
+                selectedSzId={
+                  selected !== undefined && selected !== null
+                    ? selected.selectedSzId
+                    : null
+                }
+                selected={selected}
+                topStore={this.props.topStore}
+                undoManager={undoManager}
+                getMapSensorsForSz={this.getMapSensorsForSz}
+                helpEngine={this.state.helpEngine}
+                mapImagesManager={this.state.mapImagesManager}
+                onHelpGuideClicked={this.onHelpGuideClicked}
+              />
 
-                {/* Following Modal Dialog is shown only on user's initial virgin use of APTD.
-                  * Specifically, when there is no /etc/apeg/aptd/aptdConf.xml file
-                  */}
-                <div id={'apInitModal'} className={topState.loading ? "showLoading" : ""}>
-                    <Modal
-                        /* show if not initialized, or if ap === null */
-                        show={topState.ap !== null &&
-                              ! topState.ap.initialized &&
-                              this.showInitializationModal}
-                        type={ModalType.ONE_BUTTON_SUCCESS}
-                        description={"Welcome to SensConfig.\n" +
-                        "To start, please choose these initial settings..."}
-                        onClicks={[this.onInitializationSave]}
-                        buttonLabels={['Next']}
-                        modalClasses={'fullscreen-dark-backdrop'}
-                        node={this.renderInitializationContent()}
-                        topStore={this.props.topStore}
-                    />
-                </div>
-                {/* Note Modal stack is last component, so it is on top of all the others,
-                  * and prevents clicks from going through */}
-                {this.renderCredentialValidationDialogStack()}
+              <InfoPanel
+                mapCabinetTrayHeight={this.mapCabinetTrayHeight}
+                selected={selected}
+                topStore={this.props.topStore}
+                undoManager={undoManager}
+                webSocketManager={this.webSocketManager}
+                httpManager={this.state.httpManager}
+                onRequireLoginChanged={this.onRequireLoginChanged}
+                mapImagesManager={this.state.mapImagesManager!}
+              />
             </div>
+            <BottomBar
+              currentApTime={topState.currentApTime}
+              currentApTimezone={topState.currentApTimezone}
+              clientTimeMsAtLastServerUpdate={
+                topState.clientTimeMsAtLastServerUpdate
+              }
+              connected={
+                this.webSocketManager !== undefined &&
+                this.webSocketManager !== null &&
+                this.webSocketManager.connected
+              }
+              webSocketManager={this.webSocketManager}
+              topStore={this.props.topStore}
+            />
+
+            {/* Following Modal Dialog is shown only on user's initial virgin use of APTD.
+             * Specifically, when there is no /etc/apeg/aptd/aptdConf.xml file
+             */}
+            <div
+              id={"apInitModal"}
+              className={topState.loading ? "showLoading" : ""}
+            >
+              <Modal
+                /* show if not initialized, or if ap === null */
+                show={
+                  topState.ap !== null &&
+                  !topState.ap.initialized &&
+                  this.showInitializationModal
+                }
+                type={ModalType.ONE_BUTTON_SUCCESS}
+                description={
+                  "Welcome to SensConfig.\n" +
+                  "To start, please choose these initial settings..."
+                }
+                onClicks={[this.onInitializationSave]}
+                buttonLabels={["Next"]}
+                modalClasses={"fullscreen-dark-backdrop"}
+                node={this.renderInitializationContent()}
+                topStore={this.props.topStore}
+              />
+            </div>
+            {/* Note Modal stack is last component, so it is on top of all the others,
+             * and prevents clicks from going through */}
+            {this.renderCredentialValidationDialogStack()}
+          </div>
         );
     }
 
