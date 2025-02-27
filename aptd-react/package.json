@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.5.5",
+    "@types/babel__traverse": "7.14.2",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.6.1",
     "@types/react": "^16.8.23",
@@ -12,7 +13,7 @@
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
     "source-map-explorer": "^2.0.1",
-    "typescript": "^3.4.5",
+    "typescript": "^3.7.0",
     "zustand": "^4.3.9"
   },
   "scripts": {
@@ -23,7 +24,10 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "no-unused-expressions": "off"
+    }
   },
   "browserslist": {
     "production": [
