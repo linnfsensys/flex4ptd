@@ -83,7 +83,7 @@ class InfoPanelMap extends React.Component<InfoPanelMapProps, any> {
     render() {
         return (
             <div id='infoPanelMap'>
-                <div id='infoPanelMapHeader' className='infoPanelHeader'>Map Settings Hot Load
+                <div id='infoPanelMapHeader' className='infoPanelHeader'>Map Settings
                 </div>
                 <TimeZoneUnitsMapDisplay mapChooserRowSize={3}
                                          mapVerbiage="Background map"

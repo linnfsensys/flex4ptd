@@ -178,6 +178,7 @@ export class AptdApp extends React.Component<AptdAppProps, AptdAppState> {
                     topStore={this.props.topStore}
                     webSocketManager={this.webSocketManager}
                     httpManager={this.state.httpManager}
+                    mapImagesManager={this.state.mapImagesManager}
                   />
                 </div>
               )}
