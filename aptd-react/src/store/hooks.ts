@@ -86,51 +86,51 @@ export const useSelection = () => {
 export const useMapDevices = () => {
   return {
     ap: useAppStore(state => state.ap),
-    radios: useAppStore(state => state.radios),
-    mapRepeaters: useAppStore(state => state.mapRepeaters),
-    mapSensors: useAppStore(state => state.mapSensors),
-    sensorZones: useAppStore(state => state.sensorZones),
+    radios: useAppStore(state => state.radios) as {[id: string]: GUIRadioClient},
+    mapRepeaters: useAppStore(state => state.mapRepeaters) as {[id: string]: GUIRepeaterClient},
+    mapSensors: useAppStore(state => state.mapSensors) as {[id: string]: GUISensorClient},
+    sensorZones: useAppStore(state => state.sensorZones) as {[id: string]: GUISZClient},
     trayDevices: useAppStore(state => state.trayDevices),
-    ccCards: useAppStore(state => state.ccCards),
+    ccCards: useAppStore(state => state.ccCards) as {[id: string]: GUICCInterfaceBaseClient},
     sensorDotidToSzId: useAppStore(state => state.sensorDotidToSzId),
     
     // 获取特定设备
-    getRadio: useCallback((radioId: string) => {
-      return useAppStore.getState().radios[radioId]
+    getRadio: useCallback((radioId: string): GUIRadioClient | undefined => {
+      return useAppStore.getState().radios[radioId] as GUIRadioClient
     }, []),
     
-    getMapSensor: useCallback((sensorId: string) => {
-      return useAppStore.getState().mapSensors[sensorId]
+    getMapSensor: useCallback((sensorId: string): GUISensorClient | undefined => {
+      return useAppStore.getState().mapSensors[sensorId] as GUISensorClient
     }, []),
     
-    getMapRepeater: useCallback((repeaterId: string) => {
-      return useAppStore.getState().mapRepeaters[repeaterId]
+    getMapRepeater: useCallback((repeaterId: string): GUIRepeaterClient | undefined => {
+      return useAppStore.getState().mapRepeaters[repeaterId] as GUIRepeaterClient
     }, []),
     
-    getSensorZone: useCallback((szId: string) => {
-      return useAppStore.getState().sensorZones[szId]
+    getSensorZone: useCallback((szId: string): GUISZClient | undefined => {
+      return useAppStore.getState().sensorZones[szId] as GUISZClient
     }, []),
     
     getTrayDevice: useCallback((deviceId: string) => {
       return useAppStore.getState().trayDevices[deviceId]
     }, []),
     
-    getCCCard: useCallback((cardId: string) => {
-      return useAppStore.getState().ccCards[cardId]
+    getCCCard: useCallback((cardId: string): GUICCInterfaceBaseClient | undefined => {
+      return useAppStore.getState().ccCards[cardId] as GUICCInterfaceBaseClient
     }, []),
     
     // 获取特定传感器区域中的所有传感器
-    getMapSensorsForSz: useCallback((szId: string) => {
-      const state = useAppStore.getState()
-      const result: {[sensorId: string]: GUISensorClient} = {}
+    getMapSensorsForSz: useCallback((szId: string): {[sensorId: string]: GUISensorClient} => {
+      const state = useAppStore.getState();
+      const result: {[sensorId: string]: GUISensorClient} = {};
       
       Object.entries(state.sensorDotidToSzId).forEach(([sensorId, currentSzId]) => {
         if (currentSzId === szId && state.mapSensors[sensorId]) {
-          result[sensorId] = state.mapSensors[sensorId]
+          result[sensorId] = state.mapSensors[sensorId] as GUISensorClient;
         }
-      })
+      });
       
-      return result
+      return result;
     }, [])
   }
 }

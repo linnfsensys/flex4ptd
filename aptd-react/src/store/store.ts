@@ -96,7 +96,15 @@ const useAppStore = create<AppStore>()(
         lastRadioPositionById: {},
         validationErrors: {},
         validationGlobalErrors: {},
-        mapSettings: {} as MapSettings,
+        mapSettings: {
+          showRFLinks: true,
+          showCCLinks: true,
+          showLegend: true,
+          showCabinetIcon: false,
+          cabinetIconPosition: {x:0, y:0},
+          northArrowRotationDegrees: 0,
+          textFields: {},
+        },
         httpManager: null,
         techSupport: null,
         pingScanStatus: null,
@@ -179,6 +187,13 @@ const useAppStore = create<AppStore>()(
                 ...state.mapSensors[action.objectId], 
                 ...(action.newData as Partial<GUISensorClient>) 
               }
+            } else if (action.objectType === ObjectType.MAP_SETTINGS && action.newData) {
+              // 处理地图设置更新
+              state.mapSettings = { 
+                ...state.mapSettings, 
+                ...(action.newData as Partial<MapSettings>) 
+              }
+              console.log('更新地图设置:', state.mapSettings)
             }
             // 其他类型的处理...
           }, false, `dispatch/${action.objectType}`)

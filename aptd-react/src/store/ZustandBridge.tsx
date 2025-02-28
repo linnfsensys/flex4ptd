@@ -1,7 +1,7 @@
 import React from 'react'
 import useAppStore from './store'
 import TopStore, { DispatchType } from '../TopStore'
-import { Action } from '../AptdClientTypes'
+import { Action, ObjectType, UpdateType } from '../AptdClientTypes'
 import UndoManager from '../UndoManager'
 import ValidationManager from '../ValidationManager'
 
@@ -42,8 +42,19 @@ class ZustandBridge extends React.Component<ZustandBridgeProps> {
             }
         )
         
+        // 监听Zustand的mapSettings变化，同步到TopStore
+        this.unsubscribeMapSettings = useAppStore.subscribe(
+            state => state.mapSettings,
+            (mapSettings) => {
+                console.log('[ZustandBridge] mapSettings changed in Zustand, syncing to TopStore', mapSettings);
+                // 将Zustand的mapSettings同步到TopStore
+                this.syncZustandToTopStore();
+            }
+        )
+        
         // 重写TopStore的dispatch方法，使其同时更新Zustand
         const originalDispatch = this.props.topStore.dispatch.bind(this.props.topStore)
+        this.originalDispatch = originalDispatch;
         this.props.topStore.dispatch = (action: Action, dispatchType: DispatchType = DispatchType.ORIGINAL, callback?: () => void) => {
             // 先调用原始的dispatch方法
             originalDispatch(action, dispatchType, () => {
@@ -64,6 +75,10 @@ class ZustandBridge extends React.Component<ZustandBridgeProps> {
             this.unsubscribeDispatch()
         }
         
+        if (this.unsubscribeMapSettings) {
+            this.unsubscribeMapSettings()
+        }
+        
         // 恢复原始的dispatch方法
         if (this.originalDispatch) {
             this.props.topStore.dispatch = this.originalDispatch
@@ -72,6 +87,7 @@ class ZustandBridge extends React.Component<ZustandBridgeProps> {
 
     private intervalId: NodeJS.Timeout | null = null
     private unsubscribeDispatch: (() => void) | null = null
+    private unsubscribeMapSettings: (() => void) | null = null
     private originalDispatch: ((action: Action, dispatchType?: DispatchType, callback?: () => void) => void) | null = null
 
     syncTopStoreToZustand = () => {
@@ -89,6 +105,24 @@ class ZustandBridge extends React.Component<ZustandBridgeProps> {
 
             if (process.env.NODE_ENV === 'development') {
                 console.log('[ZustandBridge] Synced TopStore to Zustand', new Date().toISOString())
+            }
+        }
+    }
+
+    syncZustandToTopStore = () => {
+        if (this.props.topStore && this.originalDispatch) {
+            const zustandState = useAppStore.getState();
+            
+            // 同步mapSettings到TopStore
+            this.originalDispatch({
+                objectType: ObjectType.MAP_SETTINGS,
+                objectId: 'mapSettings',
+                updateType: UpdateType.UPDATE,
+                newData: zustandState.mapSettings
+            }, DispatchType.ORIGINAL);
+
+            if (process.env.NODE_ENV === 'development') {
+                console.log('[ZustandBridge] Synced Zustand to TopStore', new Date().toISOString())
             }
         }
     }
