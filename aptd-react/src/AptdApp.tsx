@@ -174,7 +174,11 @@ export class AptdApp extends React.Component<AptdAppProps, AptdAppState> {
                     overflow: "auto"
                   }}
                 >
-                  <ZustandApp />
+                  <ZustandApp 
+                    topStore={this.props.topStore}
+                    webSocketManager={this.webSocketManager}
+                    httpManager={this.state.httpManager}
+                  />
                 </div>
               )}
             <TopBar
