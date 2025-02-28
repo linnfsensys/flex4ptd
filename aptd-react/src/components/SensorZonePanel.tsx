@@ -11,6 +11,7 @@ import UndoManager from '../UndoManager';
 import WebSocketManager from '../WebSocketManager';
 import AptdButton from '../AptdButton';
 import RssiSlider from '../widgets/RssiSlider';
+import SensorPanel from './SensorPanel';
 import '../infoPanels/InfoPanel.css';
 import '../infoPanels/InfoPanelSensorZone.css';
 import '../infoPanels/InfoPanelSensor.css';
@@ -179,47 +180,6 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     return result;
   };
   
-  // 渲染传感器全局错误
-  const renderSensorGlobalErrors = (sensorId: string): React.ReactNode[] => {
-    if (!topStore) return [];
-    
-    const result: React.ReactNode[] = [];
-    const errorKey = `InfoPanel:${ObjectType.MAP_SENSOR}:${sensorId}`;
-    const globalErrors = topStore.getTopState().validationGlobalErrors[errorKey];
-    
-    if (globalErrors !== undefined) {
-      for (let errno = 0; errno < globalErrors.length; errno++) {
-        if (errno > 0) {
-          result.push(<br key={`br-${errno}`} />);
-        }
-        result.push(
-          <span className="globalError" key={errno.toString()}>
-            <img src={ErrorAsteriskIcon} width={17} alt="error" />
-            {globalErrors[errno]}
-          </span>
-        );
-      }
-    }
-    
-    return result;
-  };
-  
-  // 电池状态文本映射
-  const batteryStatusText: {[key in BatteryStatus]: string} = {
-    [BatteryStatus.GOOD]: 'Good',
-    [BatteryStatus.REPLACE]: 'Replace',
-    [BatteryStatus.UNKNOWN]: 'Unknown'
-  };
-  
-  // 处理替换传感器
-  const handleReplaceSensor = (sensorId: string) => {
-    // 这里应该实现替换传感器的逻辑
-    console.log(`替换传感器 ${sensorId}`);
-    
-    // 在实际应用中，这里应该显示一个模态框让用户输入替换传感器的ID
-    // 然后更新状态
-  };
-  
   // 渲染传感器
   const renderSensors = () => {
     if (!szModel || !szModel.sensorIds || !szModel.sensorIds.length) {
@@ -227,163 +187,21 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     }
     
     return szModel.sensorIds.map((sensorId, index) => {
-      const sensorModel = mapSensors[sensorId];
-      if (!sensorModel) return null;
-      
-      // 确定传感器位置文本
-      let position = '';
-      if (szModel.sensorIds.length > 1) {
-        switch (index) {
-          case 0:
-            position = ' (Lead)';
-            break;
-          case 1:
-            if (szModel.sensorIds.length === 2) {
-              position = ' (Trail)';
-            } else if (szModel.sensorIds.length === 3) {
-              position = ' (Middle)';
-            }
-            break;
-          case 2:
-            position = ' (Trail)';
-            break;
-        }
-      }
-      
-      const header = `Sensor ${sensorId}${position}`;
-      const warning = `Sensor ${sensorId} is not reporting`;
-      const objectType = sensorModel.info.location === Location.TRAY ? 
-        ObjectType.TRAY_SENSOR : ObjectType.MAP_SENSOR;
-      
-      const batteryStatus = getSensorBatteryStatus(sensorId);
-      const isUnheard = sensorModel.unheard || !sensorModel.seen;
-      
-      // 检查是否是停车检测区域
-      const stopBarCheck = szModel.otype === 'GUIStopbarSensorZone';
-      const systemContext = getSystemContext();
+      // 创建实际的TopStore和UndoManager实例
+      const actualTopStore = topStore || {} as TopStore;
+      const actualUndoManager = undoManager || {} as UndoManager;
       
       return (
         <React.Fragment key={`sensor-${sensorId}`}>
-          <div className="infoPanelSensor" data-sensorid={sensorId}>
-            <div className="infoPanelSensorHeader infoPanelHeader">{header}</div>
-            <div id="infoPanelSensorGlobalErrors" className="globalErrors">
-              {renderSensorGlobalErrors(sensorId)}
-            </div>
-            
-            {isUnheard && (
-              <span id="infoPanelUnheardWarning">
-                <img src={WarningIcon} width={17} alt="unheard" />
-                {warning}
-              </span>
-            )}
-            
-            <RssiSlider
-              id={sensorId}
-              deviceModel={sensorModel}
-              unseen={isUnheard}
-              topStore={topStore}
-            />
-            
-            <table className="sensorForm">
-              <tbody>
-                <ReadOnlyField 
-                  key={`id64${sensorId}`} 
-                  label="Factory ID"
-                  idName={`id64${sensorId}`}
-                  text={sensorModel.id64}
-                  fieldName="id64" 
-                  deviceType={objectType}
-                  deviceId={sensorId}
-                />
-                
-                <ReadOnlyField 
-                  key={`firmware${sensorId}`} 
-                  label="Software Version"
-                  idName={`firmware${sensorId}`}
-                  text={sensorModel.fwVer === undefined || sensorModel.fwVer === null ? 
-                    '' : sensorModel.fwVer}
-                  fieldName="fwVer" 
-                  deviceType={objectType}
-                  deviceId={sensorId}
-                />
-                
-                <ReadOnlyField 
-                  label="Battery Status"
-                  text={batteryStatusText[batteryStatus]}
-                  theClassName={batteryStatus === BatteryStatus.GOOD ? 'green' : 'red'}
-                  idName="batteryStatusRof"
-                  key="batteryStatus"
-                  fieldName="batteryStatus"
-                  deviceType={ObjectType.MAP_SENSOR}
-                  deviceId={sensorId}
-                />
-                
-                <InputField 
-                  key={`ccExtension${sensorId}`} 
-                  fieldName="ccExtension"
-                  idName={`ccExtension${sensorId}`} 
-                  label="Extension Time"
-                  unit="msec" 
-                  maxLength={5} 
-                  objectId={sensorId}
-                  objectType={objectType}
-                  disabled={objectType === ObjectType.TRAY_SENSOR || 
-                    ((systemContext === 'SCOOT' || systemContext === 'MOVA') && !stopBarCheck)}
-                  text={sensorModel.ccExtension.toString()}
-                  characterType={CharacterType.NONNEGATIVE_INTEGER}
-                  transformValueToStore={(value) => ({ value: parseInt(value) })}
-                  topStore={actualTopStore} 
-                  undoManager={actualUndoManager}
-                />
-                
-                <InputField 
-                  key={`ccDelay${sensorId}`} 
-                  fieldName="ccDelay"
-                  idName={`ccDelay${sensorId}`} 
-                  label="Delay Time"
-                  unit="msec" 
-                  maxLength={5} 
-                  objectId={sensorId}
-                  objectType={objectType}
-                  disabled={objectType === ObjectType.TRAY_SENSOR}
-                  text={sensorModel.ccDelay.toString()}
-                  characterType={CharacterType.NONNEGATIVE_INTEGER}
-                  transformValueToStore={(value) => ({ value: parseInt(value) })}
-                  topStore={actualTopStore} 
-                  undoManager={actualUndoManager}
-                />
-                
-                <tr className="readOnlyField">
-                  <td className="right">
-                    <span className="buttonPane">
-                      <AptdButton 
-                        id={`replace${sensorId}`}
-                        key={`replace${sensorId}`}
-                        theClassName="replaceAnchor gray"
-                        dataDotid={sensorId}
-                        disabled={sensorModel.info.location === Location.TRAY || !sensorModel.configured}
-                        onClick={() => handleReplaceSensor(sensorId)}
-                        text="Replace this Sensor"
-                        title=""
-                      />
-                    </span>
-                  </td>
-                  <td>
-                    <input 
-                      type="text"
-                      value={sensorModel.replacementSensorId === '' || 
-                        sensorModel.replacementSensorId === undefined ? 
-                        '' : `(with ${sensorModel.replacementSensorId})`}
-                      className="cell readOnlyInput replacementInfo"
-                      readOnly={true}
-                      disabled={true}
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <hr/>
-          </div>
+          {/* 使用SensorPanel组件渲染传感器信息 */}
+          <SensorPanel
+            topStore={actualTopStore}
+            undoManager={actualUndoManager}
+            webSocketManager={webSocketManager}
+            indexInSz={index}
+            nSensorsInSz={szModel.sensorIds.length}
+            sensorId={sensorId}
+          />
           
           {/* 如果不是最后一个传感器，添加间隔设置 */}
           {index < szModel.sensorIds.length - 1 && (
