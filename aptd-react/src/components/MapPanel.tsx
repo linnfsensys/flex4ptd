@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useMapSettings, useActions, useAppState, useMapDevices } from '../store/hooks';
+import { useMapSettings, useActions, useAppState, useMapDevices, useAP } from '../store/hooks';
 import CheckboxField from './CheckboxField';
 import AptdButton from '../AptdButton';
 import { TextField, ObjectType, UpdateType } from '../AptdClientTypes';
@@ -18,6 +18,7 @@ interface MapPanelProps {
   webSocketManager?: WebSocketManager | null;
   httpManager?: HttpManager | null;
   mapImagesManager?: MapImagesManager | null;
+  undoManager?: UndoManager;
 }
 
 /**
@@ -28,13 +29,14 @@ const MapPanel: React.FC<MapPanelProps> = ({
   topStore,
   webSocketManager = null,
   httpManager = null,
-  mapImagesManager = null
+  mapImagesManager = null,
+  undoManager
 }) => {
   // 使用Zustand hooks获取状态和操作
   const { mapSettings, updateMapSettings } = useMapSettings();
   const { dispatch } = useActions();
   const { disabled } = useAppState();
-  const { ap } = useMapDevices();
+  const { ap } = useAP();
   
   // 使用ref保存最新的mapSettings值，以便在回调中访问
   const mapSettingsRef = useRef(mapSettings);
@@ -92,7 +94,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
     });
   };
 
-  // 使用传入的实例或创建模拟实例
+  // 创建实际的TopStore实例（如果需要）
   const actualTopStore = topStore || {
     getTopState: () => ({
       ap,
@@ -101,7 +103,9 @@ const MapPanel: React.FC<MapPanelProps> = ({
     dispatch: dispatch
   } as unknown as TopStore;
   
-  const actualUndoManager = (topStore && topStore.undoManager) || {} as UndoManager;
+  // 创建实际的UndoManager实例（如果需要）
+  const actualUndoManager = undoManager || (topStore && topStore.undoManager) || {} as UndoManager;
+  
   const actualHttpManager = httpManager || {} as HttpManager;
   const actualMapImagesManager = mapImagesManager || {} as MapImagesManager;
 

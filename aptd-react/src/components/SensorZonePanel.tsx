@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useMapDevices, useSelection } from '../store/hooks';
+import { useSelection, useSensorZones, useSensors, useAP, useUnitConversion } from '../store/hooks';
 import { ObjectType, CharacterType, BatteryStatus } from '../AptdClientTypes';
 import { UnitTypes, ServerObjectType, Location } from '../AptdServerTypes';
 import InputField from '../fields/InputField';
@@ -42,8 +42,11 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
   webSocketManager
 }) => {
   // 使用Zustand hooks获取状态
-  const { sensorZones, mapSensors, ap } = useMapDevices();
   const { selected } = useSelection();
+  const { sensorZones, updateSensorZone, getSensorsInZone } = useSensorZones();
+  const { mapSensors, updateSensor, getSensorBatteryStatus } = useSensors();
+  const { ap, getSystemContext, getUnitType } = useAP();
+  const { mmToInches, inchesToMm, isImperial } = useUnitConversion();
   
   // 获取选中的传感器区域ID
   const szId = selected && selected.selectedSzId ? selected.selectedSzId : null;
@@ -132,7 +135,8 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
       return 6; // 默认值
     }
     
-    const isDefault = ap?.systemContext === 'DEFAULT';
+    const systemContext = getSystemContext();
+    const isDefault = systemContext === 'DEFAULT';
     const sensitivity = szModel.stopbarSensitivity;
     
     if (!isDefault && sensitivity < 4) {
@@ -200,21 +204,6 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     return result;
   };
   
-  // 获取电池状态
-  const getBatteryStatus = (sensorModel: any): BatteryStatus => {
-    let batteryStatus: BatteryStatus;
-    if (!ap) {
-      batteryStatus = BatteryStatus.UNKNOWN;
-    } else if (sensorModel.voltage === -1) {
-      batteryStatus = BatteryStatus.UNKNOWN;
-    } else if (sensorModel.voltage < ap.sensorLowBatteryThreshold) {
-      batteryStatus = BatteryStatus.REPLACE;
-    } else {
-      batteryStatus = BatteryStatus.GOOD;
-    }
-    return batteryStatus;
-  };
-  
   // 电池状态文本映射
   const batteryStatusText: {[key in BatteryStatus]: string} = {
     [BatteryStatus.GOOD]: 'Good',
@@ -224,8 +213,6 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
   
   // 处理替换传感器
   const handleReplaceSensor = (sensorId: string) => {
-    if (!topStore) return;
-    
     // 这里应该实现替换传感器的逻辑
     console.log(`替换传感器 ${sensorId}`);
     
@@ -268,11 +255,12 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
       const objectType = sensorModel.info.location === Location.TRAY ? 
         ObjectType.TRAY_SENSOR : ObjectType.MAP_SENSOR;
       
-      const batteryStatus = getBatteryStatus(sensorModel);
+      const batteryStatus = getSensorBatteryStatus(sensorId);
       const isUnheard = sensorModel.unheard || !sensorModel.seen;
       
       // 检查是否是停车检测区域
       const stopBarCheck = szModel.otype === 'GUIStopbarSensorZone';
+      const systemContext = getSystemContext();
       
       return (
         <React.Fragment key={`sensor-${sensorId}`}>
@@ -340,7 +328,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
                   objectId={sensorId}
                   objectType={objectType}
                   disabled={objectType === ObjectType.TRAY_SENSOR || 
-                    ((ap?.systemContext === 'SCOOT' || ap?.systemContext === 'MOVA') && !stopBarCheck)}
+                    ((systemContext === 'SCOOT' || systemContext === 'MOVA') && !stopBarCheck)}
                   text={sensorModel.ccExtension.toString()}
                   characterType={CharacterType.NONNEGATIVE_INTEGER}
                   transformValueToStore={(value) => ({ value: parseInt(value) })}
@@ -402,15 +390,13 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
             <React.Fragment>
               <table key={`between${index}`} className="betweenSensors">
                 <tbody>
-                  {ap?.units === UnitTypes.IMPERIAL ? (
+                  {isImperial() ? (
                     <React.Fragment key={`spacings${index}`}>
                       {/* Imperial 版本 */}
                       <tr>
                         <InputField 
                           label="Separation"
-                          text={webSocketManager ? 
-                            WebSocketManager.mmToInches(szModel.spacingsMm[index]) : 
-                            szModel.spacingsMm[index]}
+                          text={mmToInches(szModel.spacingsMm[index])}
                           idName={`${szId}separation${index}`}
                           key={`${szId}separation${index}`}
                           row={false}
@@ -423,9 +409,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
                           unit="in"
                           characterType={CharacterType.NONNEGATIVE_FLOAT}
                           required={true}
-                          transformValueToStore={webSocketManager ? 
-                            WebSocketManager.inchesToMm : 
-                            (value) => ({ value })}
+                          transformValueToStore={inchesToMm}
                           topStore={actualTopStore}
                           undoManager={actualUndoManager}
                         />
@@ -435,9 +419,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
                       </tr>
                       <InputField  
                         label="Length Correction"
-                        text={webSocketManager ? 
-                          WebSocketManager.mmToInches(szModel.lengthCorrectionsMm[index]) : 
-                          szModel.lengthCorrectionsMm[index]}
+                        text={mmToInches(szModel.lengthCorrectionsMm[index])}
                         idName={`${szId}lengthCorrection${index}`}
                         key={`${szId}lengthCorrection${index}`}
                         fieldName="lengthCorrectionsMm"
@@ -448,9 +430,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
                         unit="in"
                         characterType={CharacterType.FLOAT}
                         required={false}
-                        transformValueToStore={webSocketManager ? 
-                          WebSocketManager.inchesToMm : 
-                          (value) => ({ value })}
+                        transformValueToStore={inchesToMm}
                         topStore={actualTopStore}
                         undoManager={actualUndoManager}
                       />
@@ -522,7 +502,6 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
   
   const otypeErrorPresent = checkOtypeError();
   const key = 'sensorZoneUse_' + szId;
-  const isImperial = ap?.units === UnitTypes.IMPERIAL;
   
   return (
     <div id="infoPanelSensorZone">
@@ -566,8 +545,8 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
                       szModel.stopbarSensitivity === undefined) ||
                       otypeErrorPresent}
             value={getAdjustedSensitivity()}
-            min={ap?.systemContext === 'DEFAULT' ? 1 : 4}
-            max={ap?.systemContext === 'DEFAULT' ? 15 : 9}
+            min={getSystemContext() === 'DEFAULT' ? 1 : 4}
+            max={getSystemContext() === 'DEFAULT' ? 15 : 9}
             step={1}
             key={'szSensitivity' + szId}
             idName="szSensitivity"
