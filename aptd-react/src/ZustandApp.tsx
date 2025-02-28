@@ -4,6 +4,7 @@ import ExampleComponent from './store/ExampleComponent';
 import MapPanel from './components/MapPanel';
 import RadioPanel from './components/RadioPanel';
 import APTabsPanel from './components/APTabsPanel';
+import SensorZonePanel from './components/SensorZonePanel';
 import WebSocketManager from './WebSocketManager';
 import HttpManager from './HttpManager';
 import TopStore from './TopStore';
@@ -36,6 +37,8 @@ const ZustandApp: React.FC<ZustandAppProps> = ({
       setActivePanel('ap');
     } else if (selected.selectedDeviceType === ObjectType.RADIO) {
       setActivePanel('radio');
+    } else if (selected.selectedDeviceType === ObjectType.SENSOR_ZONE) {
+      setActivePanel('sensorZone');
     } else if (
       selected.selectedDeviceType === ObjectType.MAP || 
       selected.selectedDeviceType === ObjectType.MAP_SETTINGS ||
@@ -63,7 +66,20 @@ const ZustandApp: React.FC<ZustandAppProps> = ({
       
       {activePanel === 'radio' && (
         <div style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f0f8ff' }}>
-          <RadioPanel />
+          <RadioPanel 
+            topStore={topStore}
+            undoManager={topStore?.undoManager}
+          />
+        </div>
+      )}
+
+      {activePanel === 'sensorZone' && (
+        <div id="sensorSzPanel" style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f0fff0' }}>
+          <SensorZonePanel 
+            topStore={topStore}
+            undoManager={topStore?.undoManager}
+            webSocketManager={webSocketManager}
+          />
         </div>
       )}
 
