@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useMapSettings, useMapDevices, useSelection, useAP } from '../store/hooks';
 import { TextField as BaseTextField, ObjectType } from '../AptdClientTypes';
 import './MapAndTrayPanel.css';
@@ -13,8 +13,11 @@ import { GUIPoint } from '../AptdServerTypes';
 // Import device icons
 const RadioIcon = require('../assets/icons/spp.png');
 const RepeaterIcon = require('../assets/icons/SensysSkinMapRepeater.png');
-const SensorIcon = require('../assets/icons/empty_rssi_icon.png'); // 使用已有的图标作为传感器图标
+const SensorIcon = require('../assets/icons/empty_rssi_icon.png');
 const APIcon = require('../assets/icons/ap_diamond.png');
+const NorthArrowIcon = require('../assets/icons/north_arrow_icon.png');
+const MapZoomIn = require('../assets/icons/map_zoom_plus.png');
+const MapZoomOut = require('../assets/icons/map_zoom_minus.png');
 
 // Define Hilight interface locally
 interface Hilight {
@@ -56,6 +59,18 @@ interface MapSettings {
   sensorZones?: {[id: string]: SensorZone};
 }
 
+// Define Point interface similar to original
+interface Point {
+  x: number;
+  y: number;
+}
+
+// Define WidthHeight interface
+interface WidthHeight {
+  width: number;
+  height: number;
+}
+
 // Define sensor and repeater types
 interface GUISensor {
   id: string;
@@ -95,6 +110,9 @@ interface MapAndTrayPanelProps {
   mapCabinetTrayHeight: number;
   trayHeight: number;
   mapHeight: number;
+  leftCabinetPresent?: boolean; // Add this prop to control left cabinet visibility
+  rightCabinetPresent?: boolean; // Add this prop to control right cabinet visibility
+  cabinetWidth?: number; // Width of cabinets
 }
 
 /**
@@ -108,7 +126,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   mapCabinetTrayWidth,
   mapCabinetTrayHeight,
   trayHeight,
-  mapHeight
+  mapHeight,
+  leftCabinetPresent = false,
+  rightCabinetPresent = true,
+  cabinetWidth = 60
 }) => {
   // 使用Zustand hooks获取状态和操作
   const { mapSettings } = useMapSettings();
@@ -141,6 +162,59 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   
   // 选中的托盘设备状态
   const [selectedTrayDevice, setSelectedTrayDevice] = useState<string | null>(null);
+  
+  // Map dimensions calculations (similar to updateMapDimensions in original)
+  const mapWidth = useMemo(() => {
+    return mapCabinetTrayWidth - (leftCabinetPresent ? cabinetWidth : 0) - (rightCabinetPresent ? cabinetWidth : 0);
+  }, [mapCabinetTrayWidth, leftCabinetPresent, rightCabinetPresent, cabinetWidth]);
+  
+  // Calculate map SVG position
+  const mapSvgXY = useMemo(() => {
+    return {
+      x: leftCabinetPresent ? cabinetWidth : 0,
+      y: 0
+    };
+  }, [leftCabinetPresent, cabinetWidth]);
+  
+  // Get map image dimensions - matching original getMapImageWidthHeight() method
+  const mapImageDimensions = useMemo((): WidthHeight => {
+    let widthHeight: WidthHeight;
+    if (mapImagesManager === null) {
+      widthHeight = {width: 1680, height: 1680};
+    } else if (mapImagesManager.isCustomMapSelected() && mapImagesManager.customMapExists) {
+      widthHeight = {width: 1680, height: 1680};
+    } else {
+      const mapDatum = mapImagesManager.getCurrentMapDatum();
+      if (mapDatum !== null && mapDatum !== undefined) {
+        widthHeight = {
+          width: mapDatum.width,
+          height: mapDatum.height,
+        };
+      } else {
+        widthHeight = {width: 1680, height: 1680};
+      }
+    }
+    return widthHeight;
+  }, [mapImagesManager]);
+  
+  // Determine map view box
+  const mapViewBox = useMemo(() => {
+    return `0 0 ${mapWidth} ${mapHeight}`;
+  }, [mapWidth, mapHeight]);
+  
+  // Calculate map elements transform
+  const mapElementsTransform = useMemo(() => {
+    // Match the original transform logic - scale first, then translate
+    return `scale(${zoomLevel}) translate(${pan.x} ${pan.y})`;
+  }, [pan.x, pan.y, zoomLevel]);
+  
+  // Calculate map XY position for background rectangle and image - using original calculation
+  const mapXY = useMemo(() => {
+    // Original calculation: (mapWidth/scale - mapImageWidth)/2.0
+    const mapX = (mapWidth/zoomLevel - mapImageDimensions.width)/2.0;
+    const mapY = (mapHeight/zoomLevel - mapImageDimensions.height)/2.0;
+    return { x: mapX, y: mapY };
+  }, [mapWidth, mapHeight, zoomLevel, mapImageDimensions]);
   
   // 引用
   const mapRef = useRef<HTMLDivElement>(null);
@@ -187,9 +261,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     }
     
     const rect = mapRef.current.getBoundingClientRect();
+    // 使用与原始版本相似的转换逻辑
     return {
-      x: (e.clientX - rect.left) / zoomLevel - pan.x,
-      y: (e.clientY - rect.top) / zoomLevel - pan.y
+      x: (e.clientX - rect.left - (mapWidth/2)) / zoomLevel - pan.x,
+      y: (e.clientY - rect.top - (mapHeight/2)) / zoomLevel - pan.y
     };
   };
   
@@ -211,6 +286,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     // 只处理左键点击
     if (e.button !== 0) return;
     
+    // 阻止事件传播和默认行为
+    e.stopPropagation();
+    e.preventDefault();
+    
     // 开始拖动
     const mousePos = {
       x: e.clientX,
@@ -223,6 +302,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   // 处理地图鼠标移动事件
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isDragging) {
+      // 阻止事件传播和默认行为
+      e.stopPropagation();
+      e.preventDefault();
+      
       const mousePos = {
         x: e.clientX,
         y: e.clientY
@@ -233,8 +316,12 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   };
   
   // 处理地图鼠标释放事件
-  const handleMouseUp = () => {
+  const handleMouseUp = (e: React.MouseEvent) => {
     if (isDragging) {
+      // 阻止事件传播和默认行为
+      e.stopPropagation();
+      e.preventDefault();
+      
       stopDragging();
       
       // 持久化到AP状态
@@ -307,9 +394,13 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   // 处理缩放
   const handleZoom = (direction: 'in' | 'out') => {
     const zoomFactor = direction === 'in' ? 1.1 : 0.9;
-    const newZoomLevel = Math.max(0.5, Math.min(2.0, zoomLevel * zoomFactor));
+    // 原始版本对缩放限制是0.1到8.0
+    const newZoomLevel = Math.max(0.1, Math.min(8.0, zoomLevel * zoomFactor));
     
+    // 更新状态
     setZoomLevel(newZoomLevel);
+    
+    // 持久化到AP状态
     updateZoomLevel(newZoomLevel);
   };
   
@@ -326,7 +417,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     
     return Object.entries(sensorZones).map(([szId, szData]) => {
       const isSelected = selected?.selectedSzId === szId;
-      const position = (szData as any).position || { x: 0, y: 0 };
+      const position = (szData as any).info?.position || (szData as any).position || { x: 0, y: 0 };
       
       const szSensors = Object.entries(mapSensors || {})
         .filter(([sensorId]) => sensorDotidToSzId[sensorId] === szId)
@@ -399,8 +490,9 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       return rfLinks.map((link: RFLink, index: number) => {
         const targetId = link.dstId;
         const targetDevice = radios[targetId];
-        const sensorPosition = (sensorData as any).position;
-        const targetPosition = targetDevice ? (targetDevice as any).position : null;
+        const sensorPosition = (sensorData as any).info?.position || (sensorData as any).position;
+        const targetPosition = targetDevice ? 
+          ((targetDevice as any).info?.position || (targetDevice as any).position) : null;
         
         if (!targetPosition || !sensorPosition) return null;
         
@@ -440,7 +532,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     
     return Object.entries(radios).map(([radioId, radioData]) => {
       const isSelected = selected?.selectedDotid === radioId;
-      const position = (radioData as any).position || { x: 0, y: 0 };
+      const position = (radioData as any).info?.position || (radioData as any).position || { x: 0, y: 0 };
       
       return (
         <g 
@@ -473,7 +565,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     
     return Object.entries(mapRepeaters).map(([repeaterId, repeaterData]) => {
       const isSelected = selected?.selectedDotid === repeaterId;
-      const position = (repeaterData as any).position || { x: 0, y: 0 };
+      const position = (repeaterData as any).info?.position || (repeaterData as any).position || { x: 0, y: 0 };
       
       return (
         <g 
@@ -506,7 +598,11 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     
     return Object.entries(trayDevices).map(([deviceId, deviceData], index) => {
       const isSelected = selectedTrayDevice === deviceId;
-      const xPosition = 25 + (index * 43);
+      // 使用设备自己的位置信息，如果有的话
+      const devicePosition = (deviceData as any).info?.position || (deviceData as any).position;
+      // 如果设备没有位置信息，则使用计算的位置
+      const xPosition = devicePosition ? devicePosition.x : 25 + (index * 43);
+      const yPosition = devicePosition ? devicePosition.y : 9;
       
       // 检查设备类型，根据设备类型的字段确定是传感器还是中继器
       // 在原始代码中，设备类型存储在otype字段中
@@ -518,7 +614,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             key={deviceId}
             id={deviceId}
             className={`traySensorG draggable dotid-${deviceId} ${isSelected ? 'selected' : ''}`}
-            transform={`translate(${xPosition}, 9)`}
+            transform={`translate(${xPosition}, ${yPosition})`}
             data-dotid={deviceId}
             data-devicetype={ObjectType.TRAY_SENSOR}
             onMouseDown={(e) => handleTrayDeviceMouseDown(e, deviceId)}
@@ -536,7 +632,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             key={deviceId}
             id={deviceId}
             className={`trayRepeaterG draggable dotid-${deviceId} ${isSelected ? 'selected' : ''}`}
-            transform={`translate(${xPosition}, 9)`}
+            transform={`translate(${xPosition}, ${yPosition})`}
             data-dotid={deviceId}
             data-devicetype={ObjectType.TRAY_REPEATER}
             onMouseDown={(e) => handleTrayDeviceMouseDown(e, deviceId)}
@@ -561,10 +657,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   
   // 渲染AP
   const renderAP = () => {
-    if (!ap || !(ap as any).position) return null;
+    if (!ap) return null;
     
     const isSelected = selected?.selectedDotid === 'AP';
-    const position = (ap as any).position;
+    const position = (ap as any).info?.position || (ap as any).position || { x: 0, y: 0 };
     
     return (
       <g 
@@ -642,55 +738,59 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
         id="mapCabinetSvg"
         data-devicetype={ObjectType.MAP}
       >
-        {/* 左侧机柜 */}
-        <g className="cabinetG" key="left" transform="translate(0, 0)">
-          <rect
-            className="cabinetRect"
-            width={60}
-            height={mapHeight}
-          />
-          {/* 左侧机柜卡片 */}
-        </g>
+        {/* Left cabinet - conditionally rendered based on leftCabinetPresent */}
+        {leftCabinetPresent && (
+          <g className="cabinetG" key="left" transform="translate(0, 0)">
+            <rect
+              className="cabinetRect"
+              width={cabinetWidth}
+              height={mapHeight}
+            />
+            {/* Left cabinet cards could be rendered here */}
+          </g>
+        )}
         
-        {/* 地图 SVG */}
+        {/* Map SVG - using original structure and properties */}
         <svg 
-          x={60} 
-          y={0}
+          x={mapSvgXY.x} 
+          y={mapSvgXY.y}
           className="mapSvg" 
           id="mapSvg"
-          width={mapCabinetTrayWidth - 120} // 减去左右两侧机柜宽度
+          width={mapWidth}
           height={mapHeight}
-          viewBox={`0 0 ${mapCabinetTrayWidth - 120} ${mapHeight}`}
-          preserveAspectRatio="xMidYMid meet"
+          viewBox={mapViewBox}
+          transform="scale(1)"
         >
-          {/* 地图元素组 */}
+          {/* Map elements group - using original transform structure */}
           <g 
             className="mapElementsG" 
-            transform={`translate(${mapCabinetTrayWidth/2 - 120} ${mapHeight/2}) scale(${zoomLevel})`}
+            transform={mapElementsTransform}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
           >
-            {/* 地图背景图 */}
-            <g className="mapImageG" onMouseUp={handleMouseUp}>
+            {/* Map background image */}
+            <g 
+              className="mapImageG"
+              onMouseUp={handleMouseUp}
+            >
               <rect 
                 id="mapBgRect"
-                x={-mapCabinetTrayWidth/2}
-                y={-mapHeight/2}
-                width={mapCabinetTrayWidth - 120}
-                height={mapHeight}
+                x={mapXY.x} 
+                y={mapXY.y}
+                width={mapImageDimensions.width} 
+                height={mapImageDimensions.height}
               />
               <image 
                 id="mapImage"
-                x={-mapCabinetTrayWidth/2}
-                y={-mapHeight/2}
-                width={mapCabinetTrayWidth - 120}
-                height={mapHeight}
+                x={mapXY.x} 
+                y={mapXY.y}
+                width={mapImageDimensions.width} 
+                height={mapImageDimensions.height}
                 xlinkHref={mapImagesManager?.getCurrentMapUrl() || ''}
-                preserveAspectRatio="xMidYMid meet"
               />
             </g>
             
-            {/* 北箭头图标 */}
+            {/* North arrow icon */}
             <g 
               className="gNorthArrowIconOutter selectable" 
               data-devicetype="MAP_NORTH_ARROW_ICON" 
@@ -708,30 +808,37 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
                 className="gNorthArrowIcon draggable" 
                 data-dotid="image" 
                 data-devicetype="MAP_NORTH_ARROW_ICON"
-              />
+              >
+                <image 
+                  width="35" 
+                  height="35" 
+                  xlinkHref={NorthArrowIcon}
+                  className="northArrowIcon"
+                />
+              </g>
             </g>
             
-            {/* RF链接 */}
+            {/* RF links */}
             <g className="allRfLinks">
               {renderRFLinks()}
             </g>
             
-            {/* CC链接 */}
+            {/* CC links */}
             <g className="allCCLinks">
               {renderCCLinks()}
             </g>
             
-            {/* 传感器区域 */}
+            {/* Sensor zones */}
             <g className="allMapSensorZones">
               {renderSensorZones()}
             </g>
             
-            {/* 无线电 */}
+            {/* Radios */}
             <g className="allRadios">
               {renderRadios()}
             </g>
             
-            {/* 中继器 */}
+            {/* Repeaters */}
             <g className="allRepeaters">
               {renderRepeaters()}
             </g>
@@ -739,41 +846,45 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             {/* AP */}
             {renderAP()}
             
-            {/* 测试 */}
+            {/* Testing */}
             <g className="testing" />
           </g>
           
-          {/* 缩放控制 */}
+          {/* Zoom controls */}
           <image 
-            x={mapCabinetTrayWidth - 130} 
+            x={mapWidth - 70}
             y={mapHeight - 120}
             width="30"
             height="30"
             id="mapZoomIn"
+            xlinkHref={MapZoomIn}
             onClick={() => handleZoom('in')}
           />
           <image 
-            x={mapCabinetTrayWidth - 130} 
+            x={mapWidth - 70}
             y={mapHeight - 90}
             width="30"
             height="30"
             id="mapZoomOut"
+            xlinkHref={MapZoomOut}
             onClick={() => handleZoom('out')}
           />
         </svg>
         
-        {/* 右侧机柜 */}
-        <g className="cabinetG" transform={`translate(${mapCabinetTrayWidth - 60}, 0)`} key="right">
-          <rect
-            className="cabinetRect"
-            width={60}
-            height={mapHeight}
-          />
-          {renderCabinetCards()}
-        </g>
+        {/* Right cabinet - conditionally rendered based on rightCabinetPresent */}
+        {rightCabinetPresent && (
+          <g className="cabinetG" transform={`translate(${mapCabinetTrayWidth - cabinetWidth}, 0)`} key="right">
+            <rect
+              className="cabinetRect"
+              width={cabinetWidth}
+              height={mapHeight}
+            />
+            {renderCabinetCards()}
+          </g>
+        )}
       </svg>
       
-      {/* 托盘 */}
+      {/* Tray */}
       <div id="trayDiv" style={{ width: mapCabinetTrayWidth, position: 'absolute', top: mapHeight }}>
         <svg 
           id="traySvg"
