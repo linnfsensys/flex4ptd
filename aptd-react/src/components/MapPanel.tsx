@@ -12,6 +12,7 @@ import UndoManager from '../UndoManager';
 import HttpManager from '../HttpManager';
 import MapImagesManager from '../MapImagesManager';
 import WebSocketManager from '../WebSocketManager';
+import MapAndTrayPanel from './MapAndTrayPanel';
 
 interface MapPanelProps {
   topStore?: TopStore;
@@ -110,123 +111,139 @@ const MapPanel: React.FC<MapPanelProps> = ({
   const actualMapImagesManager = mapImagesManager || {} as MapImagesManager;
 
   return (
-    <div id="infoPanelMap">
-      <div id="infoPanelMapHeader" className="infoPanelHeader">地图设置</div>
+    <div className="map-panel-container">
+      {/* 添加MapAndTrayPanel组件 */}
+      <div className="map-and-tray-container" style={{ height: '600px', marginBottom: '20px' }}>
+        <MapAndTrayPanel 
+          topStore={topStore}
+          undoManager={undoManager}
+          mapImagesManager={mapImagesManager}
+          mapCabinetTrayWidth={800}
+          mapCabinetTrayHeight={600}
+          trayHeight={150}
+          mapHeight={450}
+        />
+      </div>
       
-      {/* 添加 TimeZoneUnitsMapDisplay 组件 */}
-      <TimeZoneUnitsMapDisplay 
-        mapChooserRowSize={3}
-        mapVerbiage="背景地图"
-        apModel={ap}
-        initialization={false}
-        topStore={actualTopStore}
-        undoManager={actualUndoManager}
-        httpManager={actualHttpManager}
-        mapImagesManager={actualMapImagesManager}
-      />
-      
-      <div>
-        <table>
-          <tbody>
-            <tr><td><b/></td><td></td></tr>
-            <tr>
-              <td colSpan={2}>
-                <h4>地图功能</h4>
-                <hr/>
-              </td>
-            </tr>
-            <tr className="checkboxField row showRFLinks">
-              <td className="cell right">
-                <input 
-                  type="checkbox" 
-                  className="left" 
-                  id="showRFLinks" 
-                  checked={mapSettings.showRFLinks || false}
-                  onChange={(e) => handleCheckboxChange(e.target.checked, 'showRFLinks')}
-                  disabled={disabled}
-                />
-              </td>
-              <td className="left">
-                <label htmlFor="showRFLinks" className="cell checkboxFieldLabel left">
-                  显示RF连接&nbsp;
-                </label>
-              </td>
-            </tr>
-            <tr className="checkboxField row showCCLinks">
-              <td className="cell right">
-                <input 
-                  type="checkbox" 
-                  className="left" 
-                  id="showCCLinks" 
-                  checked={mapSettings.showCCLinks || false}
-                  onChange={(e) => handleCheckboxChange(e.target.checked, 'showCCLinks')}
-                  disabled={disabled}
-                />
-              </td>
-              <td className="left">
-                <label htmlFor="showCCLinks" className="cell checkboxFieldLabel left">
-                  显示CC连接&nbsp;
-                </label>
-              </td>
-            </tr>
-            <tr className="checkboxField row showLegend">
-              <td className="cell right">
-                <input 
-                  type="checkbox" 
-                  className="left" 
-                  id="showLegend" 
-                  checked={mapSettings.showLegend || false}
-                  onChange={(e) => handleCheckboxChange(e.target.checked, 'showLegend')}
-                  disabled={disabled}
-                />
-              </td>
-              <td className="left">
-                <label htmlFor="showLegend" className="cell checkboxFieldLabel left">
-                  显示图例&nbsp;
-                </label>
-              </td>
-            </tr>
-            <tr className="checkboxField row showCabinetIcon">
-              <td className="cell right">
-                <input 
-                  type="checkbox" 
-                  className="left" 
-                  id="showCabinetIcon" 
-                  checked={mapSettings.showCabinetIcon || false}
-                  onChange={(e) => handleCheckboxChange(e.target.checked, 'showCabinetIcon')}
-                  disabled={disabled}
-                />
-              </td>
-              <td className="left">
-                <label htmlFor="showCabinetIcon" className="cell checkboxFieldLabel left">
-                  显示机柜图标&nbsp;
-                </label>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <table>
-          <tbody>
-            <tr><td><b/></td><td></td></tr>
-            <tr>
-              <td className="textBox">
-                <span id="textButtonAndNote" className="buttonPane">
-                  <AptdButton 
-                    id="textButtonId"
-                    title="在地图上创建文本框"
-                    theClassName="textBox gray"
-                    text="添加文本字段"
-                    onClick={handleAddTextField}
+      {/* 地图设置面板 */}
+      <div id="infoPanelMap">
+        <div id="infoPanelMapHeader" className="infoPanelHeader">地图设置</div>
+        
+        {/* 添加 TimeZoneUnitsMapDisplay 组件 */}
+        <TimeZoneUnitsMapDisplay 
+          mapChooserRowSize={3}
+          mapVerbiage="背景地图"
+          apModel={ap}
+          initialization={false}
+          topStore={actualTopStore}
+          undoManager={actualUndoManager}
+          httpManager={actualHttpManager}
+          mapImagesManager={actualMapImagesManager}
+        />
+        
+        <div>
+          <table>
+            <tbody>
+              <tr><td><b/></td><td></td></tr>
+              <tr>
+                <td colSpan={2}>
+                  <h4>地图功能</h4>
+                  <hr/>
+                </td>
+              </tr>
+              <tr className="checkboxField row showRFLinks">
+                <td className="cell right">
+                  <input 
+                    type="checkbox" 
+                    className="left" 
+                    id="showRFLinks" 
+                    checked={mapSettings.showRFLinks || false}
+                    onChange={(e) => handleCheckboxChange(e.target.checked, 'showRFLinks')}
                     disabled={disabled}
                   />
-                  <span>
-                    点击此按钮向地图添加文本框
+                </td>
+                <td className="left">
+                  <label htmlFor="showRFLinks" className="cell checkboxFieldLabel left">
+                    显示RF连接&nbsp;
+                  </label>
+                </td>
+              </tr>
+              <tr className="checkboxField row showCCLinks">
+                <td className="cell right">
+                  <input 
+                    type="checkbox" 
+                    className="left" 
+                    id="showCCLinks" 
+                    checked={mapSettings.showCCLinks || false}
+                    onChange={(e) => handleCheckboxChange(e.target.checked, 'showCCLinks')}
+                    disabled={disabled}
+                  />
+                </td>
+                <td className="left">
+                  <label htmlFor="showCCLinks" className="cell checkboxFieldLabel left">
+                    显示CC连接&nbsp;
+                  </label>
+                </td>
+              </tr>
+              <tr className="checkboxField row showLegend">
+                <td className="cell right">
+                  <input 
+                    type="checkbox" 
+                    className="left" 
+                    id="showLegend" 
+                    checked={mapSettings.showLegend || false}
+                    onChange={(e) => handleCheckboxChange(e.target.checked, 'showLegend')}
+                    disabled={disabled}
+                  />
+                </td>
+                <td className="left">
+                  <label htmlFor="showLegend" className="cell checkboxFieldLabel left">
+                    显示图例&nbsp;
+                  </label>
+                </td>
+              </tr>
+              <tr className="checkboxField row showCabinetIcon">
+                <td className="cell right">
+                  <input 
+                    type="checkbox" 
+                    className="left" 
+                    id="showCabinetIcon" 
+                    checked={mapSettings.showCabinetIcon || false}
+                    onChange={(e) => handleCheckboxChange(e.target.checked, 'showCabinetIcon')}
+                    disabled={disabled}
+                  />
+                </td>
+                <td className="left">
+                  <label htmlFor="showCabinetIcon" className="cell checkboxFieldLabel left">
+                    显示机柜图标&nbsp;
+                  </label>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <tbody>
+              <tr><td><b/></td><td></td></tr>
+              <tr>
+                <td className="textBox">
+                  <span id="textButtonAndNote" className="buttonPane">
+                    <AptdButton 
+                      id="textButtonId"
+                      title="在地图上创建文本框"
+                      theClassName="textBox gray"
+                      text="添加文本字段"
+                      onClick={handleAddTextField}
+                      disabled={disabled}
+                    />
+                    <span>
+                      点击此按钮向地图添加文本框
+                    </span>
                   </span>
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

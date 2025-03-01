@@ -520,11 +520,51 @@ export const useAP = () => {
     return ap?.units || UnitTypes.METRIC;
   }, [ap]);
   
+  // 获取缩放级别
+  const getZoomLevel = useCallback(() => {
+    return ap?.zoomLevel || 1.0;
+  }, [ap]);
+  
+  // 获取平移偏移
+  const getPan = useCallback(() => {
+    return ap?.pan || { x: 0, y: 0 };
+  }, [ap]);
+  
+  // 更新缩放级别
+  const updateZoomLevel = useCallback((newZoomLevel: number) => {
+    const oldZoomLevel = ap?.zoomLevel || 1.0;
+    
+    dispatch({
+      objectType: ObjectType.AP,
+      objectId: 'AP',
+      updateType: UpdateType.UPDATE,
+      newData: { zoomLevel: newZoomLevel },
+      origData: { zoomLevel: oldZoomLevel }
+    });
+  }, [dispatch, ap]);
+  
+  // 更新平移偏移
+  const updatePan = useCallback((newPan: { x: number, y: number }) => {
+    const oldPan = ap?.pan || { x: 0, y: 0 };
+    
+    dispatch({
+      objectType: ObjectType.AP,
+      objectId: 'AP',
+      updateType: UpdateType.UPDATE,
+      newData: { pan: newPan },
+      origData: { pan: oldPan }
+    });
+  }, [dispatch, ap]);
+  
   return {
     ap,
     updateAP,
     getSystemContext,
-    getUnitType
+    getUnitType,
+    getZoomLevel,
+    getPan,
+    updateZoomLevel,
+    updatePan
   };
 };
 

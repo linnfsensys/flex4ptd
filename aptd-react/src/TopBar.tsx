@@ -30,6 +30,7 @@ interface TopBarProps {
     undoManager: UndoManager,
     helpEngine: HelpEngine,
     onHelpGuideClicked: ()=>void,
+    children?: ReactNode,
 }
 
 // HR: apparently, couldn't easily use the import syntax for images, due to Typescript.
@@ -245,6 +246,7 @@ class TopBar extends Component<TopBarProps, any> {
                                 theClassName={this.props.saveColor === SaveColor.PINK ?
                                     'pink red' : this.props.saveColor}
                     />
+                    {this.props.children}
                 </span>
             </div>
         )
