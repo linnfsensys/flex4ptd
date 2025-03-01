@@ -7,11 +7,27 @@ import UndoManager from '../UndoManager';
 import MapImagesManager from '../MapImagesManager';
 import { useMapTrayStore } from '../store/mapTrayStore';
 import { GUIPoint } from '../AptdServerTypes';
+// Import Hilight from a local interface instead of from HelpEngine
+// to avoid the module not found error
+
+// Import device icons
+const RadioIcon = require('../assets/icons/spp.png');
+const RepeaterIcon = require('../assets/icons/SensysSkinMapRepeater.png');
+const SensorIcon = require('../assets/icons/empty_rssi_icon.png'); // 使用已有的图标作为传感器图标
+const APIcon = require('../assets/icons/ap_diamond.png');
+
+// Define Hilight interface locally
+interface Hilight {
+  id: string;
+  target: string;
+  type: string;
+}
 
 // Mock HelpEngine interface
 interface HelpEngine {
   getHelpBalloons: () => any;
   getHelpHiLights: () => any;
+  isHelpEnabled: () => boolean;
 }
 
 // Extend TextField interface to include position and rotationDegrees
@@ -61,14 +77,20 @@ interface TrayDevice {
   [key: string]: any;
 }
 
+// Define RF Link type
+interface RFLink {
+  dstId: string;
+  [key: string]: any;
+}
+
 // Extend ObjectType enum
 const TRAY_DEVICE = 'TRAY_DEVICE';
 type ExtendedObjectType = ObjectType | typeof TRAY_DEVICE;
 
 interface MapAndTrayPanelProps {
-  topStore?: TopStore;
-  undoManager?: UndoManager;
-  mapImagesManager?: MapImagesManager;
+  topStore: TopStore;
+  undoManager: UndoManager;
+  mapImagesManager: MapImagesManager;
   mapCabinetTrayWidth: number;
   mapCabinetTrayHeight: number;
   trayHeight: number;
@@ -90,9 +112,9 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
 }) => {
   // 使用Zustand hooks获取状态和操作
   const { mapSettings } = useMapSettings();
-  const { mapSensors, mapRepeaters, radios, trayDevices = {} } = useMapDevices();
+  const { mapSensors, mapRepeaters, radios, trayDevices = {}, sensorZones, ccCards, sensorDotidToSzId } = useMapDevices();
   const { selected, selectDevice, clearSelection } = useSelection();
-  const { updateAP, getZoomLevel, getPan, updateZoomLevel, updatePan } = useAP();
+  const { ap, updateAP, getZoomLevel, getPan, updateZoomLevel, updatePan } = useAP();
   
   // 使用mapTrayStore管理地图平移和缩放
   const { 
@@ -284,379 +306,499 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   
   // 处理缩放
   const handleZoom = (direction: 'in' | 'out') => {
-    let newZoomLevel = zoomLevel;
-    
-    if (direction === 'in') {
-      // 放大，最大缩放级别为2.0
-      newZoomLevel = Math.min(zoomLevel * 1.2, 2.0);
-    } else {
-      // 缩小，最小缩放级别为0.2
-      newZoomLevel = Math.max(zoomLevel / 1.2, 0.2);
-    }
+    const zoomFactor = direction === 'in' ? 1.1 : 0.9;
+    const newZoomLevel = Math.max(0.5, Math.min(2.0, zoomLevel * zoomFactor));
     
     setZoomLevel(newZoomLevel);
-    
-    // 持久化到AP状态
     updateZoomLevel(newZoomLevel);
   };
   
   // 重置视图
   const handleResetView = () => {
     resetView();
-    
-    // 持久化到AP状态
     updateZoomLevel(1.0);
     updatePan({ x: 0, y: 0 });
   };
   
-  // 渲染文本字段
-  const renderTextFields = () => {
-    const settings = mapSettings as MapSettings;
-    if (!settings.textFields) return null;
-    
-    return Object.entries(settings.textFields).map(([id, textField]) => {
-      const isSelected = selected?.selectedDotid === id;
-      
-      return (
-        <div
-          key={id}
-          className={`text-field ${isSelected ? 'selected' : ''}`}
-          style={{
-            left: textField.position.x,
-            top: textField.position.y,
-            transform: `rotate(${textField.rotationDegrees}deg)`,
-            fontWeight: 'normal',
-            fontStyle: 'normal',
-            fontSize: '14px'
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (isSelected) {
-              clearSelection();
-            } else {
-              selectDevice(ObjectType.TEXT_FIELD, id);
-            }
-          }}
-        >
-          {textField.text}
-        </div>
-      );
-    });
-  };
-  
   // 渲染传感器区域
   const renderSensorZones = () => {
-    const settings = mapSettings as MapSettings;
-    if (!settings.sensorZones) return null;
+    if (!sensorZones) return null;
     
-    return Object.entries(settings.sensorZones).map(([id, zone]) => {
-      if (!zone.position || !zone.size) return null;
+    return Object.entries(sensorZones).map(([szId, szData]) => {
+      const isSelected = selected?.selectedSzId === szId;
+      const position = (szData as any).position || { x: 0, y: 0 };
+      
+      const szSensors = Object.entries(mapSensors || {})
+        .filter(([sensorId]) => sensorDotidToSzId[sensorId] === szId)
+        .map(([sensorId, sensorData]) => {
+          const isSelected = selected?.selectedDotid === sensorId;
+          
+          return (
+            <g 
+              key={sensorId}
+              className={`mapSensorG draggable ${isSelected ? 'selected' : ''}`}
+              data-dotid={sensorId}
+              data-devicetype={ObjectType.MAP_SENSOR}
+              onClick={(e) => {
+                e.stopPropagation();
+                selectDevice(ObjectType.MAP_SENSOR, sensorId);
+              }}
+            >
+              <circle cx="35" cy="12.5" r="12.5" className="sensor" />
+              <g className="text" transform="translate(35, 12.5) rotate(360)">
+                <text className="dotidText">{sensorId}</text>
+              </g>
+            </g>
+          );
+        });
       
       return (
-        <div
-          key={id}
-          className="sensor-zone"
-          style={{
-            left: zone.position.x,
-            top: zone.position.y,
-            width: zone.size.width,
-            height: zone.size.height
+        <g 
+          key={szId}
+          className={`szG draggable ${isSelected ? 'selected' : ''}`}
+          transform={`translate(${position.x}, ${position.y})`}
+          data-dotid={szId}
+          data-devicetype="szG"
+          onClick={(e) => {
+            e.stopPropagation();
+            selectDevice(ObjectType.SENSOR_ZONE, szId);
           }}
-        />
+        >
+          <g 
+            className="szRectG draggable"
+            data-dotid={szId}
+            data-devicetype={ObjectType.SENSOR_ZONE}
+          >
+            <rect className="szRect" height="25" width="70" />
+            <text x="62" y="15" className="arrow">→</text>
+            <g className="sensorsInSZ">
+              {szSensors}
+            </g>
+          </g>
+          <g 
+            className="szRotateG draggable"
+            data-dotid={szId}
+            data-devicetype="szRotateG"
+          >
+            <rect className="rotateIconConnecton" x="70" y="12.5" height="1" width="15" />
+            <circle cx="85" cy="12.5" r="5" className="rotateIcon" style={{ fill: 'rgb(255, 255, 255)' }} />
+          </g>
+        </g>
       );
     });
   };
   
-  // 渲染地图传感器
-  const renderMapSensors = () => {
-    return Object.entries(mapSensors).map(([id, sensor]) => {
-      // 确保传感器有位置属性
-      const sensorWithPosition = sensor as GUISensor;
-      if (!sensorWithPosition.position) return null;
+  // 渲染射频链接
+  const renderRFLinks = () => {
+    // 简化版本的RF链接渲染
+    return Object.entries(mapSensors || {}).map(([sensorId, sensorData]) => {
+      const rfLinks = (sensorData as any).rfLinks || [];
       
-      const isSelected = selected?.selectedDeviceType === ObjectType.MAP_SENSOR && 
-                         selected?.selectedDotid === id;
+      if (rfLinks.length === 0) return null;
+      
+      return rfLinks.map((link: RFLink, index: number) => {
+        const targetId = link.dstId;
+        const targetDevice = radios[targetId];
+        const sensorPosition = (sensorData as any).position;
+        const targetPosition = targetDevice ? (targetDevice as any).position : null;
+        
+        if (!targetPosition || !sensorPosition) return null;
+        
+        return (
+          <g key={`${sensorId}-${targetId}-${index}`} className={`rfLinkGOuter dotid-${sensorId}`}>
+            <polyline 
+              points={`${sensorPosition.x} ${sensorPosition.y}, ${targetPosition.x} ${targetPosition.y}`}
+              className={`rfLinkPolyline deviceId-${sensorId}`}
+              data-deviceid={sensorId}
+              data-dstid={targetId}
+            />
+            <g className="allDraggableRfLinks">
+              <polyline 
+                points={`${sensorPosition.x} ${sensorPosition.y}, ${targetPosition.x} ${targetPosition.y}`}
+                className={`rfLinkPolylineBuffer draggable deviceId-${sensorId}`}
+                data-deviceid={sensorId}
+                data-dstid={targetId}
+                data-segmentid="0"
+                data-devicetype="RF_LINK"
+              />
+            </g>
+          </g>
+        );
+      });
+    }).flat().filter(Boolean);
+  };
+  
+  // 渲染射频链接
+  const renderCCLinks = () => {
+    // 简化版本的CC链接渲染
+    return [];
+  };
+  
+  // 渲染无线电
+  const renderRadios = () => {
+    if (!radios) return null;
+    
+    return Object.entries(radios).map(([radioId, radioData]) => {
+      const isSelected = selected?.selectedDotid === radioId;
+      const position = (radioData as any).position || { x: 0, y: 0 };
       
       return (
-        <div
-          key={id}
-          className={`map-sensor ${isSelected ? 'selected' : ''}`}
-          style={{
-            left: sensorWithPosition.position.x - 10,
-            top: sensorWithPosition.position.y - 10,
-            width: 20,
-            height: 20,
-            borderRadius: '50%',
-            backgroundColor: 'green'
-          }}
+        <g 
+          key={radioId}
+          className={`radioGOuter radioG draggable dotid-${radioId} ${isSelected ? 'selected' : ''}`}
+          transform={`translate(${position.x}, ${position.y})`}
+          data-dotid={radioId}
+          data-devicetype={ObjectType.RADIO}
           onClick={(e) => {
             e.stopPropagation();
-            if (isSelected) {
-              clearSelection();
-            } else {
-              selectDevice(ObjectType.MAP_SENSOR, id);
-            }
+            selectDevice(ObjectType.RADIO, radioId);
           }}
-        />
+        >
+          <rect className="radio" height="56" width="56" />
+          <image 
+            width="56" 
+            height="56" 
+            xlinkHref={RadioIcon} 
+            className="radio"
+          />
+          <text x="30" y="15">Radio-{radioId.slice(-1)}</text>
+        </g>
       );
     });
   };
   
   // 渲染中继器
   const renderRepeaters = () => {
-    return Object.entries(mapRepeaters).map(([id, repeater]) => {
-      // 确保中继器有位置属性
-      const repeaterWithPosition = repeater as GUIRepeater;
-      if (!repeaterWithPosition.position) return null;
-      
-      const isSelected = selected?.selectedDeviceType === ObjectType.MAP_REPEATER && 
-                         selected?.selectedDotid === id;
+    if (!mapRepeaters) return null;
+    
+    return Object.entries(mapRepeaters).map(([repeaterId, repeaterData]) => {
+      const isSelected = selected?.selectedDotid === repeaterId;
+      const position = (repeaterData as any).position || { x: 0, y: 0 };
       
       return (
-        <div
-          key={id}
-          className={`map-repeater ${isSelected ? 'selected' : ''}`}
-          style={{
-            left: repeaterWithPosition.position.x - 10,
-            top: repeaterWithPosition.position.y - 10,
-            width: 20,
-            height: 20,
-            backgroundColor: 'blue'
-          }}
+        <g 
+          key={repeaterId}
+          className={`repeaterGOuter repeaterG draggable dotid-${repeaterId} ${isSelected ? 'selected' : ''}`}
+          transform={`translate(${position.x}, ${position.y})`}
+          data-dotid={repeaterId}
+          data-devicetype={ObjectType.MAP_REPEATER}
           onClick={(e) => {
             e.stopPropagation();
-            if (isSelected) {
-              clearSelection();
-            } else {
-              selectDevice(ObjectType.MAP_REPEATER, id);
-            }
+            selectDevice(ObjectType.MAP_REPEATER, repeaterId);
           }}
-        />
+        >
+          <rect className="repeater" height="40" width="40" />
+          <image 
+            width="40" 
+            height="40" 
+            xlinkHref={RepeaterIcon} 
+            className="repeater"
+          />
+          <text x="20" y="20">R-{repeaterId.slice(-2)}</text>
+        </g>
       );
     });
-  };
-  
-  // 渲染无线电设备
-  const renderRadios = () => {
-    return Object.entries(radios).map(([id, radio]) => {
-      // 确保无线电设备有位置属性
-      const radioWithPosition = radio as { position?: GUIPoint };
-      if (!radioWithPosition.position) return null;
-      
-      const isSelected = selected?.selectedDeviceType === ObjectType.RADIO && 
-                         selected?.selectedDotid === id;
-      
-      return (
-        <div
-          key={id}
-          className={`map-radio ${isSelected ? 'selected' : ''}`}
-          style={{
-            left: radioWithPosition.position.x - 12,
-            top: radioWithPosition.position.y - 12,
-            width: 24,
-            height: 24,
-            backgroundColor: 'purple',
-            borderRadius: '3px'
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (isSelected) {
-              clearSelection();
-            } else {
-              selectDevice(ObjectType.RADIO, id);
-            }
-          }}
-        />
-      );
-    });
-  };
-  
-  // 渲染RF连接
-  const renderRFLinks = () => {
-    const settings = mapSettings as MapSettings;
-    if (!settings.showRFLinks) return null;
-    
-    // 这里可以实现RF连接的渲染逻辑
-    return null;
-  };
-  
-  // 渲染CC连接
-  const renderCCLinks = () => {
-    const settings = mapSettings as MapSettings;
-    if (!settings.showCCLinks) return null;
-    
-    // 这里可以实现CC连接的渲染逻辑
-    return null;
-  };
-  
-  // 渲染机柜图标
-  const renderCabinetIcon = () => {
-    const settings = mapSettings as MapSettings;
-    if (!settings.showCabinetIcon) return null;
-    
-    // 这里可以实现机柜图标的渲染逻辑
-    return (
-      <div
-        className="cabinet-icon"
-        style={{
-          left: 50,
-          top: 50,
-          width: 30,
-          height: 40,
-          backgroundColor: 'gray'
-        }}
-      />
-    );
   };
   
   // 渲染托盘设备
   const renderTrayDevices = () => {
     if (!trayDevices) return null;
     
-    return Object.entries(trayDevices).map(([id, device]) => {
-      const trayDevice = device as unknown as TrayDevice;
-      if (!trayDevice.position) return null;
+    return Object.entries(trayDevices).map(([deviceId, deviceData], index) => {
+      const isSelected = selectedTrayDevice === deviceId;
+      const xPosition = 25 + (index * 43);
       
-      const isSelected = selectedTrayDevice === id;
+      // 检查设备类型，根据设备类型的字段确定是传感器还是中继器
+      // 在原始代码中，设备类型存储在otype字段中
+      const isSensor = (deviceData as any).otype === 'GUISensor';
       
-      // 根据设备类型设置不同的样式
-      let style: React.CSSProperties = {
-        position: 'absolute',
-        left: trayDevice.position.x,
-        top: trayDevice.position.y,
-        cursor: 'pointer'
-      };
-      
-      // 根据设备类型设置不同的类名和样式
-      let className = `tray-device ${isSelected ? 'selected' : ''}`;
-      let content = null;
-      
-      // 根据设备类型设置不同的样式
-      const deviceType = trayDevice.deviceType || 'unknown';
-      
-      if (deviceType.includes('sensor')) {
-        style = {
-          ...style,
-          width: 20,
-          height: 20,
-          borderRadius: '50%',
-          backgroundColor: 'green'
-        };
-        className += ' tray-sensor';
-      } else if (deviceType.includes('repeater')) {
-        style = {
-          ...style,
-          width: 20,
-          height: 20,
-          backgroundColor: 'blue'
-        };
-        className += ' tray-repeater';
+      if (isSensor) {
+        return (
+          <g 
+            key={deviceId}
+            id={deviceId}
+            className={`traySensorG draggable dotid-${deviceId} ${isSelected ? 'selected' : ''}`}
+            transform={`translate(${xPosition}, 9)`}
+            data-dotid={deviceId}
+            data-devicetype={ObjectType.TRAY_SENSOR}
+            onMouseDown={(e) => handleTrayDeviceMouseDown(e, deviceId)}
+          >
+            <circle cx="0" cy="20" r="20" className="sensor" />
+            <text x="0" y="20" className="trayDotidText">{deviceId}</text>
+            <g className='rssiImg'>
+              {/* 这里可以添加RSSI图标，如果需要的话 */}
+            </g>
+          </g>
+        );
       } else {
-        style = {
-          ...style,
-          width: 24,
-          height: 24,
-          backgroundColor: 'gray',
-          borderRadius: '3px'
-        };
-        className += ' tray-other';
+        return (
+          <g 
+            key={deviceId}
+            id={deviceId}
+            className={`trayRepeaterG draggable dotid-${deviceId} ${isSelected ? 'selected' : ''}`}
+            transform={`translate(${xPosition}, 9)`}
+            data-dotid={deviceId}
+            data-devicetype={ObjectType.TRAY_REPEATER}
+            onMouseDown={(e) => handleTrayDeviceMouseDown(e, deviceId)}
+          >
+            <rect className="repeater" height="40" width="40" x="-20" />
+            <polygon points="-20 39, 0 0, 20 39" className="triangle" />
+            <image 
+              x="-20" 
+              y="0"
+              width="40" 
+              height="40" 
+              xlinkHref={RepeaterIcon}
+              className="repeater"
+            />
+            <text className="devType" x="0" y="18">Repeater</text>
+            <text x="0" y="33">{deviceId}</text>
+          </g>
+        );
       }
+    });
+  };
+  
+  // 渲染AP
+  const renderAP = () => {
+    if (!ap || !(ap as any).position) return null;
+    
+    const isSelected = selected?.selectedDotid === 'AP';
+    const position = (ap as any).position;
+    
+    return (
+      <g 
+        className={`apGOuter apG draggable dotid-AP ${isSelected ? 'selected' : ''}`}
+        transform={`translate(${position.x}, ${position.y})`}
+        data-dotid="AP"
+        data-devicetype={ObjectType.AP}
+        onClick={(e) => {
+          e.stopPropagation();
+          selectDevice(ObjectType.AP, 'AP');
+        }}
+      >
+        <rect className="ap" height="56" width="56" />
+        <image 
+          width="56" 
+          height="56" 
+          xlinkHref={APIcon} 
+          className="ap"
+        />
+        <text x="30" y="15">Gateway {(ap as any).gatewayId || ''}</text>
+      </g>
+    );
+  };
+  
+  // 渲染机柜卡片
+  const renderCabinetCards = () => {
+    if (!ccCards) return null;
+    
+    return Object.entries(ccCards).map(([cardId, cardData], index) => {
+      const isSelected = selected?.selectedDotid === cardId;
       
       return (
-        <div
-          key={id}
-          className={className}
-          style={style}
-          onMouseDown={(e) => handleTrayDeviceMouseDown(e, id)}
+        <g 
+          key={cardId}
+          className={`ccCardGOuter ccCardG selectable dotid-${cardId} ${isSelected ? 'selected' : ''}`}
+          transform={`translate(0, ${5 + index * 65})`}
+          data-dotid={cardId}
+          data-devicetype={ObjectType.CCCARD}
           onClick={(e) => {
             e.stopPropagation();
-            if (isSelected) {
-              setSelectedTrayDevice(null);
-            } else {
-              selectExtendedDevice(TRAY_DEVICE, id);
-            }
+            selectDevice(ObjectType.CCCARD, cardId);
           }}
         >
-          {content}
-        </div>
+          <rect className="ccCard" height="63" width="50" />
+          <rect className="cardRect" width="35" height="59" x="0" y="2" />
+          <text className="cardText" x="46" y="13" transform="rotate(90, 40, 15)">{cardId.split('-')[1]}</text>
+          
+          {/* 渲染通道 */}
+          {(cardData as any).channels && Object.entries((cardData as any).channels).map(([channelId, channelData], channelIndex) => (
+            <g 
+              key={channelId}
+              className={`ccChannelG dotid-${cardId}-${channelId}`}
+              transform={`translate(2, ${1 + channelIndex * 15})`}
+              data-dotid={`${cardId}-${channelId}`}
+              data-devicetype={ObjectType.CC_CHANNEL}
+            >
+              <rect className="ccChannelRect" height="15" width="28" rx="3" />
+              <text className="channelText" x="12" y="7">Ch {channelIndex + 1}</text>
+            </g>
+          ))}
+        </g>
       );
     });
   };
   
   return (
-    <div className="map-and-tray-container" style={{ width: dimensions.width, height: dimensions.height }}>
-      {/* 地图容器 */}
-      <div
-        ref={mapRef}
-        className={`map-container ${isDragging ? 'dragging' : ''}`}
-        style={{ height: mapHeight }}
-        onMouseDown={handleMouseDown}
+    <div id="mapCabinetTrayDiv" className="map-and-tray-container" style={{ width: dimensions.width, height: dimensions.height }}>
+      <svg
+        width={mapCabinetTrayWidth}
+        height={mapCabinetTrayHeight}
+        className="mapCabinet"
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onClick={handleClick}
+        id="mapCabinetSvg"
+        data-devicetype={ObjectType.MAP}
       >
-        {/* 地图内容 */}
-        <div
-          className="map-content"
-          style={{
-            transform: `scale(${zoomLevel}) translate(${pan.x}px, ${pan.y}px)`,
-            width: '100%',
-            height: '100%'
-          }}
+        {/* 左侧机柜 */}
+        <g className="cabinetG" key="left" transform="translate(0, 0)">
+          <rect
+            className="cabinetRect"
+            width={60}
+            height={mapHeight}
+          />
+          {/* 左侧机柜卡片 */}
+        </g>
+        
+        {/* 地图 SVG */}
+        <svg 
+          x={60} 
+          y={0}
+          className="mapSvg" 
+          id="mapSvg"
+          width={mapCabinetTrayWidth - 120} // 减去左右两侧机柜宽度
+          height={mapHeight}
+          viewBox={`0 0 ${mapCabinetTrayWidth - 120} ${mapHeight}`}
+          preserveAspectRatio="xMidYMid meet"
         >
-          {/* 渲染地图元素 */}
-          {renderSensorZones()}
-          {renderRFLinks()}
-          {renderCCLinks()}
-          {renderMapSensors()}
-          {renderRepeaters()}
-          {renderRadios()}
-          {renderTextFields()}
-          {renderCabinetIcon()}
-        </div>
+          {/* 地图元素组 */}
+          <g 
+            className="mapElementsG" 
+            transform={`translate(${mapCabinetTrayWidth/2 - 120} ${mapHeight/2}) scale(${zoomLevel})`}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+          >
+            {/* 地图背景图 */}
+            <g className="mapImageG" onMouseUp={handleMouseUp}>
+              <rect 
+                id="mapBgRect"
+                x={-mapCabinetTrayWidth/2}
+                y={-mapHeight/2}
+                width={mapCabinetTrayWidth - 120}
+                height={mapHeight}
+              />
+              <image 
+                id="mapImage"
+                x={-mapCabinetTrayWidth/2}
+                y={-mapHeight/2}
+                width={mapCabinetTrayWidth - 120}
+                height={mapHeight}
+                xlinkHref={mapImagesManager?.getCurrentMapUrl() || ''}
+                preserveAspectRatio="xMidYMid meet"
+              />
+            </g>
+            
+            {/* 北箭头图标 */}
+            <g 
+              className="gNorthArrowIconOutter selectable" 
+              data-devicetype="MAP_NORTH_ARROW_ICON" 
+              transform="translate(35, 35)"
+            >
+              <g 
+                className="gNorthArrowIconRotate draggable" 
+                data-dotid="rotate" 
+                data-devicetype="MAP_NORTH_ARROW_ICON"
+              >
+                <rect className="rotateIconConnecton" x="17.5" y="-15" height="15" width="1" />
+                <circle cx="17.5" cy="-15" r="5" className="rotateIcon" style={{ fill: 'rgb(255, 255, 255)' }} />
+              </g>
+              <g 
+                className="gNorthArrowIcon draggable" 
+                data-dotid="image" 
+                data-devicetype="MAP_NORTH_ARROW_ICON"
+              />
+            </g>
+            
+            {/* RF链接 */}
+            <g className="allRfLinks">
+              {renderRFLinks()}
+            </g>
+            
+            {/* CC链接 */}
+            <g className="allCCLinks">
+              {renderCCLinks()}
+            </g>
+            
+            {/* 传感器区域 */}
+            <g className="allMapSensorZones">
+              {renderSensorZones()}
+            </g>
+            
+            {/* 无线电 */}
+            <g className="allRadios">
+              {renderRadios()}
+            </g>
+            
+            {/* 中继器 */}
+            <g className="allRepeaters">
+              {renderRepeaters()}
+            </g>
+            
+            {/* AP */}
+            {renderAP()}
+            
+            {/* 测试 */}
+            <g className="testing" />
+          </g>
+          
+          {/* 缩放控制 */}
+          <image 
+            x={mapCabinetTrayWidth - 130} 
+            y={mapHeight - 120}
+            width="30"
+            height="30"
+            id="mapZoomIn"
+            onClick={() => handleZoom('in')}
+          />
+          <image 
+            x={mapCabinetTrayWidth - 130} 
+            y={mapHeight - 90}
+            width="30"
+            height="30"
+            id="mapZoomOut"
+            onClick={() => handleZoom('out')}
+          />
+        </svg>
         
-        {/* 缩放控制 */}
-        <div className="zoom-controls">
-          <div className="zoom-button" onClick={() => handleZoom('in')}>+</div>
-          <div className="zoom-level">{Math.round(zoomLevel * 100)}%</div>
-          <div className="zoom-button" onClick={() => handleZoom('out')}>-</div>
-          <div className="zoom-button" onClick={handleResetView}>R</div>
-        </div>
-        
-        {/* 图例 */}
-        {(mapSettings as MapSettings).showLegend && (
-          <div className="legend">
-            <div className="legend-title">Legend</div>
-            <div className="legend-item">
-              <div className="legend-color" style={{ backgroundColor: 'green', borderRadius: '50%' }}></div>
-              <div className="legend-text">Sensor</div>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{ backgroundColor: 'blue' }}></div>
-              <div className="legend-text">Repeater</div>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{ backgroundColor: 'purple' }}></div>
-              <div className="legend-text">Radio</div>
-            </div>
-          </div>
-        )}
-      </div>
+        {/* 右侧机柜 */}
+        <g className="cabinetG" transform={`translate(${mapCabinetTrayWidth - 60}, 0)`} key="right">
+          <rect
+            className="cabinetRect"
+            width={60}
+            height={mapHeight}
+          />
+          {renderCabinetCards()}
+        </g>
+      </svg>
       
-      {/* 托盘容器 */}
-      <div
-        ref={trayRef}
-        className="tray-container"
-        style={{ height: trayHeight }}
-        onMouseMove={handleTrayMouseMove}
-        onMouseUp={handleTrayMouseUp}
-        onMouseLeave={handleTrayMouseUp}
-      >
-        {/* 托盘内容 */}
-        <div className="tray-content">
-          {renderTrayDevices()}
-        </div>
+      {/* 托盘 */}
+      <div id="trayDiv" style={{ width: mapCabinetTrayWidth, position: 'absolute', top: mapHeight }}>
+        <svg 
+          id="traySvg"
+          width={mapCabinetTrayWidth}
+          height={trayHeight}
+          className="traySvg"
+          onMouseMove={handleTrayMouseMove}
+          onMouseUp={handleTrayMouseUp}
+        >
+          <g 
+            className="trayG"
+            data-devicetype={ObjectType.TRAY}
+          >
+            <rect
+              id="trayRect"
+              className="tray"
+              width={mapCabinetTrayWidth}
+              height={trayHeight}
+              x={0}
+              y={0}
+            />
+            {renderTrayDevices()}
+          </g>
+          <g id="trayDragProxyG" className="trayDragProxyG" />
+        </svg>
       </div>
     </div>
   );

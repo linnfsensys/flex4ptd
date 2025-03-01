@@ -92,6 +92,22 @@ export default class MapImagesManager {
         return mapDatum;
     }
 
+    /**
+     * Returns the URL of the current map image
+     */
+    public getCurrentMapUrl(): string {
+        if (this.isCustomMapSelected() && this.customMapExists) {
+            return this.mapData[this.customMapIndex]!.image;
+        } else {
+            const mapDatum: MapDatum | null | undefined = this.getCurrentMapDatum();
+            if (mapDatum !== null && mapDatum !== undefined) {
+                return `${process.env.REACT_APP_API_BASE_URL}/images/maps/${mapDatum.image}`;
+            } else {
+                return '';
+            }
+        }
+    }
+
     public isCustomMapSelected(): boolean {
         const customSelected: boolean =
             this.topStore.getTopState().ap !== null &&
