@@ -490,49 +490,213 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   
   // 渲染射频链接
   const renderRFLinks = () => {
-    // 使用地图位置偏移修正RF链接的位置
-    return Object.entries(mapSensors || {}).map(([sensorId, sensorData]) => {
-      const rfLinks = (sensorData as any).rfLinks || [];
+    if (!mapSettings?.showRFLinks) {
+      return [];
+    }
+    
+    const sensorRfLinks = Object.entries(mapSensors || {}).map(([dotId, sensorData]) => {
+      const rfLink = (sensorData as any).info?.rfLink;
       
-      if (rfLinks.length === 0) return null;
-      
-      return rfLinks.map((link: RFLink, index: number) => {
-        const targetId = link.dstId;
-        const targetDevice = radios[targetId];
-        const sensorPosition = (sensorData as any).info?.position || (sensorData as any).position;
-        const targetPosition = targetDevice ? 
-          ((targetDevice as any).info?.position || (targetDevice as any).position) : null;
+      if (dotId && rfLink) {
+        // 检查是否选中的链接
+        const selected = false; // 在实际中应该检查选择状态
         
-        if (!targetPosition || !sensorPosition) return null;
+        // 检查链接的位置类型
+        if (rfLink.location === 'MAP_AUTO') {
+          console.error('renderRFLinks(): unexpected MAP_AUTO rflink', rfLink, sensorData);
+          return null;
+        }
         
-        // 修正两端点的位置，加上地图偏移量
-        const x1 = sensorPosition.x + mapXY.x;
-        const y1 = sensorPosition.y + mapXY.y;
-        const x2 = targetPosition.x + mapXY.x;
-        const y2 = targetPosition.y + mapXY.y;
+        const lines = rfLink.lines;
+        if (!lines || lines.length === 0) return null;
+        
+        // 渲染可见的polyline - 从原始版本中提取
+        let points = '';
+        if (lines && lines.length > 0) {
+          const firstLine = lines[0];
+          points = `${firstLine.aPoint.x + mapXY.x} ${firstLine.aPoint.y + mapXY.y}`;
+          
+          for (const line of lines) {
+            points += `, ${line.bPoint.x + mapXY.x} ${line.bPoint.y + mapXY.y}`;
+          }
+        }
+        
+        // 渲染可拖动链接
+        const draggableLinks = [];
+        if (lines && lines.length > 0) {
+          for (let segmentIndex = 0; segmentIndex < lines.length; segmentIndex++) {
+            const line = lines[segmentIndex];
+            let segmentPoints = '';
+            
+            if (segmentIndex === 0) {
+              segmentPoints = `${line.aPoint.x + mapXY.x} ${line.aPoint.y + mapXY.y}`;
+            } else {
+              segmentPoints = `${line.aPoint.x + mapXY.x} ${line.aPoint.y + mapXY.y}`;
+            }
+            
+            segmentPoints += `, ${line.bPoint.x + mapXY.x} ${line.bPoint.y + mapXY.y}`;
+            
+            draggableLinks.push(
+              <polyline 
+                key={`rfLinkPlB-${dotId}-${rfLink.dstId}-${segmentIndex}`}
+                points={segmentPoints}
+                className={`rfLinkPolylineBuffer draggable deviceId-${dotId}`}
+                data-deviceid={dotId}
+                data-dstid={rfLink.dstId}
+                data-segmentid={segmentIndex}
+                data-devicetype={ObjectType.RF_LINK}
+              />
+            );
+          }
+        }
+        
+        // 渲染悬停点
+        const draggablePoints = [];
+        if (lines && lines.length > 1) {
+          for (let lineIndex = 0; lineIndex < lines.length - 1; lineIndex++) {
+            const point = {
+              x: lines[lineIndex].bPoint.x + mapXY.x - 5,
+              y: lines[lineIndex].bPoint.y + mapXY.y - 5
+            };
+            
+            draggablePoints.push(
+              <rect 
+                key={`rfLinkRect-${dotId}-${rfLink.dstId}-${lineIndex}`}
+                className="rfLinkPolylineBuffer draggable point"
+                data-deviceid={dotId}
+                data-dstid={rfLink.dstId}
+                data-segmentid={lineIndex}
+                data-devicetype={ObjectType.RF_LINK}
+                x={point.x}
+                y={point.y}
+                height="10"
+                width="10"
+              />
+            );
+          }
+        }
         
         return (
-          <g key={`${sensorId}-${targetId}-${index}`} className={`rfLinkGOuter dotid-${sensorId}`}>
+          <g key={`rf${dotId}`} className={`rfLinkGOuter dotid-${dotId}`}>
             <polyline 
-              points={`${x1} ${y1}, ${x2} ${y2}`}
-              className={`rfLinkPolyline deviceId-${sensorId}`}
-              data-deviceid={sensorId}
-              data-dstid={targetId}
+              points={points}
+              className={`rfLinkPolyline${selected ? ' selected' : ''} deviceId-${dotId}`}
+              data-deviceid={dotId}
+              data-dstid={rfLink.dstId}
             />
             <g className="allDraggableRfLinks">
-              <polyline 
-                points={`${x1} ${y1}, ${x2} ${y2}`}
-                className={`rfLinkPolylineBuffer draggable deviceId-${sensorId}`}
-                data-deviceid={sensorId}
-                data-dstid={targetId}
-                data-segmentid="0"
-                data-devicetype="RF_LINK"
-              />
+              {draggablePoints}
+              {draggableLinks}
             </g>
           </g>
         );
-      });
-    }).flat().filter(Boolean);
+      }
+      return null;
+    });
+    
+    // 添加中继器的RF链接渲染
+    const repeaterRfLinks = Object.entries(mapRepeaters || {}).map(([dotId, repeaterData]) => {
+      const rfLink = (repeaterData as any).info?.rfLink;
+      
+      if (dotId && rfLink) {
+        // 检查是否选中的链接
+        const selected = false; // 在实际中应该检查选择状态
+        
+        // 检查链接的位置类型
+        if (rfLink.location === 'MAP_AUTO') {
+          console.error('renderRFLinks(): unexpected MAP_AUTO rflink', rfLink, repeaterData);
+          return null;
+        }
+        
+        const lines = rfLink.lines;
+        if (!lines || lines.length === 0) return null;
+        
+        // 渲染可见的polyline
+        let points = '';
+        if (lines && lines.length > 0) {
+          const firstLine = lines[0];
+          points = `${firstLine.aPoint.x + mapXY.x} ${firstLine.aPoint.y + mapXY.y}`;
+          
+          for (const line of lines) {
+            points += `, ${line.bPoint.x + mapXY.x} ${line.bPoint.y + mapXY.y}`;
+          }
+        }
+        
+        // 渲染可拖动链接
+        const draggableLinks = [];
+        if (lines && lines.length > 0) {
+          for (let segmentIndex = 0; segmentIndex < lines.length; segmentIndex++) {
+            const line = lines[segmentIndex];
+            let segmentPoints = '';
+            
+            if (segmentIndex === 0) {
+              segmentPoints = `${line.aPoint.x + mapXY.x} ${line.aPoint.y + mapXY.y}`;
+            } else {
+              segmentPoints = `${line.aPoint.x + mapXY.x} ${line.aPoint.y + mapXY.y}`;
+            }
+            
+            segmentPoints += `, ${line.bPoint.x + mapXY.x} ${line.bPoint.y + mapXY.y}`;
+            
+            draggableLinks.push(
+              <polyline 
+                key={`rfLinkPlB-${dotId}-${rfLink.dstId}-${segmentIndex}`}
+                points={segmentPoints}
+                className={`rfLinkPolylineBuffer draggable deviceId-${dotId}`}
+                data-deviceid={dotId}
+                data-dstid={rfLink.dstId}
+                data-segmentid={segmentIndex}
+                data-devicetype={ObjectType.RF_LINK}
+              />
+            );
+          }
+        }
+        
+        // 渲染悬停点
+        const draggablePoints = [];
+        if (lines && lines.length > 1) {
+          for (let lineIndex = 0; lineIndex < lines.length - 1; lineIndex++) {
+            const point = {
+              x: lines[lineIndex].bPoint.x + mapXY.x - 5,
+              y: lines[lineIndex].bPoint.y + mapXY.y - 5
+            };
+            
+            draggablePoints.push(
+              <rect 
+                key={`rfLinkRect-${dotId}-${rfLink.dstId}-${lineIndex}`}
+                className="rfLinkPolylineBuffer draggable point"
+                data-deviceid={dotId}
+                data-dstid={rfLink.dstId}
+                data-segmentid={lineIndex}
+                data-devicetype={ObjectType.RF_LINK}
+                x={point.x}
+                y={point.y}
+                height="10"
+                width="10"
+              />
+            );
+          }
+        }
+        
+        return (
+          <g key={`rf${dotId}`} className={`rfLinkGOuter dotid-${dotId}`}>
+            <polyline 
+              points={points}
+              className={`rfLinkPolyline${selected ? ' selected' : ''} deviceId-${dotId}`}
+              data-deviceid={dotId}
+              data-dstid={rfLink.dstId}
+            />
+            <g className="allDraggableRfLinks">
+              {draggablePoints}
+              {draggableLinks}
+            </g>
+          </g>
+        );
+      }
+      return null;
+    });
+    
+    // 合并传感器和中继器的RF链接
+    return [...sensorRfLinks, ...repeaterRfLinks].filter(Boolean);
   };
   
   // 渲染射频链接
