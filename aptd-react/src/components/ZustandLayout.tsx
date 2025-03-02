@@ -95,8 +95,11 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
     height: window.innerHeight - 50 // Subtract toolbar height
   });
 
-  // Calculate panel dimensions
-  const mapCabinetTrayWidth = Math.floor(dimensions.width * 0.7); // 70% of width for map
+  // 使用黄金比例计算布局
+  // 黄金比例约为1.618:1
+  const GOLDEN_RATIO = 1.618;
+  const INFO_PANEL_WIDTH = 400; // 固定宽度，单位像素
+  const mapCabinetTrayWidth = dimensions.width - INFO_PANEL_WIDTH; // 剩余宽度给地图面板
   const mapCabinetTrayHeight = dimensions.height - 40; // 减去TopBar高度
   const trayHeight = Math.floor(mapCabinetTrayHeight * 0.2); // 20% of height for tray
   const mapHeight = mapCabinetTrayHeight - trayHeight;
@@ -142,7 +145,7 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
       </div>
       
       <div className="zustand-main-content">
-        <div className="map-tray-container" style={{ width: mapCabinetTrayWidth }}>
+        <div className="map-tray-container" style={{ width: `${mapCabinetTrayWidth}px` }}>
           <MapAndTrayPanel
             topStore={topStore}
             undoManager={undoManager}
@@ -153,7 +156,7 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
             mapHeight={mapHeight}
           />
         </div>
-        <div className="info-panel-container" style={{ width: dimensions.width - mapCabinetTrayWidth }}>
+        <div className="info-panel-container" style={{ width: `${INFO_PANEL_WIDTH}px` }}>
           <ZustandInfoPanel
             mapCabinetTrayHeight={mapCabinetTrayHeight}
             topStore={topStore}

@@ -25,9 +25,19 @@
   height: 100%;
   overflow: hidden;
   border-right: 1px solid #ccc;
+  /* 不使用flex，使用固定宽度 */
 }
 
 .info-panel-container {
+  /* 固定宽度 */
   height: 100%;
   overflow: auto;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 修复cabinet位置 */
+.cabinetG {
+  position: absolute;
+  right: 0;
+  top: 0;
 } 

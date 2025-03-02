@@ -156,11 +156,11 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     resetView 
   } = useMapTrayStore();
   
-  // 本地状态
-  const [dimensions, setDimensions] = useState({
+  // 修改：使用传入的mapCabinetTrayWidth作为初始宽度，不再使用本地状态
+  const dimensions = {
     width: mapCabinetTrayWidth,
     height: mapCabinetTrayHeight
-  });
+  };
   
   // 拖动状态
   const [draggingTrayDevice, setDraggingTrayDevice] = useState<string | null>(null);
@@ -1033,168 +1033,172 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   };
   
   return (
-    <div id="mapCabinetTrayDiv" className="map-and-tray-container" style={{ width: dimensions.width, height: dimensions.height }}>
-      <svg
-        width={mapCabinetTrayWidth}
-        height={mapCabinetTrayHeight}
-        className="mapCabinet"
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        id="mapCabinetSvg"
-        data-devicetype={ObjectType.MAP}
-      >
-        {/* Left cabinet - conditionally rendered based on leftCabinetPresent */}
-        {leftCabinetPresent && (
-          <g className="cabinetG" key="left" transform="translate(0, 0)">
-            <rect
-              className="cabinetRect"
-              width={cabinetWidth}
-              height={mapHeight}
-            />
-            {/* Left cabinet cards could be rendered here */}
-          </g>
-        )}
-        
-        {/* Map SVG - using original structure and properties */}
-        <svg 
-          x={mapSvgXY.x} 
-          y={mapSvgXY.y}
-          className="mapSvg" 
-          id="mapSvg"
-          width={mapWidth}
+    <div id="mapCabinetTrayDiv" className="map-and-tray-container" style={{ width: '100%', height: dimensions.height }}>
+      <div className="map-section" style={{ height: mapHeight }}>
+        <svg
+          className="mapCabinet"
           height={mapHeight}
-          viewBox={mapViewBox}
-          transform="scale(1)"
+          id="mapCabinetSvg"
+          data-devicetype={ObjectType.MAP}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
         >
-          {/* Map elements group - using original transform structure */}
-          <g 
-            className="mapElementsG" 
-            transform={mapElementsTransform}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
+          {/* Left cabinet - conditionally rendered based on leftCabinetPresent */}
+          {leftCabinetPresent && (
+            <g className="cabinetG" key="left" transform="translate(0, 0)">
+              <rect
+                className="cabinetRect"
+                width={cabinetWidth}
+                height={mapHeight}
+              />
+              {/* Left cabinet cards could be rendered here */}
+            </g>
+          )}
+          
+          {/* Map SVG - using original structure and properties */}
+          <svg 
+            x={mapSvgXY.x} 
+            y={mapSvgXY.y}
+            className="mapSvg" 
+            id="mapSvg"
+            width={mapWidth}
+            height={mapHeight}
+            viewBox={mapViewBox}
+            transform="scale(1)"
           >
-            {/* Map background image */}
+            {/* Map elements group - using original transform structure */}
             <g 
-              className="mapImageG"
+              className="mapElementsG" 
+              transform={mapElementsTransform}
+              onMouseDown={handleMouseDown}
               onMouseUp={handleMouseUp}
             >
-              <rect 
-                id="mapBgRect"
-                x={mapXY.x} 
-                y={mapXY.y}
-                width={mapImageDimensions.width} 
-                height={mapImageDimensions.height}
-              />
-              <image 
-                id="mapImage"
-                x={mapXY.x} 
-                y={mapXY.y}
-                width={mapImageDimensions.width} 
-                height={mapImageDimensions.height}
-                xlinkHref={mapImagesManager?.getCurrentMapUrl() || ''}
-              />
-            </g>
-            
-            {/* North arrow icon */}
-            <g 
-              className="gNorthArrowIconOutter selectable" 
-              data-devicetype="MAP_NORTH_ARROW_ICON" 
-              transform="translate(35, 35)"
-            >
+              {/* Map background image */}
               <g 
-                className="gNorthArrowIconRotate draggable" 
-                data-dotid="rotate" 
-                data-devicetype="MAP_NORTH_ARROW_ICON"
+                className="mapImageG"
+                onMouseUp={handleMouseUp}
               >
-                <rect className="rotateIconConnecton" x="17.5" y="-15" height="15" width="1" />
-                <circle cx="17.5" cy="-15" r="5" className="rotateIcon" style={{ fill: 'rgb(255, 255, 255)' }} />
-              </g>
-              <g 
-                className="gNorthArrowIcon draggable" 
-                data-dotid="image" 
-                data-devicetype="MAP_NORTH_ARROW_ICON"
-              >
+                <rect 
+                  id="mapBgRect"
+                  x={mapXY.x} 
+                  y={mapXY.y}
+                  width={mapImageDimensions.width} 
+                  height={mapImageDimensions.height}
+                />
                 <image 
-                  width="35" 
-                  height="35" 
-                  xlinkHref={NorthArrowIcon}
-                  className="northArrowIcon"
+                  id="mapImage"
+                  x={mapXY.x} 
+                  y={mapXY.y}
+                  width={mapImageDimensions.width} 
+                  height={mapImageDimensions.height}
+                  xlinkHref={mapImagesManager?.getCurrentMapUrl() || ''}
                 />
               </g>
+              
+              {/* North arrow icon */}
+              <g 
+                className="gNorthArrowIconOutter selectable" 
+                data-devicetype="MAP_NORTH_ARROW_ICON" 
+                transform="translate(35, 35)"
+              >
+                <g 
+                  className="gNorthArrowIconRotate draggable" 
+                  data-dotid="rotate" 
+                  data-devicetype="MAP_NORTH_ARROW_ICON"
+                >
+                  <rect className="rotateIconConnecton" x="17.5" y="-15" height="15" width="1" />
+                  <circle cx="17.5" cy="-15" r="5" className="rotateIcon" style={{ fill: 'rgb(255, 255, 255)' }} />
+                </g>
+                <g 
+                  className="gNorthArrowIcon draggable" 
+                  data-dotid="image" 
+                  data-devicetype="MAP_NORTH_ARROW_ICON"
+                >
+                  <image 
+                    width="35" 
+                    height="35" 
+                    xlinkHref={NorthArrowIcon}
+                    className="northArrowIcon"
+                  />
+                </g>
+              </g>
+              
+              {/* RF links */}
+              <g className="allRfLinks">
+                {renderRFLinks()}
+              </g>
+              
+              {/* CC links */}
+              <g className="allCCLinks">
+                {renderCCLinks()}
+              </g>
+              
+              {/* Sensor zones */}
+              <g className="allMapSensorZones">
+                {renderSensorZones()}
+              </g>
+              
+              {/* Radios */}
+              <g className="allRadios">
+                {renderRadios()}
+              </g>
+              
+              {/* Repeaters */}
+              <g className="allRepeaters">
+                {renderRepeaters()}
+              </g>
+              
+              {/* AP */}
+              {renderAP()}
+              
+              {/* Testing */}
+              <g className="testing" />
             </g>
             
-            {/* RF links */}
-            <g className="allRfLinks">
-              {renderRFLinks()}
-            </g>
-            
-            {/* CC links */}
-            <g className="allCCLinks">
-              {renderCCLinks()}
-            </g>
-            
-            {/* Sensor zones */}
-            <g className="allMapSensorZones">
-              {renderSensorZones()}
-            </g>
-            
-            {/* Radios */}
-            <g className="allRadios">
-              {renderRadios()}
-            </g>
-            
-            {/* Repeaters */}
-            <g className="allRepeaters">
-              {renderRepeaters()}
-            </g>
-            
-            {/* AP */}
-            {renderAP()}
-            
-            {/* Testing */}
-            <g className="testing" />
-          </g>
-          
-          {/* Zoom controls */}
-          <image 
-            x={mapWidth - 70}
-            y={mapHeight - 120}
-            width="30"
-            height="30"
-            id="mapZoomIn"
-            xlinkHref={MapZoomIn}
-            onClick={() => handleZoom('in')}
-          />
-          <image 
-            x={mapWidth - 70}
-            y={mapHeight - 90}
-            width="30"
-            height="30"
-            id="mapZoomOut"
-            xlinkHref={MapZoomOut}
-            onClick={() => handleZoom('out')}
-          />
-        </svg>
-        
-        {/* Right cabinet - conditionally rendered based on rightCabinetPresent */}
-        {rightCabinetPresent && (
-          <g className="cabinetG" transform={`translate(${mapCabinetTrayWidth - cabinetWidth}, 0)`} key="right">
-            <rect
-              className="cabinetRect"
-              width={cabinetWidth}
-              height={mapHeight}
+            {/* Zoom controls */}
+            <image 
+              x={mapWidth - 70}
+              y={mapHeight - 120}
+              width="30"
+              height="30"
+              id="mapZoomIn"
+              xlinkHref={MapZoomIn}
+              onClick={() => handleZoom('in')}
             />
-            {renderCabinetCards()}
-          </g>
-        )}
-      </svg>
+            <image 
+              x={mapWidth - 70}
+              y={mapHeight - 90}
+              width="30"
+              height="30"
+              id="mapZoomOut"
+              xlinkHref={MapZoomOut}
+              onClick={() => handleZoom('out')}
+            />
+          </svg>
+          
+          {/* Right cabinet - conditionally rendered based on rightCabinetPresent */}
+          {rightCabinetPresent && (
+            <g className="cabinetG" key="right">
+              <rect
+                className="cabinetRect"
+                width={cabinetWidth}
+                height={mapHeight}
+              />
+              {renderCabinetCards()}
+            </g>
+          )}
+        </svg>
+      </div>
       
       {/* Tray */}
-      <div id="trayDiv" style={{ width: mapCabinetTrayWidth, position: 'absolute', top: mapHeight }}>
+      <div id="trayDiv" ref={trayRef} onScroll={(e) => {
+        // 可以在这里处理滚动事件
+        console.log('Tray scrolled');
+      }}>
         <svg 
           id="traySvg"
-          width={mapCabinetTrayWidth}
+          width="100%"
           height={trayHeight}
           className="traySvg"
           onMouseMove={handleTrayMouseMove}
@@ -1207,7 +1211,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             <rect
               id="trayRect"
               className="tray"
-              width={mapCabinetTrayWidth}
+              width="100%"
               height={trayHeight}
               x={0}
               y={0}
