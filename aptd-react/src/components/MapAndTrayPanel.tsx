@@ -18,6 +18,12 @@ const APIcon = require('../assets/icons/ap_diamond.png');
 const NorthArrowIcon = require('../assets/icons/north_arrow_icon.png');
 const MapZoomIn = require('../assets/icons/map_zoom_plus.png');
 const MapZoomOut = require('../assets/icons/map_zoom_minus.png');
+const WarningIcon = require('../assets/icons/icons8-warning-96.png');
+const RssiEmpty = require('../assets/icons/empty_rssi_icon.png');
+const RssiHigh = require('../assets/icons/rssi_high.png');
+const RssiMid = require('../assets/icons/rssi_mid.png');
+const RssiLow = require('../assets/icons/rssi_low.png');
+const RssiAlert = require('../assets/icons/rssi_alert.png');
 
 // Define Hilight interface locally
 interface Hilight {
@@ -419,6 +425,9 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       const isSelected = selected?.selectedSzId === szId;
       const position = (szData as any).info?.position || (szData as any).position || { x: 0, y: 0 };
       
+      // 调整传感器区域的transform - 加上地图位置偏移量
+      const transform = `translate(${position.x + mapXY.x}, ${position.y + mapXY.y})`;
+      
       const szSensors = Object.entries(mapSensors || {})
         .filter(([sensorId]) => sensorDotidToSzId[sensorId] === szId)
         .map(([sensorId, sensorData]) => {
@@ -447,7 +456,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
         <g 
           key={szId}
           className={`szG draggable ${isSelected ? 'selected' : ''}`}
-          transform={`translate(${position.x}, ${position.y})`}
+          transform={transform}
           data-dotid={szId}
           data-devicetype="szG"
           onClick={(e) => {
@@ -481,7 +490,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   
   // 渲染射频链接
   const renderRFLinks = () => {
-    // 简化版本的RF链接渲染
+    // 使用地图位置偏移修正RF链接的位置
     return Object.entries(mapSensors || {}).map(([sensorId, sensorData]) => {
       const rfLinks = (sensorData as any).rfLinks || [];
       
@@ -496,17 +505,23 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
         
         if (!targetPosition || !sensorPosition) return null;
         
+        // 修正两端点的位置，加上地图偏移量
+        const x1 = sensorPosition.x + mapXY.x;
+        const y1 = sensorPosition.y + mapXY.y;
+        const x2 = targetPosition.x + mapXY.x;
+        const y2 = targetPosition.y + mapXY.y;
+        
         return (
           <g key={`${sensorId}-${targetId}-${index}`} className={`rfLinkGOuter dotid-${sensorId}`}>
             <polyline 
-              points={`${sensorPosition.x} ${sensorPosition.y}, ${targetPosition.x} ${targetPosition.y}`}
+              points={`${x1} ${y1}, ${x2} ${y2}`}
               className={`rfLinkPolyline deviceId-${sensorId}`}
               data-deviceid={sensorId}
               data-dstid={targetId}
             />
             <g className="allDraggableRfLinks">
               <polyline 
-                points={`${sensorPosition.x} ${sensorPosition.y}, ${targetPosition.x} ${targetPosition.y}`}
+                points={`${x1} ${y1}, ${x2} ${y2}`}
                 className={`rfLinkPolylineBuffer draggable deviceId-${sensorId}`}
                 data-deviceid={sensorId}
                 data-dstid={targetId}
@@ -526,6 +541,29 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     return [];
   };
   
+  // 添加验证错误检查函数
+  const hasValidationErrors = (objectType: ObjectType, objectId: string): boolean => {
+    if (!topStore) return false;
+    
+    // 检查验证错误
+    for (let validationKey of Object.keys(topStore.getTopState().validationErrors || {})) {
+      let errorKey = TopStore.parseValidationErrorsKey(validationKey);
+      if (errorKey.objectType === objectType && errorKey.objectId === objectId) {
+        return true;
+      }
+    }
+    
+    // 检查全局验证错误
+    for (let validationKey of Object.keys(topStore.getTopState().validationGlobalErrors || {})) {
+      let errorKey = TopStore.parseValidationGlobalErrorsKey(validationKey);
+      if (errorKey.objectType === objectType && errorKey.objectId === objectId) {
+        return true;
+      }
+    }
+    
+    return false;
+  };
+  
   // 渲染无线电
   const renderRadios = () => {
     if (!radios) return null;
@@ -533,12 +571,17 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     return Object.entries(radios).map(([radioId, radioData]) => {
       const isSelected = selected?.selectedDotid === radioId;
       const position = (radioData as any).info?.position || (radioData as any).position || { x: 0, y: 0 };
+      const radioWidth = 56;
+      const radioHeight = 56;
+      
+      // 使用与原始版本相同的变换计算 - 包括居中偏移和地图位置
+      const transform = `translate(${position.x - radioWidth/2 + mapXY.x}, ${position.y - radioHeight/2 + mapXY.y})`;
       
       return (
         <g 
           key={radioId}
           className={`radioGOuter radioG draggable dotid-${radioId} ${isSelected ? 'selected' : ''}`}
-          transform={`translate(${position.x}, ${position.y})`}
+          transform={transform}
           data-dotid={radioId}
           data-devicetype={ObjectType.RADIO}
           onClick={(e) => {
@@ -546,14 +589,42 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             selectDevice(ObjectType.RADIO, radioId);
           }}
         >
-          <rect className="radio" height="56" width="56" />
+          <rect className="radio" height={radioHeight} width={radioWidth} />
           <image 
-            width="56" 
-            height="56" 
+            width={radioWidth} 
+            height={radioHeight} 
             xlinkHref={RadioIcon} 
             className="radio"
           />
-          <text x="30" y="15">Radio-{radioId.slice(-1)}</text>
+          {/* 添加固件进度显示 */}
+          {(radioData as any).percentComplete !== undefined && (radioData as any).percentComplete > 0 && (
+            <rect
+              x={radioWidth/2 - 10}
+              y={radioHeight/4.5}
+              width={20 * ((radioData as any).percentComplete / 100)}
+              height={3}
+              fill="yellow"
+            />
+          )}
+          <text x="30" y="15">
+            {/* 使用与原始版本相同的格式：Radio-X */}
+            Radio-{(radioData as any).apConnection?.replace('SPP', '') || radioId.slice(-1)}
+          </text>
+          {/* 添加未收到警告标记 */}
+          {(radioData as any).unheard === true && (
+            <image
+              id="unheard"
+              x={0}
+              y={30}
+              width="15"
+              height="15"
+              xlinkHref={WarningIcon}
+            />
+          )}
+          {/* 添加缺陷标记 - 如果有验证错误 */}
+          {hasValidationErrors(ObjectType.RADIO, radioId) && (
+            <text x={radioWidth-6} y={30} className="deficient">*</text>
+          )}
         </g>
       );
     });
@@ -566,12 +637,17 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     return Object.entries(mapRepeaters).map(([repeaterId, repeaterData]) => {
       const isSelected = selected?.selectedDotid === repeaterId;
       const position = (repeaterData as any).info?.position || (repeaterData as any).position || { x: 0, y: 0 };
+      const repeaterWidth = 40;
+      const repeaterHeight = 40;
+      
+      // 使用与原始版本相同的变换计算
+      const transform = `translate(${position.x - repeaterWidth/2 + mapXY.x}, ${position.y - repeaterHeight/2 + mapXY.y})`;
       
       return (
         <g 
           key={repeaterId}
           className={`repeaterGOuter repeaterG draggable dotid-${repeaterId} ${isSelected ? 'selected' : ''}`}
-          transform={`translate(${position.x}, ${position.y})`}
+          transform={transform}
           data-dotid={repeaterId}
           data-devicetype={ObjectType.MAP_REPEATER}
           onClick={(e) => {
@@ -579,14 +655,29 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             selectDevice(ObjectType.MAP_REPEATER, repeaterId);
           }}
         >
-          <rect className="repeater" height="40" width="40" />
+          <rect className="repeater" height={repeaterHeight} width={repeaterWidth} />
           <image 
-            width="40" 
-            height="40" 
+            width={repeaterWidth} 
+            height={repeaterHeight} 
             xlinkHref={RepeaterIcon} 
             className="repeater"
           />
           <text x="20" y="20">R-{repeaterId.slice(-2)}</text>
+          {/* 添加未收到警告标记 */}
+          {(repeaterData as any).unheard === true && (
+            <image
+              id="unheard"
+              x={0}
+              y={30}
+              width="15"
+              height="15"
+              xlinkHref={WarningIcon}
+            />
+          )}
+          {/* 添加缺陷标记 - 如果有验证错误 */}
+          {hasValidationErrors(ObjectType.MAP_REPEATER, repeaterId) && (
+            <text x={repeaterWidth-6} y={30} className="deficient">*</text>
+          )}
         </g>
       );
     });
@@ -596,6 +687,36 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   const renderTrayDevices = () => {
     if (!trayDevices) return null;
     
+    // 添加获取RSSI图标的函数
+    const getRssiIcon = (deviceData: any): string => {
+      // 如果设备未看到或未收到
+      if (deviceData.unheard || !deviceData.seen) {
+        return RssiEmpty;
+      }
+      
+      // 检查是否有rssi数据
+      if (deviceData.rssi !== undefined && ap) {
+        // 获取阈值
+        let rssiHigh = (ap as any).rssiHigh || -66;
+        let rssiMed = (ap as any).rssiMed || -80;
+        let rssiLow = (ap as any).rssiLow || -86;
+        
+        // 根据信号强度返回相应图标
+        if (deviceData.rssi >= rssiHigh) {
+          return RssiHigh;
+        } else if (deviceData.rssi >= rssiMed) {
+          return RssiMid;
+        } else if (deviceData.rssi >= rssiLow) {
+          return RssiLow;
+        } else {
+          return RssiAlert;
+        }
+      }
+      
+      // 默认返回空图标
+      return RssiEmpty;
+    };
+    
     return Object.entries(trayDevices).map(([deviceId, deviceData], index) => {
       const isSelected = selectedTrayDevice === deviceId;
       // 使用设备自己的位置信息，如果有的话
@@ -604,11 +725,14 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       const xPosition = devicePosition ? devicePosition.x : 25 + (index * 43);
       const yPosition = devicePosition ? devicePosition.y : 9;
       
+      // 在托盘中我们不需要额外的地图偏移，但需要正确居中设备
+      
       // 检查设备类型，根据设备类型的字段确定是传感器还是中继器
-      // 在原始代码中，设备类型存储在otype字段中
       const isSensor = (deviceData as any).otype === 'GUISensor';
       
       if (isSensor) {
+        // 传感器在托盘中
+        const sensorRadius = 20;
         return (
           <g 
             key={deviceId}
@@ -619,14 +743,27 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             data-devicetype={ObjectType.TRAY_SENSOR}
             onMouseDown={(e) => handleTrayDeviceMouseDown(e, deviceId)}
           >
-            <circle cx="0" cy="20" r="20" className="sensor" />
+            <circle cx="0" cy="20" r={sensorRadius} className="sensor" />
             <text x="0" y="20" className="trayDotidText">{deviceId}</text>
             <g className='rssiImg'>
-              {/* 这里可以添加RSSI图标，如果需要的话 */}
+              {/* 使用getRssiIcon函数动态选择RSSI图标 */}
+              {(deviceData as any).rssi !== undefined && (
+                <image
+                  x="-10"
+                  y="30"
+                  width="20"
+                  height="20"
+                  xlinkHref={getRssiIcon(deviceData as any)}
+                  className="rssi"
+                />
+              )}
             </g>
           </g>
         );
       } else {
+        // 中继器在托盘中
+        const repeaterWidth = 40;
+        const repeaterHeight = 40;
         return (
           <g 
             key={deviceId}
@@ -637,13 +774,13 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             data-devicetype={ObjectType.TRAY_REPEATER}
             onMouseDown={(e) => handleTrayDeviceMouseDown(e, deviceId)}
           >
-            <rect className="repeater" height="40" width="40" x="-20" />
-            <polygon points="-20 39, 0 0, 20 39" className="triangle" />
+            <rect className="repeater" height={repeaterHeight} width={repeaterWidth} x={-repeaterWidth/2} />
+            <polygon points={`${-repeaterWidth/2} ${repeaterHeight-1}, 0 0, ${repeaterWidth/2} ${repeaterHeight-1}`} className="triangle" />
             <image 
-              x="-20" 
+              x={-repeaterWidth/2}
               y="0"
-              width="40" 
-              height="40" 
+              width={repeaterWidth}
+              height={repeaterHeight}
               xlinkHref={RepeaterIcon}
               className="repeater"
             />
@@ -661,11 +798,16 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     
     const isSelected = selected?.selectedDotid === 'AP';
     const position = (ap as any).info?.position || (ap as any).position || { x: 0, y: 0 };
+    const apWidth = 56;
+    const apHeight = 56;
+    
+    // 使用与原始版本相同的变换计算
+    const transform = `translate(${position.x - apWidth/2 + mapXY.x}, ${position.y - apHeight/2 + mapXY.y})`;
     
     return (
       <g 
         className={`apGOuter apG draggable dotid-AP ${isSelected ? 'selected' : ''}`}
-        transform={`translate(${position.x}, ${position.y})`}
+        transform={transform}
         data-dotid="AP"
         data-devicetype={ObjectType.AP}
         onClick={(e) => {
@@ -673,10 +815,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
           selectDevice(ObjectType.AP, 'AP');
         }}
       >
-        <rect className="ap" height="56" width="56" />
+        <rect className="ap" height={apHeight} width={apWidth} />
         <image 
-          width="56" 
-          height="56" 
+          width={apWidth} 
+          height={apHeight} 
           xlinkHref={APIcon} 
           className="ap"
         />
