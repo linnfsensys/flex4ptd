@@ -1,7 +1,23 @@
 .zustand-layout {
   display: flex;
+  flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#topBar {
+  flex: 0 0 auto;
+  width: 100%;
+  background-color: #333;
+  color: white;
+  z-index: 100;
+}
+
+.zustand-main-content {
+  flex: 1;
+  display: flex;
+  width: 100%;
   overflow: hidden;
 }
 

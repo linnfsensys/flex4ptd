@@ -36,15 +36,11 @@ import './button.css';
 
 import ZustandBridge from './store/ZustandBridge';
 import ZustandApp from './ZustandApp';
+import { SaveColor } from './constants/SaveColorEnum';
+
 interface LogManager {
     enableLogging: Function;
     disableLogging: Function;
-}
-
-export enum SaveColor {
-    PINK = 'pink',
-    YELLOW = 'yellow',
-    GRAY = 'gray',
 }
 
 interface AptdAppProps {

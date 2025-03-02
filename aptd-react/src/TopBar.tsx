@@ -2,7 +2,8 @@ import React, {Component, ReactNode} from 'react';
 import './TopBar.css';
 import {GUIRadioClient, ModalType, ObjectType, UpdateType} from "./AptdClientTypes"
 import WebSocketManager from "./WebSocketManager";
-import AptdApp, {SaveColor} from "./AptdApp";
+import AptdApp from "./AptdApp";
+import { SaveColor } from "./constants/SaveColorEnum";
 import UndoManager from "./UndoManager";
 import TopStore from "./TopStore";
 import AptdButton from "./AptdButton";
