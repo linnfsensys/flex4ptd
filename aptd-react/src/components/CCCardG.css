@@ -1,0 +1,41 @@
+.ccCardG {
+  cursor: pointer;
+}
+
+.ccCardRect {
+  fill: #f5f5f5;
+  stroke: #999;
+  stroke-width: 1;
+}
+
+.ccCardRect.selected {
+  stroke: #2196f3;
+  stroke-width: 2;
+}
+
+.ccCardTitle {
+  font-size: 10px;
+  fill: #333;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.ccCardG:hover .ccCardRect {
+  stroke: #2196f3;
+}
+
+/* 警告标记样式 */
+.warningMark {
+  fill: #ff9800;
+  stroke: #e65100;
+  stroke-width: 1;
+}
+
+.warningMarkText {
+  font-size: 10px;
+  fill: white;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+} 

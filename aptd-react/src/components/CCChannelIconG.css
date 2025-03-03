@@ -1,0 +1,32 @@
+.ccChannelG {
+  cursor: pointer;
+}
+
+.ccChannelRect {
+  fill: #e0e0e0;
+  stroke: #999;
+  stroke-width: 1;
+}
+
+.ccChannelRect.disabled {
+  fill: #f0f0f0;
+  stroke: #ccc;
+}
+
+.ccChannelRect.detected {
+  fill: #a5d6a7;
+  stroke: #4caf50;
+}
+
+.channelText {
+  font-size: 8px;
+  fill: #333;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.ccChannelG:hover .ccChannelRect {
+  stroke: #2196f3;
+  stroke-width: 2;
+} 

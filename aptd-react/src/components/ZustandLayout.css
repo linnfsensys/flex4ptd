@@ -33,11 +33,4 @@
   height: 100%;
   overflow: auto;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
-/* 修复cabinet位置 */
-.cabinetG {
-  position: absolute;
-  right: 0;
-  top: 0;
 } 

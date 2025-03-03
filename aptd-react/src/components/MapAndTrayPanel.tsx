@@ -7,6 +7,8 @@ import UndoManager from '../UndoManager';
 import MapImagesManager from '../MapImagesManager';
 import { useMapTrayStore } from '../store/mapTrayStore';
 import { GUIPoint } from '../AptdServerTypes';
+import { GUICCInterfaceBaseClient } from '../AptdClientTypes';
+import CCCardG from './CCCardG';
 // Import Hilight from a local interface instead of from HelpEngine
 // to avoid the module not found error
 
@@ -993,44 +995,107 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   
   // 渲染机柜卡片
   const renderCabinetCards = () => {
-    if (!ccCards) return null;
+    // 获取检测到的通道ID
+    const getDetectedChannelIds = (): Set<string> => {
+      const detectedSensors = new Set<string>();
+      
+      // 收集所有检测到的传感器
+      Object.entries(mapSensors || {}).forEach(([sensorId, sensor]) => {
+        if (sensor.detect) {
+          detectedSensors.add(sensorId);
+        }
+      });
+      
+      // 根据检测到的传感器获取通道ID
+      const detectedChannelIds = new Set<string>();
+      
+      Object.entries(ccCards || {}).forEach(([cardId, card]) => {
+        const channels = (card as any).channelsById || {};
+        
+        Object.entries(channels).forEach(([channelId, channel]) => {
+          const sensors = (channel as any).sensors || [];
+          
+          // 如果通道连接的任何传感器被检测到，则标记该通道
+          sensors.forEach((sensorId: string) => {
+            if (detectedSensors.has(sensorId)) {
+              detectedChannelIds.add(`${cardId}-${channelId}`);
+            }
+          });
+        });
+      });
+      
+      return detectedChannelIds;
+    };
     
-    return Object.entries(ccCards).map(([cardId, cardData], index) => {
-      const isSelected = selected?.selectedDotid === cardId;
+    const detectedChannelIds = getDetectedChannelIds();
+    
+    // 计算卡片位置
+    let currentY = 10; // 起始位置
+    const spacing = 5; // 卡片之间的间距
+    
+    return Object.entries(ccCards || {}).map(([cardId, cardData]) => {
+      // 计算卡片高度（基础高度 + 通道数量 * 每个通道高度）
+      const channelsCount = Object.keys((cardData as any).channelsById || {}).length;
+      const cardHeight = 20 + (channelsCount * 15); // 基础高度 + 通道高度
+      
+      // 保存当前卡片的Y位置
+      const yPos = currentY;
+      
+      // 更新下一张卡片的位置
+      currentY += cardHeight + spacing;
       
       return (
-        <g 
+        <CCCardG
           key={cardId}
-          className={`ccCardGOuter ccCardG selectable dotid-${cardId} ${isSelected ? 'selected' : ''}`}
-          transform={`translate(0, ${5 + index * 65})`}
-          data-dotid={cardId}
-          data-devicetype={ObjectType.CCCARD}
-          onClick={(e) => {
+          datum={cardData as GUICCInterfaceBaseClient}
+          selected={selected?.selectedDotid === cardId}
+          detectedChannels={detectedChannelIds}
+          x={0}
+          y={yPos}
+          onMouseDown={(e) => {
             e.stopPropagation();
-            selectDevice(ObjectType.CCCARD, cardId);
+            selectExtendedDevice(ObjectType.CCCARD, cardId);
           }}
-        >
-          <rect className="ccCard" height="63" width="50" />
-          <rect className="cardRect" width="35" height="59" x="0" y="2" />
-          <text className="cardText" x="46" y="13" transform="rotate(90, 40, 15)">{cardId.split('-')[1]}</text>
-          
-          {/* 渲染通道 */}
-          {(cardData as any).channels && Object.entries((cardData as any).channels).map(([channelId, channelData], channelIndex) => (
-            <g 
-              key={channelId}
-              className={`ccChannelG dotid-${cardId}-${channelId}`}
-              transform={`translate(2, ${1 + channelIndex * 15})`}
-              data-dotid={`${cardId}-${channelId}`}
-              data-devicetype={ObjectType.CC_CHANNEL}
-            >
-              <rect className="ccChannelRect" height="15" width="28" rx="3" />
-              <text className="channelText" x="12" y="7">Ch {channelIndex + 1}</text>
-            </g>
-          ))}
-        </g>
+          onMouseEnter={(e) => {
+            // 处理鼠标进入事件
+            console.log('Mouse enter card', cardId);
+          }}
+          onMouseLeave={(e) => {
+            // 处理鼠标离开事件
+            console.log('Mouse leave card', cardId);
+          }}
+        />
       );
     });
   };
+  
+  // 更新机柜卡片的位置
+  const updateCabinetCardPositions = () => {
+    // 计算每张卡片的垂直位置
+    let currentY = 10; // 起始位置
+    const spacing = 5; // 卡片之间的间距
+    const updatedCCCards = { ...ccCards };
+    
+    Object.entries(updatedCCCards).forEach(([cardId, cardData]) => {
+      // 更新卡片的位置
+      (updatedCCCards[cardId] as any).yPos = currentY;
+      
+      // 计算卡片高度（基础高度 + 通道数量 * 每个通道高度）
+      const channelsCount = Object.keys((cardData as any).channelsById || {}).length;
+      const cardHeight = 20 + (channelsCount * 15); // 基础高度 + 通道高度
+      
+      // 更新下一张卡片的位置
+      currentY += cardHeight + spacing;
+    });
+    
+    // 我们不直接更新状态，而是记录位置信息
+    // 在渲染时使用这些计算出的位置
+  };
+  
+  // 在组件挂载时计算位置
+  useEffect(() => {
+    updateCabinetCardPositions();
+  }, []);
   
   return (
     <div id="mapCabinetTrayDiv" className="map-and-tray-container" style={{ width: '100%', height: dimensions.height }}>
@@ -1179,7 +1244,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
           
           {/* Right cabinet - conditionally rendered based on rightCabinetPresent */}
           {rightCabinetPresent && (
-            <g className="cabinetG" key="right">
+            <g className="cabinetG" transform={`translate(${mapCabinetTrayWidth - cabinetWidth}, 0)`} key="right">
               <rect
                 className="cabinetRect"
                 width={cabinetWidth}
