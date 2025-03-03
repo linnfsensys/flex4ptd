@@ -1030,13 +1030,13 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     const detectedChannelIds = getDetectedChannelIds();
     
     // 计算卡片位置
-    let currentY = 10; // 起始位置
+    let currentY = 5; // 起始位置与原始版本一致
     const spacing = 5; // 卡片之间的间距
     
     return Object.entries(ccCards || {}).map(([cardId, cardData]) => {
       // 计算卡片高度（基础高度 + 通道数量 * 每个通道高度）
       const channelsCount = Object.keys((cardData as any).channelsById || {}).length;
-      const cardHeight = 20 + (channelsCount * 15); // 基础高度 + 通道高度
+      const cardHeight = 63; // 使用固定高度，与原始版本一致
       
       // 保存当前卡片的Y位置
       const yPos = currentY;

@@ -46,7 +46,8 @@ const CCChannelIconG: React.FC<CCChannelIconGProps> = ({
     rectClassNames += ' detected';
   }
   
-  const transform = `translate(${x}, ${y + 1})`;
+  const transform = `translate(${x}, ${y})`;
+  const channelNumber = toInt(channelNo);
 
   return (
     <g 
@@ -66,7 +67,7 @@ const CCChannelIconG: React.FC<CCChannelIconGProps> = ({
         rx={3}
       />
       <text className="channelText" x="12" y="7">
-        {`Ch ${toInt(channelNo)}`}
+        {`Ch ${channelNumber}`}
       </text>
     </g>
   );
