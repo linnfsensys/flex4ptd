@@ -253,14 +253,26 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   
   // 当mapTrayStore状态改变时，更新AP状态
   useEffect(() => {
+    // 获取当前AP的zoomLevel和pan
+    const currentZoomLevel = getZoomLevel();
+    const currentPan = getPan();
+
+    // 只有当值真正变化时才更新
+    const zoomChanged = Math.abs(currentZoomLevel - zoomLevel) > 0.001;
+    const panChanged =
+      Math.abs(currentPan.x - pan.x) > 0.001 ||
+      Math.abs(currentPan.y - pan.y) > 0.001;
+
     // 使用防抖来减少更新频率
-    const timeoutId = setTimeout(() => {
-      updateZoomLevel(zoomLevel);
-      updatePan(pan);
-    }, 100);
-    
-    return () => clearTimeout(timeoutId);
-  }, [zoomLevel, pan, updateZoomLevel, updatePan]);
+    if (zoomChanged || panChanged) {
+      const timeoutId = setTimeout(() => {
+        if (zoomChanged) updateZoomLevel(zoomLevel);
+        if (panChanged) updatePan(pan);
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [zoomLevel, pan, getZoomLevel, getPan, updateZoomLevel, updatePan]);
   
   // 获取鼠标相对于地图的位置
   const getMousePosition = (e: React.MouseEvent): GUIPoint => {
