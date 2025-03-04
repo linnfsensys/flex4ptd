@@ -40,6 +40,7 @@ interface TopBarZustandProps {
   undoManager: UndoManager;
   helpEngine: HelpEngine;
   onHelpGuideClicked: () => void;
+  onSwitchToOriginal: () => void;
   children?: ReactNode;
 }
 
@@ -65,6 +66,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
   undoManager,
   helpEngine,
   onHelpGuideClicked,
+  onSwitchToOriginal,
   children
 }) => {
   // 使用topBarStore中的状态和操作
@@ -409,6 +411,14 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
                       'pink red' : saveColor}
         />
         {children}
+        <AptdButton 
+          id={'switchToOriginal'}
+          title={''}
+          helpEngine={helpEngine}
+          text={'Zustand'}
+          onClick={onSwitchToOriginal}
+          theClassName={'gray'}
+        />
       </span>
     </div>
   );

@@ -20,6 +20,7 @@ interface ZustandLayoutProps {
   httpManager: HttpManager;
   onRequireLoginChanged: () => void;
   mapImagesManager: MapImagesManager;
+  onSwitchToOriginal: () => void;
 }
 
 /**
@@ -32,7 +33,8 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
   webSocketManager,
   httpManager,
   onRequireLoginChanged,
-  mapImagesManager
+  mapImagesManager,
+  onSwitchToOriginal
 }) => {
   // 获取TopStore的当前状态
   const topState = topStore.getTopState();
@@ -119,7 +121,7 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
 
   return (
     <div className="zustand-layout">
-      <div id="topBar">
+      <div className="top-bar-container">
         <TopBarZustand
           undoEnabled={
             undoManager.hasUndoableXacts() &&
@@ -141,6 +143,7 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
           undoManager={undoManager}
           helpEngine={helpEngine}
           onHelpGuideClicked={onHelpGuideClicked}
+          onSwitchToOriginal={onSwitchToOriginal}
         />
       </div>
       

@@ -37,6 +37,7 @@ import './button.css';
 import ZustandBridge from './store/ZustandBridge';
 import ZustandApp from './ZustandApp';
 import { SaveColor } from './constants/SaveColorEnum';
+import AptdButton from './AptdButton';
 
 interface LogManager {
     enableLogging: Function;
@@ -204,24 +205,14 @@ export class AptdApp extends React.Component<AptdAppProps, AptdAppState> {
                     onHelpGuideClicked={this.onHelpGuideClicked}
                 >
                     {/* Add a button to switch to Zustand version */}
-                    <button 
-                        className="switch-version-button"
+                    <AptdButton 
+                        id={'switchToZustand'}
+                        title={''}
+                        helpEngine={this.state.helpEngine}
+                        text={'Original'}
                         onClick={this.switchToZustand}
-                        style={{
-                            padding: '10px 20px',
-                            backgroundColor: '#ff0000',
-                            color: 'white',
-                            border: '2px solid yellow',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            marginLeft: '10px',
-                            fontSize: '16px',
-                            boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
-                        }}
-                    >
-                        Switch to Zustand Version
-                    </button>
+                        theClassName={'gray'}
+                    />
                 </TopBar>
                 <div
                     id={"mapTrayInfoPanel"}

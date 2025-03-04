@@ -32,25 +32,15 @@ const ZustandApp: React.FC<ZustandAppProps> = ({
 }) => {
   return (
     <div className="zustand-app">
-      <div className="zustand-toolbar">
-        <div className="zustand-toolbar-title">APTD - Zustand Version</div>
-        <button 
-          className="switch-version-button"
-          onClick={onSwitchToOriginal}
-        >
-          Switch to Original Version
-        </button>
-      </div>
-      <div className="zustand-content">
-        <ZustandLayout
-          topStore={topStore}
-          undoManager={undoManager}
-          webSocketManager={webSocketManager}
-          httpManager={httpManager}
-          onRequireLoginChanged={onRequireLoginChanged}
-          mapImagesManager={mapImagesManager}
-        />
-      </div>
+      <ZustandLayout
+        topStore={topStore}
+        undoManager={undoManager}
+        webSocketManager={webSocketManager}
+        httpManager={httpManager}
+        onRequireLoginChanged={onRequireLoginChanged}
+        mapImagesManager={mapImagesManager}
+        onSwitchToOriginal={onSwitchToOriginal}
+      />
     </div>
   );
 };
