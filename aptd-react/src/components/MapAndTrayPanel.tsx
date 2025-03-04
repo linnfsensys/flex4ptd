@@ -1269,10 +1269,15 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       </div>
       
       {/* Tray */}
-      <div id="trayDiv" ref={trayRef} onScroll={(e) => {
-        // 可以在这里处理滚动事件
-        console.log('Tray scrolled');
-      }}>
+      <div 
+        id="trayDiv" 
+        ref={trayRef} 
+        style={{ height: `${trayHeight}px`, overflow: 'auto' }}
+        onScroll={(e) => {
+          // 可以在这里处理滚动事件
+          console.log('Tray scrolled');
+        }}
+      >
         <svg 
           id="traySvg"
           width="100%"

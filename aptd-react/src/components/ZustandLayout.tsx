@@ -101,7 +101,7 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
   const INFO_PANEL_WIDTH = 400; // 固定宽度，单位像素
   const mapCabinetTrayWidth = dimensions.width - INFO_PANEL_WIDTH; // 剩余宽度给地图面板
   const mapCabinetTrayHeight = dimensions.height - 40; // 减去TopBar高度
-  const trayHeight = Math.floor(mapCabinetTrayHeight * 0.2); // 20% of height for tray
+  const trayHeight = 60; // 使用固定值 60，与原始版本一致
   const mapHeight = mapCabinetTrayHeight - trayHeight;
 
   // Update dimensions on window resize
