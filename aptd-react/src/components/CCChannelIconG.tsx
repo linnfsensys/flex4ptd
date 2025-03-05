@@ -30,7 +30,7 @@ const CCChannelIconG: React.FC<CCChannelIconGProps> = ({
   onMouseEnter,
   onMouseLeave
 }) => {
-  // 将通道号转换为整数
+  // convert the channel number to an integer
   const toInt = (channelNo: ChannelNumber): number => {
     return +(channelNo.substr(3));
   };

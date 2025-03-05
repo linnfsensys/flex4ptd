@@ -124,8 +124,8 @@ interface MapAndTrayPanelProps {
 }
 
 /**
- * MapAndTrayPanel组件 - 使用Zustand hooks管理地图和托盘
- * 这是MapAndTray的Zustand版本
+ * MapAndTrayPanel - the MapAndTrayPanel component implemented using Zustand
+ * this is the Zustand version of the MapAndTrayPanel
  */
 const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   topStore,
@@ -139,13 +139,13 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
   rightCabinetPresent = true,
   cabinetWidth = 60
 }) => {
-  // 使用Zustand hooks获取状态和操作
+  // use the Zustand hooks to get the state and operations
   const { mapSettings } = useMapSettings();
   const { mapSensors, mapRepeaters, radios, trayDevices = {}, sensorZones, ccCards, sensorDotidToSzId } = useMapDevices();
   const { selected, selectDevice, clearSelection } = useSelection();
   const { ap, updateAP, getZoomLevel, getPan, updateZoomLevel, updatePan } = useAP();
   
-  // 使用mapTrayStore管理地图平移和缩放
+  // use the mapTrayStore to manage the map pan and zoom
   const { 
     zoomLevel, 
     pan, 
@@ -158,17 +158,17 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     resetView 
   } = useMapTrayStore();
   
-  // 修改：使用传入的mapCabinetTrayWidth作为初始宽度，不再使用本地状态
+  // modify: use the incoming mapCabinetTrayWidth as the initial width, no longer use the local state
   const dimensions = {
     width: mapCabinetTrayWidth,
     height: mapCabinetTrayHeight
   };
   
-  // 拖动状态
+  // dragging state
   const [draggingTrayDevice, setDraggingTrayDevice] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState<GUIPoint>({ x: 0, y: 0 });
   
-  // 选中的托盘设备状态
+  // the selected tray device state
   const [selectedTrayDevice, setSelectedTrayDevice] = useState<string | null>(null);
   
   // Map dimensions calculations (similar to updateMapDimensions in original)
@@ -224,26 +224,26 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     return { x: mapX, y: mapY };
   }, [mapWidth, mapHeight, zoomLevel, mapImageDimensions]);
   
-  // 引用
+  // references to the map and tray divs
   const mapRef = useRef<HTMLDivElement>(null);
   const trayRef = useRef<HTMLDivElement>(null);
   
-  // 扩展的选择设备函数
+  // the extended select device function
   const selectExtendedDevice = (deviceType: ExtendedObjectType, deviceId: string) => {
     if (deviceType === TRAY_DEVICE) {
-      // 对于托盘设备，我们使用本地状态来跟踪选择
+      // for the tray device, we use the local state to track the selection
       setSelectedTrayDevice(deviceId);
       console.log('Selecting tray device:', deviceId);
-      // 在实际应用中，这里应该调用适当的方法来选择托盘设备
+      // in the actual application, this should call the appropriate method to select the tray device
     } else {
-      // 对于其他设备类型，使用原始的selectDevice函数
+      // for other device types, use the original selectDevice function
       selectDevice(deviceType as ObjectType, deviceId);
     }
   };
   
-  // 同步Zustand store和AP状态
+  // synchronize the Zustand store and AP state
   useEffect(() => {
-    // 从AP状态初始化mapTrayStore
+    // initialize the mapTrayStore from the AP state
     const initialZoomLevel = getZoomLevel();
     const initialPan = getPan();
     
@@ -251,19 +251,19 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     setPan(initialPan);
   }, [getZoomLevel, getPan, setZoomLevel, setPan]);
   
-  // 当mapTrayStore状态改变时，更新AP状态
+  // when the mapTrayStore state changes, update the AP state
   useEffect(() => {
-    // 获取当前AP的zoomLevel和pan
+    // get the current AP's zoomLevel and pan
     const currentZoomLevel = getZoomLevel();
     const currentPan = getPan();
 
-    // 只有当值真正变化时才更新
+    // only update when the value really changes
     const zoomChanged = Math.abs(currentZoomLevel - zoomLevel) > 0.001;
     const panChanged =
       Math.abs(currentPan.x - pan.x) > 0.001 ||
       Math.abs(currentPan.y - pan.y) > 0.001;
 
-    // 使用防抖来减少更新频率
+    // use debounce to reduce the update frequency
     if (zoomChanged || panChanged) {
       const timeoutId = setTimeout(() => {
         if (zoomChanged) updateZoomLevel(zoomLevel);
@@ -274,21 +274,21 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     }
   }, [zoomLevel, pan, getZoomLevel, getPan, updateZoomLevel, updatePan]);
   
-  // 获取鼠标相对于地图的位置
+  // get the mouse position relative to the map
   const getMousePosition = (e: React.MouseEvent): GUIPoint => {
     if (!mapRef.current) {
       return { x: 0, y: 0 };
     }
     
     const rect = mapRef.current.getBoundingClientRect();
-    // 使用与原始版本相似的转换逻辑
+    // use the same conversion logic as the original version
     return {
       x: (e.clientX - rect.left - (mapWidth/2)) / zoomLevel - pan.x,
       y: (e.clientY - rect.top - (mapHeight/2)) / zoomLevel - pan.y
     };
   };
   
-  // 获取鼠标相对于托盘的位置
+  // get the mouse position relative to the tray
   const getTrayMousePosition = (e: React.MouseEvent): GUIPoint => {
     if (!trayRef.current) {
       return { x: 0, y: 0 };
@@ -301,16 +301,16 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     };
   };
   
-  // 处理地图鼠标按下事件
+  // handle the map mouse down event
   const handleMouseDown = (e: React.MouseEvent) => {
-    // 只处理左键点击
+    // only handle the left click
     if (e.button !== 0) return;
     
-    // 阻止事件传播和默认行为
+    // stop the event propagation and default behavior
     e.stopPropagation();
     e.preventDefault();
     
-    // 开始拖动
+    // start dragging
     const mousePos = {
       x: e.clientX,
       y: e.clientY
@@ -319,10 +319,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     startDragging(mousePos);
   };
   
-  // 处理地图鼠标移动事件
+  // handle the map mouse move event
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isDragging) {
-      // 阻止事件传播和默认行为
+      // stop the event propagation and default behavior
       e.stopPropagation();
       e.preventDefault();
       
@@ -335,48 +335,48 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     }
   };
   
-  // 处理地图鼠标释放事件
+  // handle the map mouse up event
   const handleMouseUp = (e: React.MouseEvent) => {
     if (isDragging) {
-      // 阻止事件传播和默认行为
+      // stop the event propagation and default behavior
       e.stopPropagation();
       e.preventDefault();
       
       stopDragging();
       
-      // 持久化到AP状态
+      // persist to the AP state
       updatePan(pan);
     }
   };
   
-  // 处理地图点击事件
+  // handle the map click event
   const handleClick = (e: React.MouseEvent) => {
-    // 如果是拖动结束，不处理点击
+    // if the dragging is finished, do not handle the click
     if (isDragging) return;
     
-    // 获取点击位置
+    // get the click position
     const mousePos = getMousePosition(e);
     console.log('Click at', mousePos);
     
-    // 清除选择
+    // clear the selection
     clearSelection();
     setSelectedTrayDevice(null);
   };
   
-  // 处理托盘设备鼠标按下事件
+  // handle the tray device mouse down event
   const handleTrayDeviceMouseDown = (e: React.MouseEvent, deviceId: string) => {
     e.stopPropagation();
     
-    // 只处理左键点击
+    // only handle the left click
     if (e.button !== 0) return;
     
-    // 选择设备
+    // select the device
     selectExtendedDevice(TRAY_DEVICE, deviceId);
     
-    // 开始拖动
+    // start dragging
     setDraggingTrayDevice(deviceId);
     
-    // 计算拖动偏移量
+    // calculate the drag offset
     const mousePos = getTrayMousePosition(e);
     const device = trayDevices[deviceId] as unknown as TrayDevice;
     if (device && device.position) {
@@ -387,51 +387,51 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     }
   };
   
-  // 处理托盘鼠标移动事件
+  // handle the tray device mouse move event
   const handleTrayMouseMove = (e: React.MouseEvent) => {
     if (draggingTrayDevice) {
-      // 更新托盘设备位置
+      // update the tray device position
       const mousePos = getTrayMousePosition(e);
       const newPosition = {
         x: mousePos.x + dragOffset.x,
         y: mousePos.y + dragOffset.y
       };
       
-      // 这里应该更新托盘设备位置
+      // here should update the tray device position
       console.log('Update tray device position', draggingTrayDevice, newPosition);
       
-      // 在实际应用中，这里应该调用updateTrayDevice或类似的方法
+      // in the actual application, this should call updateTrayDevice or similar method
     }
   };
   
-  // 处理托盘鼠标释放事件
+  // handle the tray device mouse up event
   const handleTrayMouseUp = () => {
     if (draggingTrayDevice) {
       setDraggingTrayDevice(null);
     }
   };
   
-  // 处理缩放
+  // handle the zoom
   const handleZoom = (direction: 'in' | 'out') => {
     const zoomFactor = direction === 'in' ? 1.1 : 0.9;
-    // 原始版本对缩放限制是0.1到8.0
+    // the original version limits the zoom to 0.1 to 8.0
     const newZoomLevel = Math.max(0.1, Math.min(8.0, zoomLevel * zoomFactor));
     
-    // 更新状态
+    // update the state
     setZoomLevel(newZoomLevel);
     
-    // 持久化到AP状态
+    // persist to the AP state
     updateZoomLevel(newZoomLevel);
   };
   
-  // 重置视图
+  // handle the reset view
   const handleResetView = () => {
     resetView();
     updateZoomLevel(1.0);
     updatePan({ x: 0, y: 0 });
   };
   
-  // 渲染传感器区域
+  // render the sensor zones
   const renderSensorZones = () => {
     if (!sensorZones) return null;
     
@@ -439,7 +439,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       const isSelected = selected?.selectedSzId === szId;
       const position = (szData as any).info?.position || (szData as any).position || { x: 0, y: 0 };
       
-      // 调整传感器区域的transform - 加上地图位置偏移量
+      // adjust the sensor zone's transform - add the map position offset
       const transform = `translate(${position.x + mapXY.x}, ${position.y + mapXY.y})`;
       
       const szSensors = Object.entries(mapSensors || {})
@@ -502,7 +502,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     });
   };
   
-  // 渲染射频链接
+  // render the RF links
   const renderRFLinks = () => {
     if (!mapSettings?.showRFLinks) {
       return [];
@@ -512,10 +512,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       const rfLink = (sensorData as any).info?.rfLink;
       
       if (dotId && rfLink) {
-        // 检查是否选中的链接
-        const selected = false; // 在实际中应该检查选择状态
+        // check if the link is selected
+        const selected = false; // in the actual application, this should check the selection state
         
-        // 检查链接的位置类型
+        // check the link location type
         if (rfLink.location === 'MAP_AUTO') {
           console.error('renderRFLinks(): unexpected MAP_AUTO rflink', rfLink, sensorData);
           return null;
@@ -524,7 +524,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
         const lines = rfLink.lines;
         if (!lines || lines.length === 0) return null;
         
-        // 渲染可见的polyline - 从原始版本中提取
+        // render the visible polyline - from the original version
         let points = '';
         if (lines && lines.length > 0) {
           const firstLine = lines[0];
@@ -535,7 +535,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
           }
         }
         
-        // 渲染可拖动链接
+        // render the draggable links
         const draggableLinks = [];
         if (lines && lines.length > 0) {
           for (let segmentIndex = 0; segmentIndex < lines.length; segmentIndex++) {
@@ -564,7 +564,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
           }
         }
         
-        // 渲染悬停点
+        // render the hover points
         const draggablePoints = [];
         if (lines && lines.length > 1) {
           for (let lineIndex = 0; lineIndex < lines.length - 1; lineIndex++) {
@@ -608,15 +608,15 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       return null;
     });
     
-    // 添加中继器的RF链接渲染
+    // render the repeater's RF links
     const repeaterRfLinks = Object.entries(mapRepeaters || {}).map(([dotId, repeaterData]) => {
       const rfLink = (repeaterData as any).info?.rfLink;
       
       if (dotId && rfLink) {
-        // 检查是否选中的链接
-        const selected = false; // 在实际中应该检查选择状态
+        // check if the link is selected
+        const selected = false; // in the actual application, this should check the selection state
         
-        // 检查链接的位置类型
+        // check the link location type
         if (rfLink.location === 'MAP_AUTO') {
           console.error('renderRFLinks(): unexpected MAP_AUTO rflink', rfLink, repeaterData);
           return null;
@@ -625,7 +625,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
         const lines = rfLink.lines;
         if (!lines || lines.length === 0) return null;
         
-        // 渲染可见的polyline
+        // render the visible polyline
         let points = '';
         if (lines && lines.length > 0) {
           const firstLine = lines[0];
@@ -636,7 +636,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
           }
         }
         
-        // 渲染可拖动链接
+        // render the draggable links
         const draggableLinks = [];
         if (lines && lines.length > 0) {
           for (let segmentIndex = 0; segmentIndex < lines.length; segmentIndex++) {
@@ -665,7 +665,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
           }
         }
         
-        // 渲染悬停点
+        // render the hover points
         const draggablePoints = [];
         if (lines && lines.length > 1) {
           for (let lineIndex = 0; lineIndex < lines.length - 1; lineIndex++) {
@@ -709,21 +709,21 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       return null;
     });
     
-    // 合并传感器和中继器的RF链接
+    // merge the sensor and repeater's RF links
     return [...sensorRfLinks, ...repeaterRfLinks].filter(Boolean);
   };
   
-  // 渲染射频链接
+  // render the CC links
   const renderCCLinks = () => {
-    // 简化版本的CC链接渲染
+    // simplified version of the CC links rendering
     return [];
   };
   
-  // 添加验证错误检查函数
+  // add the validation error check function
   const hasValidationErrors = (objectType: ObjectType, objectId: string): boolean => {
     if (!topStore) return false;
     
-    // 检查验证错误
+    // check the validation errors
     for (let validationKey of Object.keys(topStore.getTopState().validationErrors || {})) {
       let errorKey = TopStore.parseValidationErrorsKey(validationKey);
       if (errorKey.objectType === objectType && errorKey.objectId === objectId) {
@@ -731,7 +731,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       }
     }
     
-    // 检查全局验证错误
+    // check the global validation errors
     for (let validationKey of Object.keys(topStore.getTopState().validationGlobalErrors || {})) {
       let errorKey = TopStore.parseValidationGlobalErrorsKey(validationKey);
       if (errorKey.objectType === objectType && errorKey.objectId === objectId) {
@@ -742,7 +742,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     return false;
   };
   
-  // 渲染无线电
+  // render the radios
   const renderRadios = () => {
     if (!radios) return null;
     
@@ -752,7 +752,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       const radioWidth = 56;
       const radioHeight = 56;
       
-      // 使用与原始版本相同的变换计算 - 包括居中偏移和地图位置
+      // use the same transform calculation as the original version - including the center offset and map position
       const transform = `translate(${position.x - radioWidth/2 + mapXY.x}, ${position.y - radioHeight/2 + mapXY.y})`;
       
       return (
@@ -774,7 +774,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             xlinkHref={RadioIcon} 
             className="radio"
           />
-          {/* 添加固件进度显示 */}
+          {/* add the firmware progress display */}
           {(radioData as any).percentComplete !== undefined && (radioData as any).percentComplete > 0 && (
             <rect
               x={radioWidth/2 - 10}
@@ -785,10 +785,10 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             />
           )}
           <text x="30" y="15">
-            {/* 使用与原始版本相同的格式：Radio-X */}
+            {/* use the same format as the original version: Radio-X */}
             Radio-{(radioData as any).apConnection?.replace('SPP', '') || radioId.slice(-1)}
           </text>
-          {/* 添加未收到警告标记 */}
+          {/* add the unheard warning mark */}
           {(radioData as any).unheard === true && (
             <image
               id="unheard"
@@ -799,7 +799,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
               xlinkHref={WarningIcon}
             />
           )}
-          {/* 添加缺陷标记 - 如果有验证错误 */}
+          {/* add the deficient mark - if there are validation errors */}
           {hasValidationErrors(ObjectType.RADIO, radioId) && (
             <text x={radioWidth-6} y={30} className="deficient">*</text>
           )}
@@ -808,7 +808,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     });
   };
   
-  // 渲染中继器
+  // render the repeaters
   const renderRepeaters = () => {
     if (!mapRepeaters) return null;
     
@@ -818,7 +818,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
       const repeaterWidth = 40;
       const repeaterHeight = 40;
       
-      // 使用与原始版本相同的变换计算
+      // use the same transform calculation as the original version
       const transform = `translate(${position.x - repeaterWidth/2 + mapXY.x}, ${position.y - repeaterHeight/2 + mapXY.y})`;
       
       return (
@@ -841,7 +841,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             className="repeater"
           />
           <text x="20" y="20">R-{repeaterId.slice(-2)}</text>
-          {/* 添加未收到警告标记 */}
+          {/* add the unheard warning mark */}
           {(repeaterData as any).unheard === true && (
             <image
               id="unheard"
@@ -852,7 +852,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
               xlinkHref={WarningIcon}
             />
           )}
-          {/* 添加缺陷标记 - 如果有验证错误 */}
+          {/* add the deficient mark - if there are validation errors */}
           {hasValidationErrors(ObjectType.MAP_REPEATER, repeaterId) && (
             <text x={repeaterWidth-6} y={30} className="deficient">*</text>
           )}
@@ -861,25 +861,25 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     });
   };
   
-  // 渲染托盘设备
+  // render the tray devices
   const renderTrayDevices = () => {
     if (!trayDevices) return null;
     
-    // 添加获取RSSI图标的函数
+    // add the function to get the RSSI icon
     const getRssiIcon = (deviceData: any): string => {
-      // 如果设备未看到或未收到
+      // if the device is unseen or unheard
       if (deviceData.unheard || !deviceData.seen) {
         return RssiEmpty;
       }
       
-      // 检查是否有rssi数据
+      // check if there is rssi data
       if (deviceData.rssi !== undefined && ap) {
-        // 获取阈值
+        // get the thresholds
         let rssiHigh = (ap as any).rssiHigh || -66;
         let rssiMed = (ap as any).rssiMed || -80;
         let rssiLow = (ap as any).rssiLow || -86;
         
-        // 根据信号强度返回相应图标
+        // return the corresponding icon based on the signal strength
         if (deviceData.rssi >= rssiHigh) {
           return RssiHigh;
         } else if (deviceData.rssi >= rssiMed) {
@@ -891,25 +891,25 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
         }
       }
       
-      // 默认返回空图标
+      // default return the empty icon
       return RssiEmpty;
     };
     
     return Object.entries(trayDevices).map(([deviceId, deviceData], index) => {
       const isSelected = selectedTrayDevice === deviceId;
-      // 使用设备自己的位置信息，如果有的话
+      // use the device's own position information, if any
       const devicePosition = (deviceData as any).info?.position || (deviceData as any).position;
-      // 如果设备没有位置信息，则使用计算的位置
+      // if the device has no position information, use the calculated position
       const xPosition = devicePosition ? devicePosition.x : 25 + (index * 43);
       const yPosition = devicePosition ? devicePosition.y : 9;
       
-      // 在托盘中我们不需要额外的地图偏移，但需要正确居中设备
+      // in the tray, we do not need the extra map offset, but we need to center the device correctly
       
-      // 检查设备类型，根据设备类型的字段确定是传感器还是中继器
+      // check the device type, determine if it is a sensor or a repeater
       const isSensor = (deviceData as any).otype === 'GUISensor';
       
       if (isSensor) {
-        // 传感器在托盘中
+        // the sensor is in the tray
         const sensorRadius = 20;
         return (
           <g 
@@ -924,7 +924,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             <circle cx="0" cy="20" r={sensorRadius} className="sensor" />
             <text x="0" y="20" className="trayDotidText">{deviceId}</text>
             <g className='rssiImg'>
-              {/* 使用getRssiIcon函数动态选择RSSI图标 */}
+              {/* use the getRssiIcon function to dynamically select the RSSI icon */}
               {(deviceData as any).rssi !== undefined && (
                 <image
                   x="-10"
@@ -939,7 +939,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
           </g>
         );
       } else {
-        // 中继器在托盘中
+        // the repeater is in the tray
         const repeaterWidth = 40;
         const repeaterHeight = 40;
         return (
@@ -970,7 +970,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     });
   };
   
-  // 渲染AP
+  // render the AP
   const renderAP = () => {
     if (!ap) return null;
     
@@ -979,7 +979,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     const apWidth = 56;
     const apHeight = 56;
     
-    // 使用与原始版本相同的变换计算
+    // use the same transform calculation as the original version
     const transform = `translate(${position.x - apWidth/2 + mapXY.x}, ${position.y - apHeight/2 + mapXY.y})`;
     
     return (
@@ -1005,20 +1005,20 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     );
   };
   
-  // 渲染机柜卡片
+  // render the cabinet cards
   const renderCabinetCards = () => {
-    // 获取检测到的通道ID
+    // get the detected channel IDs
     const getDetectedChannelIds = (): Set<string> => {
       const detectedSensors = new Set<string>();
       
-      // 收集所有检测到的传感器
+      // collect all the detected sensors
       Object.entries(mapSensors || {}).forEach(([sensorId, sensor]) => {
         if (sensor.detect) {
           detectedSensors.add(sensorId);
         }
       });
       
-      // 根据检测到的传感器获取通道ID
+      // get the detected channel IDs
       const detectedChannelIds = new Set<string>();
       
       Object.entries(ccCards || {}).forEach(([cardId, card]) => {
@@ -1027,7 +1027,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
         Object.entries(channels).forEach(([channelId, channel]) => {
           const sensors = (channel as any).sensors || [];
           
-          // 如果通道连接的任何传感器被检测到，则标记该通道
+          // if any sensor connected to the channel is detected, mark the channel
           sensors.forEach((sensorId: string) => {
             if (detectedSensors.has(sensorId)) {
               detectedChannelIds.add(`${cardId}-${channelId}`);
@@ -1041,19 +1041,19 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     
     const detectedChannelIds = getDetectedChannelIds();
     
-    // 计算卡片位置
-    let currentY = 5; // 起始位置与原始版本一致
-    const spacing = 5; // 卡片之间的间距
+    // calculate the card positions
+    let currentY = 5; // start position, consistent with the original version
+    const spacing = 5; // card spacing
     
     return Object.entries(ccCards || {}).map(([cardId, cardData]) => {
-      // 计算卡片高度（基础高度 + 通道数量 * 每个通道高度）
+      // calculate the card height (base height + channel count * each channel height)
       const channelsCount = Object.keys((cardData as any).channelsById || {}).length;
-      const cardHeight = 63; // 使用固定高度，与原始版本一致
+      const cardHeight = 63; // use the fixed height, consistent with the original version
       
-      // 保存当前卡片的Y位置
+      // save the current card's Y position
       const yPos = currentY;
       
-      // 更新下一张卡片的位置
+      // update the next card's position
       currentY += cardHeight + spacing;
       
       return (
@@ -1069,11 +1069,11 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
             selectExtendedDevice(ObjectType.CCCARD, cardId);
           }}
           onMouseEnter={(e) => {
-            // 处理鼠标进入事件
+            // handle the mouse enter event
             console.log('Mouse enter card', cardId);
           }}
           onMouseLeave={(e) => {
-            // 处理鼠标离开事件
+            // handle the mouse leave event
             console.log('Mouse leave card', cardId);
           }}
         />
@@ -1081,30 +1081,30 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
     });
   };
   
-  // 更新机柜卡片的位置
+  // update the cabinet card positions
   const updateCabinetCardPositions = () => {
-    // 计算每张卡片的垂直位置
-    let currentY = 10; // 起始位置
-    const spacing = 5; // 卡片之间的间距
+    // calculate the vertical position of each card
+    let currentY = 10; // start position
+    const spacing = 5; // card spacing
     const updatedCCCards = { ...ccCards };
     
     Object.entries(updatedCCCards).forEach(([cardId, cardData]) => {
-      // 更新卡片的位置
+      // update the card's position
       (updatedCCCards[cardId] as any).yPos = currentY;
       
-      // 计算卡片高度（基础高度 + 通道数量 * 每个通道高度）
+      // calculate the card height (base height + channel count * each channel height)
       const channelsCount = Object.keys((cardData as any).channelsById || {}).length;
-      const cardHeight = 20 + (channelsCount * 15); // 基础高度 + 通道高度
+      const cardHeight = 20 + (channelsCount * 15); // base height + channel height
       
-      // 更新下一张卡片的位置
+      // update the next card's position
       currentY += cardHeight + spacing;
     });
     
-    // 我们不直接更新状态，而是记录位置信息
-    // 在渲染时使用这些计算出的位置
+    // we do not directly update the state, but record the position information
+    // use these calculated positions when rendering
   };
   
-  // 在组件挂载时计算位置
+  // calculate the positions when the component is mounted
   useEffect(() => {
     updateCabinetCardPositions();
   }, []);
@@ -1274,7 +1274,7 @@ const MapAndTrayPanel: React.FC<MapAndTrayPanelProps> = ({
         ref={trayRef} 
         style={{ height: `${trayHeight}px`, overflow: 'auto' }}
         onScroll={(e) => {
-          // 可以在这里处理滚动事件
+          // handle the scroll event
           console.log('Tray scrolled');
         }}
       >

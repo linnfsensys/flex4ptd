@@ -29,11 +29,11 @@ const CCCardG: React.FC<CCCardGProps> = ({
   const cardHeight = 63;
   const channelHeight = 15;
   
-  // 从 ID 中提取 shelf 和 slot
+  // get the shelf and slot from the id
   const getShelfSlot = (id: string): string => {
     const parts = id.split('-');
     if (parts.length >= 2) {
-      // 移除 'S' 前缀
+      // remove the 'S' prefix
       const shelf = parts[0].replace(/^S/, '');
       const slot = parts[1].replace(/^S/, '');
       return `${shelf}-${slot}`;
@@ -41,7 +41,7 @@ const CCCardG: React.FC<CCCardGProps> = ({
     return id;
   };
   
-  // 生成通道图标
+  // generate the channel icons
   const makeChannelIcons = () => {
     const channelIcons: React.ReactNode[] = [];
     const channels = datum.channelsById || {};
@@ -60,7 +60,7 @@ const CCCardG: React.FC<CCCardGProps> = ({
           detect={isDetected}
           height={channelHeight}
           x={2}
-          y={1 + index * (channelHeight + 1)} // 调整通道间距
+          y={1 + index * (channelHeight + 1)} // adjust the channel spacing
           onMouseDown={onMouseDown}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
@@ -84,14 +84,14 @@ const CCCardG: React.FC<CCCardGProps> = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* 卡片背景 */}
+      {/* card background */}
       <rect 
         className="ccCard"
         width={cardWidth}
         height={cardHeight}
       />
       
-      {/* 卡片内部矩形 */}
+      {/* card inner rectangle */}
       <rect 
         className={`cardRect ${selected ? 'selected' : ''}`}
         width={35}
@@ -100,7 +100,7 @@ const CCCardG: React.FC<CCCardGProps> = ({
         y={2}
       />
       
-      {/* 卡片文本 - 旋转90度 */}
+      {/* card text - rotate 90 degrees */}
       <text 
         className="cardText" 
         x={46} 
@@ -110,7 +110,7 @@ const CCCardG: React.FC<CCCardGProps> = ({
         {shelfSlot}
       </text>
       
-      {/* 渲染通道图标 */}
+      {/* render the channel icons */}
       {makeChannelIcons()}
     </g>
   );

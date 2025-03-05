@@ -45,8 +45,8 @@ interface TopBarZustandProps {
 }
 
 /**
- * TopBarZustand - 使用Zustand实现的TopBar组件
- * 这是TopBar的Zustand版本
+ * TopBarZustand - the TopBar component implemented using Zustand
+ * this is the Zustand version of the TopBar
  */
 const TopBarZustand: React.FC<TopBarZustandProps> = ({
   undoEnabled,
@@ -69,17 +69,17 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
   onSwitchToOriginal,
   children
 }) => {
-  // 使用topBarStore中的状态和操作
+  // use the state and operations in the topBarStore
   const topBarState = useTopBar();
   
-  // 初始化topBarStore状态
+  // initialize the topBarStore state
   useEffect(() => {
     topBarState.setUndoState(undoEnabled, redoEnabled, undoLabel, redoLabel);
     topBarState.setSaveState(saveEnabled, saveColor);
     topBarState.setSavePctComplete(savePctComplete);
     topBarState.setPingScanStatus(pingScanStatus, pingScanSecsLeft);
     topBarState.setConfiguredDevicesResolved(topStore.getTopState().configuredDevicesResolved);
-    // 帮助引擎状态
+    // the help engine state
     topBarState.setHelpEnabled(helpEngine.isHelpEnabled());
   }, [
     undoEnabled, redoEnabled, undoLabel, redoLabel, 
@@ -88,30 +88,30 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     topStore, helpEngine
   ]);
   
-  // 是否显示保存进度
+  // whether to show the save progress
   const saveProgressVisible = savePctComplete !== null && websocketManager !== null;
   
-  // 是否有帮助指南
+  // whether the help guide is present
   const helpGuidePresent = helpEngine.isHelpEnabled();
   
-  // 是否所有配置的设备已解析
+  // whether all configured devices are resolved
   const configuredDevicesResolved = topStore.getTopState().configuredDevicesResolved;
   
-  // 判断节点模式
+  // determine the node mode
   const nodeMode = process.env.NODE_ENV;
   const productionMode = nodeMode === 'production';
   
-  // 根据生产模式决定按钮文本
+  // determine the button text based on the production mode
   const undoButtonText = productionMode ? '' : 'Undo ' + undoLabel;
   const redoButtonText = productionMode ? '' : 'Redo ' + redoLabel;
   
-  // 处理ping扫描状态
+  // handle the ping scan status
   let pingStatus = pingScanStatus;
   if (pingStatus === 100) {
     pingStatus = null;
   }
   
-  // 保存进度标签和百分比
+  // the save progress label and percentage
   let saveProgressLabel: string;
   let savePercentComplete: number;
   
@@ -120,7 +120,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     savePercentComplete = 0;
   } else if ((websocketManager === null || !websocketManager.thisUserInitiatedSave) &&
              (saveEnabled || saveColor === SaveColor.PINK)) {
-    // 如果不在保存中，且保存按钮启用，显示进度为零
+    // if not saving, and save button is enabled, show progress as 0%
     saveProgressLabel = '0% complete';
     savePercentComplete = 0;
   } else {
@@ -128,7 +128,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     savePercentComplete = savePctComplete;
   }
   
-  // 保存按钮标题
+  // the save button title
   let saveTitle = '';
   if (saveColor === SaveColor.PINK) {
     saveTitle = 'Please fix all validation errors before Saving';
@@ -136,14 +136,14 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     saveTitle = 'Please wait for scan to complete before doing Save';
   }
   
-  // 函数：检查是否有可用的无线电
+  // function: check if there is a radio available
   const isRadioAvailable = useCallback((): boolean => {
     const allUnheard = Object.values(topStore.getTopState().radios)
       .every((radio: GUIRadioClient) => radio.unheard);
     return !allUnheard;
   }, [topStore]);
   
-  // 字符串属性转换为数字
+  // function: convert the string attribute to a number
   const convertStringAttributeToNumber = (stringAttribute: string | null): number => {
     let numberVal = 0;
     if (stringAttribute !== null && stringAttribute.includes("px")) {
@@ -152,7 +152,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     return numberVal;
   };
   
-  // 渲染帮助气球覆盖
+  // function: render the help balloon overlay
   const renderHelpBalloonOverlay = (): ReactNode => {
     let helpBalloonDiv = document.getElementById('balloonOverlayDiv');
     let helpBalloonRect = document.getElementById('SaveBalloon0');
@@ -204,7 +204,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     return balloon;
   };
   
-  // 处理停止扫描点击
+  // function: handle the stop scan click
   const onStopScanClicked = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     AptdApp.blurFocusedField();
     AptdApp.unfocusInfoPanelTextField();
@@ -212,12 +212,12 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
       console.error('websocketManager is null');
       showModal(ModalType.ONE_BUTTON_ERROR, 'SensConfig is unable to connect.');
     } else {
-      // setTimeout 允许文本字段更新到 TopStore
+      // setTimeout allows the text field to update to TopStore
       setTimeout(websocketManager.stopPingScan, 500);
     }
   };
   
-  // 处理开始扫描点击
+  // function: handle the start scan click
   const onStartScanClicked = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     AptdApp.blurFocusedField();
     AptdApp.unfocusInfoPanelTextField();
@@ -225,12 +225,12 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
       console.error('websocketManager is null');
       showModal(ModalType.ONE_BUTTON_ERROR, 'SensConfig is unable to connect.');
     } else {
-      // setTimeout 允许文本字段更新到 TopStore
+      // setTimeout allows the text field to update to TopStore
       setTimeout(websocketManager.startPingScan, 500);
     }
   };
   
-  // 处理保存点击
+  // function: handle the save click
   const onSaveClicked = (): void => {
     console.debug('user clicked Save button. about to send Save msg to server');
     if (websocketManager === null) {
@@ -251,7 +251,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     }
   };
   
-  // 处理技术支持数据获取
+  // function: handle the get tech support data click
   const onGetTechSupportClicked = (): void => {
     console.debug('user made Get Tech Support gesture.');
     if (websocketManager === null) {
@@ -262,13 +262,13 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     }
   };
   
-  // 处理产品名称点击
+  // function: handle the product name click
   const onProductNameClick = (event: React.MouseEvent): void => {
     const isMac: boolean = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     if (event.ctrlKey === true || event.metaKey === true || event.altKey === true || event.shiftKey === true) {
-      // 抑制标准浏览器行为
-      // 注意：在Windows上metaKey是WINDOWS键。
-      //       在Mac上，metaKey是COMMAND键。
+      // suppress the standard browser behavior
+      // note: on Windows, metaKey is the WINDOWS key.
+      //       on Mac, metaKey is the COMMAND key.
       event.preventDefault();
     }
     if (event.ctrlKey === true || (isMac && event.metaKey === true)) {
@@ -278,7 +278,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
     }
   };
   
-  // 渲染帮助气球覆盖层
+  // function: render the help balloon overlay
   let helpBalloonOverlay: ReactNode = null;
   if (helpGuidePresent) {
     helpBalloonOverlay = renderHelpBalloonOverlay();
@@ -316,7 +316,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
             <AptdButton id={'startScan'}
                         title={''}
                         helpEngine={helpEngine}
-                        text={'Find Devices'}  // 由Robert要求的新标签
+                        text={'Find Devices'}
                         disabled={!isRadioAvailable() ||
                                   !configuredDevicesResolved}
                         onClick={onStartScanClicked}
@@ -378,7 +378,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
                     onClick={() => {
                       AptdApp.blurFocusedField();
                       AptdApp.unfocusInfoPanelTextField();
-                      // setTimeout允许文本字段更新到TopStore
+                      // setTimeout allows the text field to update to TopStore
                       setTimeout(doUndo, 500);
                     }}
         />
@@ -391,7 +391,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
                     onClick={() => {
                       AptdApp.blurFocusedField();
                       AptdApp.unfocusInfoPanelTextField();
-                      // setTimeout允许文本字段更新到TopStore
+                      // setTimeout allows the text field to update to TopStore
                       setTimeout(doRedo, 500);
                     }}
         />
@@ -404,7 +404,7 @@ const TopBarZustand: React.FC<TopBarZustandProps> = ({
                     onClick={() => {
                       AptdApp.blurFocusedField();
                       AptdApp.unfocusInfoPanelTextField();
-                      // setTimeout允许文本字段更新到TopStore
+                      // setTimeout allows the text field to update to TopStore
                       setTimeout(onSaveClicked, 1000);
                     }}
                     theClassName={saveColor === SaveColor.PINK ?

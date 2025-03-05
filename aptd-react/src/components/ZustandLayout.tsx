@@ -36,22 +36,22 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
   mapImagesManager,
   onSwitchToOriginal
 }) => {
-  // 获取TopStore的当前状态
+  // get the current state of the TopStore
   const topState = topStore.getTopState();
   const selected = topState.selected;
   
-  // 创建本地的helpEngine状态
+  // create the local helpEngine state
   const [helpEngine] = useState(() => new HelpEngine(undoManager, topStore));
   
-  // 处理帮助指南点击
+  // handle the help guide click
   const onHelpGuideClicked = useCallback(() => {
     const isCurrentlyEnabled = helpEngine.isHelpEnabled();
     helpEngine.setHelpEnabled(!isCurrentlyEnabled);
   }, [helpEngine]);
   
-  // 获取保存按钮颜色
+  // get the save button color
   const getSaveColor = useCallback((): SaveColor => {
-    // 检查是否有验证错误 
+    // check if there are validation errors
     const hasValidationErrors = Object.keys(topState.validationErrors || {}).length > 0 ||
                                Object.keys(topState.validationGlobalErrors || {}).length > 0;
     
@@ -64,29 +64,29 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
     }
   }, [topState.validationErrors, topState.validationGlobalErrors, topState.pingScanStatus]);
   
-  // 检查是否可以保存
+  // check if the save is enabled
   const isSaveEnabled = useCallback((topStore: TopStore, undoManager: UndoManager): boolean => {
-    // 检查是否有验证错误
+    // check if there are validation errors
     const hasValidationErrors = Object.keys(topState.validationErrors || {}).length > 0 ||
                                Object.keys(topState.validationGlobalErrors || {}).length > 0;
     
     if(topState.pingScanStatus !== null && topState.pingScanStatus < 100) {
-      // 正在扫描，禁用保存
+      // scanning, disable the save
       return false;
     }
     if(hasValidationErrors) {
-      // 有验证错误，禁用保存
+      // there are validation errors, disable the save
       return false;
     }
     if(!undoManager.hasUndoableXacts()) {
-      // 没有可撤销的操作，禁用保存
+      // no undoable actions, disable the save
       return false;
     }
-    // 默认启用保存
+    // default enable the save
     return true;
   }, [topState.pingScanStatus, topState.validationErrors, topState.validationGlobalErrors]);
   
-  // 显示模态对话框
+  // show the modal dialog
   const showModal = (modalType: ModalType, description: string, buttonLabels?: string[], buttonOnClicks?: Array<() => void>) => {
     topStore.showModal(modalType, description, buttonLabels, buttonOnClicks);
   };
@@ -97,13 +97,13 @@ const ZustandLayout: React.FC<ZustandLayoutProps> = ({
     height: window.innerHeight - 50 // Subtract toolbar height
   });
 
-  // 使用黄金比例计算布局
-  // 黄金比例约为1.618:1
+  // use the golden ratio to calculate the layout
+  // golden ratio is 1.618
   const GOLDEN_RATIO = 1.618;
-  const INFO_PANEL_WIDTH = 400; // 固定宽度，单位像素
-  const mapCabinetTrayWidth = dimensions.width - INFO_PANEL_WIDTH; // 剩余宽度给地图面板
-  const mapCabinetTrayHeight = dimensions.height - 40; // 减去TopBar高度
-  const trayHeight = 60; // 使用固定值 60，与原始版本一致
+  const INFO_PANEL_WIDTH = 400; // fixed width, in pixels
+  const mapCabinetTrayWidth = dimensions.width - INFO_PANEL_WIDTH; // the remaining width for the map panel
+  const mapCabinetTrayHeight = dimensions.height - 40; // subtract the top bar height
+  const trayHeight = 60; // use a fixed value of 60, consistent with the original version
   const mapHeight = mapCabinetTrayHeight - trayHeight;
 
   // Update dimensions on window resize
