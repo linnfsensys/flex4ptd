@@ -14,7 +14,7 @@ import WebSocketManager from '../WebSocketManager';
 import '../infoPanels/InfoPanel.css';
 import '../infoPanels/InfoPanelRepeater.css';
 
-// 错误和警告图标
+// error and warning icons
 const ErrorAsteriskIcon: any = require('../assets/icons/icons8-asterisk-96.png');
 const WarningIcon: any = require('../assets/icons/icons8-warning-96.png');
 
@@ -25,26 +25,26 @@ interface RepeaterPanelProps {
 }
 
 /**
- * RepeaterPanel组件 - 使用Zustand hooks管理中继器
- * 这是InfoPanelRepeater的Zustand版本
+ * RepeaterPanel component - using Zustand hooks to manage repeaters
+ * this is the Zustand version of InfoPanelRepeater
  */
 const RepeaterPanel: React.FC<RepeaterPanelProps> = ({ 
   topStore,
   undoManager,
   webSocketManager
 }) => {
-  // 使用Zustand hooks获取状态和操作
+  // use Zustand hooks to get the state and actions
   const { mapRepeaters, updateRepeater, getRepeater, getRepeaterBatteryStatus, 
           getRepeaterBrandName, disableDisallowedOptions, transformDownstreamChannelValueToStore,
           calcDesiredUpstreamChannel } = useRepeaters();
   const { ap } = useAP();
   const { selected } = useSelection();
   
-  // 本地状态
+  // local state
   const [selectedRepeater, setSelectedRepeater] = useState<string | null>(null);
   const [desiredDownstreamChannel, setDesiredDownstreamChannel] = useState<string>('AUTO');
   
-  // 通道选项
+  // channel options
   const autoValue = 'AUTO';
   const allChannelOptions: Array<Option> = [
     {value: autoValue, text: 'Auto'},
@@ -66,26 +66,26 @@ const RepeaterPanel: React.FC<RepeaterPanelProps> = ({
     {value: '15', text: '15'},
   ];
   
-  // 天线选项
+  // antenna options
   const downstreamAntennaOptions: Array<Option> = [
     {value: 'INTERNAL', text: 'Internal'},
     {value: 'EXTERNAL', text: 'External'},
   ];
   
-  // 电池状态选项
+  // battery status options
   const batteryStatusOptions: Array<Option> = [
     {value: 'GOOD', text: 'Good'},
     {value: 'REPLACE', text: 'Replace Device!'},
   ];
   
-  // 电池状态文本映射
+  // battery status text mapping
   const batteryUserViewByBatteryStatus: {[key in BatteryStatus]: string} = {
     [BatteryStatus.GOOD]: 'Good',
     [BatteryStatus.REPLACE]: 'Replace Device!',
     [BatteryStatus.UNKNOWN]: ''
   };
   
-  // 当选择变化时更新本地状态
+  // when the selection changes, update the local state
   useEffect(() => {
     if (selected && selected.selectedDeviceType === ObjectType.MAP_REPEATER) {
       setSelectedRepeater(selected.selectedDotid);
@@ -102,7 +102,7 @@ const RepeaterPanel: React.FC<RepeaterPanelProps> = ({
     }
   }, [selected, getRepeater]);
   
-  // 如果没有选中的中继器，显示空面板
+  // if there is no selected repeater, display an empty panel
   if (!selectedRepeater || !mapRepeaters[selectedRepeater]) {
     return (
       <div id="infoPanelRepeater">
@@ -114,21 +114,21 @@ const RepeaterPanel: React.FC<RepeaterPanelProps> = ({
   
   const repeaterModel = mapRepeaters[selectedRepeater];
   
-  // 计算下游通道字符串
+  // calculate the downstream channel string
   const downstreamChannelString = (repeaterModel.channelMode === ChannelMode.AUTO ||
     repeaterModel.desiredDownstreamChannel === '-1') ?
     ChannelMode.AUTO : repeaterModel.desiredDownstreamChannel;
   
-  // 计算上游通道
+  // calculate the upstream channel
   const desiredUpstreamChannel = calcDesiredUpstreamChannel(selectedRepeater);
   
-  // 确定设备类型
+  // determine the device type
   let deviceType = ObjectType.MAP_REPEATER;
   if (repeaterModel.info.location === Location.TRAY) {
     deviceType = ObjectType.TRAY_REPEATER;
   }
   
-  // 获取硬件版本信息
+  // get the hardware version information
   let hwVersionNumber: number = repeaterModel.hwVersion;
   let hwEnum: string = getSNHardwareType(hwVersionNumber);
   let hwVersion: string = getRepeaterBrandName(hwEnum);
@@ -136,23 +136,23 @@ const RepeaterPanel: React.FC<RepeaterPanelProps> = ({
     hwVersion = "";
   }
   
-  // 获取软件版本信息
+  // get the software version information
   let swVersionNumber = repeaterModel.swVersion;
   let swVersion: string = repeaterModel.swVersion.toString();
   if (swVersionNumber === -1 || swVersionNumber === 0) {
     swVersion = "";
   }
   
-  // 获取通道选项
+  // get the channel options
   let channelOptions = allChannelOptions;
   if (repeaterModel.info.location !== Location.TRAY) {
     channelOptions = disableDisallowedOptions(selectedRepeater, allChannelOptions);
   }
   
-  // 获取电池状态
+  // get the battery status
   const batteryStatus: BatteryStatus = getRepeaterBatteryStatus(selectedRepeater);
   
-  // 渲染全局错误
+  // render the global errors
   const renderGlobalErrors = () => {
     const result: React.ReactNode[] = [];
     if (!selectedRepeater) return result;
@@ -172,15 +172,15 @@ const RepeaterPanel: React.FC<RepeaterPanelProps> = ({
     return result;
   };
   
-  // 处理替换中继器
+  // handle the replace repeater
   const handleReplaceRepeater = () => {
     if (!selectedRepeater) return;
     
-    // 在实际应用中，这里应该显示一个模态框让用户输入替换中继器的ID
-    console.log(`替换中继器 ${selectedRepeater}`);
+    // in the actual application, this should display a modal box to allow the user to input the replacement repeater ID
+    console.log(`Replace repeater ${selectedRepeater}`);
   };
   
-  // 创建实际的TopStore和UndoManager实例
+  // create the actual TopStore and UndoManager instances
   const actualTopStore = topStore || {
     getTopState: () => ({
       mapRepeaters,

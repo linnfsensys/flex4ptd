@@ -9,8 +9,8 @@ interface CheckboxFieldProps {
 }
 
 /**
- * 简化版的CheckboxField组件，专为Zustand版本设计
- * 不依赖TopStore和UndoManager
+ * simplified CheckboxField component, designed for Zustand version
+ * does not depend on TopStore and UndoManager
  */
 const CheckboxField: React.FC<CheckboxFieldProps> = ({
   label,

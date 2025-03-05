@@ -20,9 +20,9 @@ interface APNetworkPanelProps {
 }
 
 /**
- * 网关网络设置面板组件 - Zustand版本
- * 对应原来的InfoPanelAPNetwork组件
- * 提供网络配置、VPN设置、时区设置等功能
+ * gateway network settings panel component - Zustand version
+ * corresponding to the original InfoPanelAPNetwork component
+ * provides network configuration, VPN settings, time zone settings, etc.
  */
 const APNetworkPanel: React.FC<APNetworkPanelProps> = ({ 
   webSocketManager, 
@@ -32,27 +32,27 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
 }) => {
   const { ap } = useMapDevices();
   
-  // IP地址模式选项
+  // IP address mode options
   const ipAddrModeOptions: Array<Option> = [
     { text: 'DHCP', value: IPMode.DHCP },
     { text: 'Static', value: IPMode.STATIC },
   ];
 
-  // VPN类型选项
+  // VPN type options
   const vpnTypeOptions: Array<Option> = [
     { text: 'PPTP', value: VPNType.PPTP },
     { text: 'PPIP', value: VPNType.PPIP },
     { text: 'Disabled', value: VPNType.DISABLED },
   ];
 
-  // 同步NTP服务器
+  // sync NTP server
   const handleSyncNTP = useCallback(() => {
     if (webSocketManager) {
       webSocketManager.sendSyncNTPMsg();
     }
   }, [webSocketManager]);
 
-  // 转换布尔值到RequireLogin
+  // transform boolean to requireLogin
   const transformBooleanToRequireLogin = (bool: boolean) => {
     if (bool) {
       return { requireLogin: 'ENABLED' };
@@ -62,7 +62,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
   };
 
   if (!ap) {
-    return <div>加载中...</div>;
+    return <div>Loading...</div>;
   }
 
   const apegId = ap.serialNumber ? 'apeg' + ap.serialNumber : '';
@@ -83,7 +83,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
             </tr>
             <tr className="readOnlyField row">
               <td className="right">
-                <label htmlFor="apFirmwareVersion" className="cell right readOnlyLabel">固件版本&nbsp;</label>
+                <label htmlFor="apFirmwareVersion" className="cell right readOnlyLabel">Firmware Version&nbsp;</label>
               </td>
               <td>
                 <input 
@@ -99,12 +99,12 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
 
             <tr>
               <td colSpan={2}>
-                <h4>网络</h4>
+                <h4>Network</h4>
                 <hr />
               </td>
             </tr>
             <SelectField 
-              label="IP地址模式" 
+              label="IP Address Mode" 
               idName="apIpAddrMode" 
               fieldName="ipAddrMode"
               objectType={ObjectType.AP}
@@ -120,7 +120,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
             {ap.ipAddrMode === IPMode.STATIC && (
               <>
                 <InputField 
-                  label="IP地址" 
+                  label="IP Address" 
                   text={ap.ipAddr || ''} 
                   idName="apIpAddr" 
                   fieldName="ipAddr"
@@ -131,7 +131,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
                   undoManager={undoManager}
                 />
                 <InputField 
-                  label="子网掩码" 
+                  label="Subnet Mask" 
                   text={ap.netMask || ''} 
                   idName="apNetmask" 
                   fieldName="netMask"
@@ -142,7 +142,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
                   undoManager={undoManager}
                 />
                 <InputField 
-                  label="网关" 
+                  label="Gateway" 
                   text={ap.gateway || ''} 
                   idName="apGateway" 
                   fieldName="gateway"
@@ -153,7 +153,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
                   undoManager={undoManager}
                 />
                 <InputField 
-                  label="DNS服务器" 
+                  label="DNS Server" 
                   text={ap.dns || ''} 
                   idName="apDns" 
                   fieldName="dns"
@@ -167,7 +167,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
             )}
             
             <InputField 
-              label="主机名" 
+              label="Hostname" 
               text={ap.hostname || ''} 
               idName="apHostname" 
               fieldName="hostname"
@@ -186,7 +186,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
               </td>
             </tr>
             <ReadOnlyField 
-              label="VPN主机" 
+              label="VPN Hostname" 
               text={ap.hostname || ''} 
               idName="apHostname" 
               fieldName="hostname"
@@ -194,7 +194,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
               deviceId="ap"
             />
             <SelectField 
-              label="VPN模式" 
+              label="VPN Type" 
               idName="apVpnType" 
               fieldName="vpnType"
               objectType={ObjectType.AP}
@@ -210,7 +210,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
             {isVpnEnabled && (
               <>
                 <InputField 
-                  label="VPN服务器" 
+                  label="VPN Server" 
                   text={(ap as any).vpnServer || ''} 
                   idName="apVpnServer" 
                   fieldName="vpnServer"
@@ -222,7 +222,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
                   undoManager={undoManager}
                 />
                 <InputField 
-                  label="VPN用户名" 
+                  label="VPN Username" 
                   text={ap.vpnUsername || ''} 
                   idName="apVpnUsername" 
                   fieldName="vpnUsername"
@@ -234,7 +234,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
                   undoManager={undoManager}
                 />
                 <InputField 
-                  label="VPN密码" 
+                  label="VPN Password" 
                   text={ap.vpnPassword || ''} 
                   idName="apVpnPassword" 
                   fieldName="vpnPassword"
@@ -250,12 +250,12 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
 
             <tr>
               <td colSpan={2}>
-                <h4>时区</h4>
+                <h4>Time Zone</h4>
                 <hr />
               </td>
             </tr>
             <SelectField 
-              label="网关时区" 
+              label="Gateway Time Zone" 
               idName="apTimeZone" 
               fieldName="timeZone"
               objectType={ObjectType.AP}
@@ -270,12 +270,12 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
             
             <tr>
               <td colSpan={2}>
-                <h4>NTP服务器</h4>
+                <h4>NTP Server</h4>
                 <hr />
               </td>
             </tr>
             <InputField 
-              label="NTP服务器1" 
+              label="NTP Server 1" 
               text={(ap.ntpHosts && ap.ntpHosts[0]) || ''} 
               idName="apNtpServer1" 
               fieldName="ntpHosts[0]"
@@ -286,7 +286,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
               undoManager={undoManager}
             />
             <InputField 
-              label="NTP服务器2" 
+              label="NTP Server 2" 
               text={(ap.ntpHosts && ap.ntpHosts[1]) || ''} 
               idName="apNtpServer2" 
               fieldName="ntpHosts[1]"
@@ -297,7 +297,7 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
               undoManager={undoManager}
             />
             <InputField 
-              label="NTP服务器3" 
+              label="NTP Server 3" 
               text={(ap.ntpHosts && ap.ntpHosts[2]) || ''} 
               idName="apNtpServer3" 
               fieldName="ntpHosts[2]"
@@ -313,8 +313,8 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
               <td>
                 <AptdButton 
                   id="syncNtpButton"
-                  text="同步NTP服务器" 
-                  title="同步NTP服务器"
+                  text="Sync NTP Server" 
+                  title="Sync NTP Server"
                   onClick={handleSyncNTP} 
                   disabled={!webSocketManager}
                 />
@@ -323,12 +323,12 @@ const APNetworkPanel: React.FC<APNetworkPanelProps> = ({
             
             <tr>
               <td colSpan={2}>
-                <h4>安全</h4>
+                <h4>Security</h4>
                 <hr />
               </td>
             </tr>
             <CheckboxField 
-              label="需要登录密码" 
+              label="Require Login Password" 
               value={ap.requireLogin === 'ENABLED'} 
               idName="requireLogin" 
               className="info-panel-checkbox"

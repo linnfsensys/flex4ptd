@@ -13,9 +13,9 @@ if (process.env.NODE_ENV === 'development') {
       const zustandState = useAppStore.getState()
       const topState = topStore.getTopState()
       
-      console.group('状态对比')
-      console.log('TopStore状态:', topState)
-      console.log('Zustand状态:', zustandState)
+      console.group('state comparison')
+      console.log('TopStore state:', topState)
+      console.log('Zustand state:', zustandState)
       
       // check if key properties are consistent
       const keysToCompare = [
@@ -36,7 +36,7 @@ if (process.env.NODE_ENV === 'development') {
       return { topState, zustandState }
     },
     
-    // 调试辅助方法
+    // debug helper methods
     logDispatch: (enabled = true) => {
       if (enabled) {
         const originalDispatch = useAppStore.getState().dispatch
@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === 'development') {
       }
     },
     
-    // 监听特定状态变化
+    // watch specific state changes
     watchState: (path: string) => {
       const parts = path.split('.')
       const selector = (state: any) => {
@@ -70,7 +70,7 @@ if (process.env.NODE_ENV === 'development') {
     }
   }
   
-  console.log('Zustand调试工具已启用！在控制台使用window.zustandStore或window.zustandDebug访问')
+  console.log('Zustand debug tools enabled! Use window.zustandStore or window.zustandDebug in the console')
 }
 
 export {}

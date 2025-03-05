@@ -16,7 +16,7 @@ import '../infoPanels/InfoPanel.css';
 import '../infoPanels/InfoPanelSensorZone.css';
 import '../infoPanels/InfoPanelSensor.css';
 
-// 传感器区域用途枚举
+// sensor zone use enum
 enum SensorZoneUse {
   STOPBAR = 'STOPBAR',
   COUNT = 'COUNT',
@@ -29,50 +29,50 @@ interface SensorZonePanelProps {
   webSocketManager?: WebSocketManager | null;
 }
 
-// 导入警告图标
+// import the warning icon
 const WarningIcon = require('../assets/icons/icons8-warning-96.png');
 const ErrorAsteriskIcon = require('../assets/icons/icons8-asterisk-96.png');
 
 /**
- * SensorZonePanel组件 - 使用Zustand hooks管理传感器区域
- * 这是InfoPanelSensorZone的Zustand版本
+ * SensorZonePanel component - using Zustand hooks to manage the sensor zone
+ * this is the Zustand version of InfoPanelSensorZone
  */
 const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
   topStore,
   undoManager,
   webSocketManager
 }) => {
-  // 使用Zustand hooks获取状态
+  // use Zustand hooks to get the state
   const { selected } = useSelection();
   const { sensorZones, updateSensorZone, getSensorsInZone } = useSensorZones();
   const { mapSensors, updateSensor, getSensorBatteryStatus } = useSensors();
   const { ap, getSystemContext, getUnitType } = useAP();
   const { mmToInches, inchesToMm, isImperial } = useUnitConversion();
   
-  // 获取选中的传感器区域ID
+  // get the selected sensor zone ID
   const szId = selected && selected.selectedSzId ? selected.selectedSzId : null;
   
-  // 获取选中的传感器区域
+  // get the selected sensor zone
   const szModel = szId ? sensorZones[szId] : null;
   
-  // 传感器区域用途选项
+  // sensor zone use options
   const useOptions: Array<Option> = [
     {value: SensorZoneUse.STOPBAR, text: 'Stopbar'},
     {value: SensorZoneUse.COUNT, text: 'Count'},
     {value: SensorZoneUse.SPEED, text: 'Speed'},
   ];
   
-  // 如果没有选中的传感器区域，显示空面板
+  // if there is no selected sensor zone, display an empty panel
   if (!szModel || !szId) {
     return (
       <div id="infoPanelSensorZone">
         <div id="infoPanelSensorZoneHeader" className="infoPanelHeader">Sensor Zone</div>
-        <div>未选择传感器区域</div>
+        <div>No sensor zone selected</div>
       </div>
     );
   }
   
-  // 转换用途到服务器对象类型
+  // convert use to server object type
   const convertUseToOtype = (use: SensorZoneUse): ServerObjectType => {
     let otype: ServerObjectType;
     switch (use) {
@@ -94,7 +94,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     return otype;
   };
   
-  // 转换服务器对象类型到用途
+  // convert server object type to use
   const convertOtypeToUse = (otype: ServerObjectType): SensorZoneUse => {
     let use: SensorZoneUse;
     switch (otype) {
@@ -114,14 +114,14 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     return use;
   };
   
-  // 转换用途值到存储格式
+  // convert use value to store format
   const transformValueToStore = (useValue: string) => {
     const newGUISensorZoneType: ServerObjectType = convertUseToOtype(useValue as SensorZoneUse);
     let szClient: any = {otype: newGUISensorZoneType};
     
     if (useValue === SensorZoneUse.STOPBAR) {
       const stopbarSensitivityVal = szModel.stopbarSensitivity !== undefined ? 
-        szModel.stopbarSensitivity : 6; // 默认灵敏度值
+        szModel.stopbarSensitivity : 6; // default sensitivity value
       szClient.stopbarSensitivity = stopbarSensitivityVal;
     } else {
       szClient.stopbarSensitivity = undefined;
@@ -130,10 +130,10 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     return szClient;
   };
   
-  // 获取调整后的灵敏度值
+  // get the adjusted sensitivity value
   const getAdjustedSensitivity = (): number => {
     if (!szModel.stopbarSensitivity) {
-      return 6; // 默认值
+      return 6; // default value
     }
     
     const systemContext = getSystemContext();
@@ -149,7 +149,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     }
   };
   
-  // 检查是否存在otype错误
+  // check if there is an otype error
   const checkOtypeError = (): boolean => {
     if (!topStore) return false;
     
@@ -160,7 +160,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     return errMsgs !== undefined && errMsgs.length > 0;
   };
   
-  // 渲染全局错误
+  // render the global errors
   const renderGlobalErrors = (): React.ReactNode[] => {
     if (!topStore) return [];
     
@@ -180,20 +180,20 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     return result;
   };
   
-  // 渲染传感器
+  // render the sensors
   const renderSensors = () => {
     if (!szModel || !szModel.sensorIds || !szModel.sensorIds.length) {
       return null;
     }
     
     return szModel.sensorIds.map((sensorId, index) => {
-      // 创建实际的TopStore和UndoManager实例
+      // create the actual TopStore and UndoManager instances
       const actualTopStore = topStore || {} as TopStore;
       const actualUndoManager = undoManager || {} as UndoManager;
       
       return (
         <React.Fragment key={`sensor-${sensorId}`}>
-          {/* 使用SensorPanel组件渲染传感器信息 */}
+          {/* use the SensorPanel component to render the sensor information */}
           <SensorPanel
             topStore={actualTopStore}
             undoManager={actualUndoManager}
@@ -203,14 +203,14 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
             sensorId={sensorId}
           />
           
-          {/* 如果不是最后一个传感器，添加间隔设置 */}
+          {/* if it is not the last sensor, add the spacing settings */}
           {index < szModel.sensorIds.length - 1 && (
             <React.Fragment>
               <table key={`between${index}`} className="betweenSensors">
                 <tbody>
                   {isImperial() ? (
                     <React.Fragment key={`spacings${index}`}>
-                      {/* Imperial 版本 */}
+                      {/* Imperial version */}
                       <tr>
                         <InputField 
                           label="Separation"
@@ -255,7 +255,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
                     </React.Fragment>
                   ) : (
                     <React.Fragment key={`spacings${index}`}>
-                      {/* 公制版本 */}
+                      {/* metric version */}
                       <tr>
                         <InputField 
                           label="Separation*"
@@ -305,7 +305,7 @@ const SensorZonePanel: React.FC<SensorZonePanelProps> = ({
     });
   };
   
-  // 创建实际的TopStore和UndoManager实例
+  // create the actual TopStore and UndoManager instances
   const actualTopStore = topStore || {
     getTopState: () => ({
       sensorZones,

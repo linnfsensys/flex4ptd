@@ -14,9 +14,9 @@ interface APVCCPanelProps {
 }
 
 /**
- * 网关虚拟CC设置面板组件 - Zustand版本
- * 对应原来的InfoPanelAPVCC组件
- * 提供虚拟CC类型和APGI报告类型设置
+ * AP virtual CC settings panel component - Zustand version
+ * corresponds to the original InfoPanelAPVCC component
+ * provides virtual CC type and APGI report type settings
  */
 const APVCCPanel: React.FC<APVCCPanelProps> = ({ 
   topStore, 
@@ -24,16 +24,16 @@ const APVCCPanel: React.FC<APVCCPanelProps> = ({
 }) => {
   const { ap, ccCards } = useMapDevices();
   
-  // 虚拟CC类型选项
+  // virtual CC type options
   const vccOptions: Array<Option> = [
-    { text: '无', value: VirtualCcType.NONE },
+    { text: 'None', value: VirtualCcType.NONE },
     { text: 'STS', value: VirtualCcType.STS },
     { text: 'APGI', value: VirtualCcType.APGI },
   ];
 
-  // 处理虚拟CC类型变更
+  // handle virtual CC type change
   const handleVirtualCcTypeChange = useCallback((value: string) => {
-    // 如果选择了APGI类型，但没有配置APGI报告类型，则设置默认值
+    // if APGI type is selected, but APGI report type is not configured, set the default value
     if (value === VirtualCcType.APGI && (ap as any).apgiReportType === undefined) {
       const actionGroup: ActionGroup = {
         description: 'Set APGI Report Type',
@@ -50,7 +50,7 @@ const APVCCPanel: React.FC<APVCCPanelProps> = ({
     }
   }, [ap, topStore]);
 
-  // APGI报告类型选项
+  // APGI report type options
   const apgiReportTypeOptions: Array<Option> = [
     { text: '已映射', value: APGIReportType.MAPPED },
     { text: '已配置', value: APGIReportType.CONFIGURED },
@@ -61,7 +61,7 @@ const APVCCPanel: React.FC<APVCCPanelProps> = ({
     return <div>加载中...</div>;
   }
 
-  // 检查是否有APGI卡
+  // check if there is an APGI card
   const apgi = Object.values(ccCards).find(card => 
     card.cardInterface === Interface.APGI
   );
@@ -71,11 +71,11 @@ const APVCCPanel: React.FC<APVCCPanelProps> = ({
       <table className="info-panel-table">
         <tbody>
           <tr>
-            <td colSpan={2} className="info-panel-section-header">虚拟CC设置</td>
+            <td colSpan={2} className="info-panel-section-header">Virtual CC Settings</td>
           </tr>
           
           <SelectField
-            label="虚拟CC类型"
+            label="Virtual CC Type"
             idName="virtualCcType"
             fieldName="virtualCcType"
             objectType={ObjectType.AP}
@@ -91,7 +91,7 @@ const APVCCPanel: React.FC<APVCCPanelProps> = ({
           
           {(ap as any).virtualCcType === VirtualCcType.APGI && (
             <SelectField
-              label="APGI报告类型"
+              label="APGI Report Type"
               idName="apgiReportType"
               fieldName="apgiReportType"
               objectType={ObjectType.AP}
@@ -107,21 +107,21 @@ const APVCCPanel: React.FC<APVCCPanelProps> = ({
           
           {(ap as any).virtualCcType === VirtualCcType.STS && (
             <Note 
-              text="STS虚拟CC通道将在STS配置面板中配置。" 
+              text="STS virtual CC channels will be configured in the STS configuration panel." 
               idName="stsNote"
             />
           )}
           
           {(ap as any).virtualCcType === VirtualCcType.APGI && (
             <Note 
-              text="APGI虚拟CC通道将在APGI配置面板中配置。" 
+              text="APGI virtual CC channels will be configured in the APGI configuration panel." 
               idName="apgiNote"
             />
           )}
           
           {Object.values(ccCards).length === 0 && (ap as any).virtualCcType !== VirtualCcType.NONE && (
             <Note 
-              text="警告：没有检测到CC卡。虚拟CC功能需要至少一张CC卡。" 
+              text="Warning: No CC cards detected. Virtual CC functionality requires at least one CC card." 
               idName="noCardNote"
             />
           )}
@@ -130,8 +130,8 @@ const APVCCPanel: React.FC<APVCCPanelProps> = ({
             <tr>
               <td colSpan={2}>
                 <div className="info-panel-subsection">
-                  <h5>APGI通道</h5>
-                  <p>APGI通道将在APGI配置面板中显示。</p>
+                  <h5>APGI Channels</h5>
+                  <p>APGI channels will be displayed in the APGI configuration panel.</p>
                 </div>
               </td>
             </tr>

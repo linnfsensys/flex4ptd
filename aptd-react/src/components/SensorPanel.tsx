@@ -12,7 +12,7 @@ import WebSocketManager from '../WebSocketManager';
 import '../infoPanels/InfoPanel.css';
 import '../infoPanels/InfoPanelSensor.css';
 
-// 错误和警告图标
+// error and warning icons
 const ErrorAsteriskIcon: any = require('../assets/icons/icons8-asterisk-96.png');
 const WarningIcon: any = require('../assets/icons/icons8-warning-96.png');
 
@@ -26,8 +26,8 @@ interface SensorPanelProps {
 }
 
 /**
- * SensorPanel组件 - 使用Zustand hooks管理传感器
- * 这是InfoPanelSensor的Zustand版本
+ * SensorPanel component - using Zustand hooks to manage sensors
+ * this is the Zustand version of InfoPanelSensor
  */
 const SensorPanel: React.FC<SensorPanelProps> = ({ 
   topStore,
@@ -37,17 +37,17 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
   nSensorsInSz = 0,
   sensorId
 }) => {
-  // 使用Zustand hooks获取状态和操作
+  // use Zustand hooks to get the state and actions
   const { mapSensors, updateSensor, getSensor, replaceSensor, getSensorBatteryStatus } = useSensors();
   const { ap } = useAP();
   const { selected } = useSelection();
   
-  // 本地状态
+  // local state
   const [selectedSensor, setSelectedSensor] = useState<string | null>(sensorId || null);
   
-  // 当选择变化时更新本地状态
+  // when the selection changes, update the local stateection changes, update the local state
   useEffect(() => {
-    // 如果提供了sensorId，优先使用它
+    // if nsorId i is provided, use itided, use it
     if (sensorId) {
       setSelectedSensor(sensorId);
     } else if (selected && selected.selectedDeviceType === ObjectType.MAP_SENSOR) {
@@ -57,7 +57,7 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
     }
   }, [selected, sensorId]);
   
-  // 如果没有选中的传感器，显示空面板
+  // if there is no selected sensor, display an empty panel
   if (!selectedSensor || !mapSensors[selectedSensor]) {
     return (
       <div className="infoPanelSensor">
@@ -69,13 +69,13 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
   
   const sensorModel = mapSensors[selectedSensor];
   
-  // 确定设备类型
+  // determine the device type
   let deviceType = ObjectType.MAP_SENSOR;
   if (sensorModel.info.location === Location.TRAY) {
     deviceType = ObjectType.TRAY_SENSOR;
   }
   
-  // 确定传感器位置标签（Lead, Middle, Trail）
+  // determine the sensor position label (Lead, Middle, Trail)
   let position: string = '';
   if (nSensorsInSz > 1 && indexInSz >= 0) {
     switch (indexInSz) {
@@ -95,23 +95,23 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
     }
   }
   
-  // 获取电池状态
+  // get the battery status
   const batteryStatus: BatteryStatus = getSensorBatteryStatus(selectedSensor);
   
-  // 电池状态文本映射
+  // battery status text mapping
   const batteryUserViewByBatteryStatus: {[key in BatteryStatus]: string} = {
     [BatteryStatus.GOOD]: 'Good',
     [BatteryStatus.REPLACE]: 'Replace Device!',
     [BatteryStatus.UNKNOWN]: ''
   };
   
-  // 检查传感器是否在停止线区域
+  // check if the sensor is in the stop bar area
   const sensorZones = topStore ? Object.values(topStore.getTopState().sensorZones) : [];
   const stopBarCheck = sensorZones.find(sensorZone => 
     sensorZone.sensorIds && sensorZone.sensorIds.indexOf(selectedSensor) !== -1
   );
   
-  // 渲染全局错误
+  // render the global errors
   const renderGlobalErrors = () => {
     const result: React.ReactNode[] = [];
     if (!selectedSensor) return result;
@@ -134,7 +134,7 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
     return result;
   };
   
-  // 检查传感器是否在托盘中
+  // check if the sensor is in the tray
   const isSensorInTray = (sensorId: string): boolean => {
     if (!topStore) return false;
     
@@ -144,11 +144,11 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
     return device.otype === 'GUISensor';
   };
   
-  // 处理替换传感器
+  // handle the replace sensor
   const handleReplaceSensor = () => {
     if (!selectedSensor || !topStore || !undoManager) return;
     
-    // 创建替换传感器的表单
+    // create the replace sensor form
     const replacementNode = (
       <form id="popupForm">
         <table>
@@ -168,7 +168,7 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
       </form>
     );
     
-    // 显示替换传感器的模态框
+    // display the replace sensor modal
     topStore.showModal(
       ModalType.ONE_BUTTON_SUCCESS,
       `To replace Sensor ${selectedSensor}, please enter the 4 character ID of the Sensor you will use to replace it. The replacement Sensor must appear in the Tray. (After you SAVE, the replacement Sensor will take on the ID ${selectedSensor}.)`,
@@ -176,7 +176,7 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
       [
         () => topStore.dismissModal(),
         () => {
-          // 验证替换ID
+          // validate the replacement ID
           const inputElt = document.getElementById('replacementIdInput') as HTMLInputElement;
           const replacementId = inputElt.value.toUpperCase();
           
@@ -189,7 +189,7 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
             return;
           }
           
-          // 更新传感器
+          // update the sensor
           undoManager.enactActionsToStore({
             actions: [{
               updateType: UpdateType.UPDATE,
@@ -211,7 +211,7 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
       replacementNode,
       undefined,
       () => {
-        // 聚焦到输入框
+        // focus to the input box
         const replacementIdInput = document.getElementById('replacementIdInput');
         if (replacementIdInput) {
           replacementIdInput.focus();
@@ -220,7 +220,7 @@ const SensorPanel: React.FC<SensorPanelProps> = ({
     );
   };
   
-  // 创建实际的TopStore和UndoManager实例
+  // create the actual TopStore and UndoManager instances
   const actualTopStore = topStore || {
     getTopState: () => ({
       mapSensors,

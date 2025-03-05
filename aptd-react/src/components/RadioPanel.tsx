@@ -14,22 +14,22 @@ interface RadioPanelProps {
 }
 
 /**
- * RadioPanel组件 - 使用Zustand hooks管理无线电设备
- * 这是InfoPanelRadio的Zustand版本
+ * RadioPanel component - using Zustand hooks to manage radio devices
+ * this is the Zustand version of InfoPanelRadio
  */
 const RadioPanel: React.FC<RadioPanelProps> = ({ 
   topStore,
   undoManager
 }) => {
-  // 使用Zustand hooks获取状态和操作
+  // use Zustand hooks to get the state and actions
   const { radios, updateRadio, getRadio } = useRadios();
   const { ap } = useAP();
   const { selected } = useSelection();
   
-  // 本地状态
+  // local state
   const [selectedRadio, setSelectedRadio] = useState<string | null>(null);
   
-  // 当选择变化时更新本地状态
+  // when the selection changes, update the local state
   useEffect(() => {
     if (selected && selected.selectedDeviceType === ObjectType.RADIO) {
       setSelectedRadio(selected.selectedDotid);
@@ -38,7 +38,7 @@ const RadioPanel: React.FC<RadioPanelProps> = ({
     }
   }, [selected]);
   
-  // 如果没有选中的无线电设备，显示空面板
+  // if there is no selected radio device, display an empty panel
   if (!selectedRadio || !radios[selectedRadio]) {
     return (
       <div className="radio-panel">
@@ -50,13 +50,13 @@ const RadioPanel: React.FC<RadioPanelProps> = ({
   
   const radioModel = radios[selectedRadio];
   
-  // 通道模式选项
+  // channel mode options
   const channelModeOptions: Array<Option> = [
     { value: 'MANUAL', text: 'Fixed' },
     { value: 'AUTO', text: 'Automatic' }
   ];
   
-  // 通道选项
+  // channel options
   const channelOptions: Array<Option> = [
     { value: '1', text: 'Channel 1' },
     { value: '2', text: 'Channel 2' },
@@ -68,23 +68,23 @@ const RadioPanel: React.FC<RadioPanelProps> = ({
     { value: '8', text: 'Channel 8' }
   ];
   
-  // 转换通道值到存储格式
+  // transform the channel value to the store format
   const transformChannelValueToStore = (channelValue: string): {[fieldName: string]: string} => {
     return { desiredChannel: channelValue };
   };
   
-  // 处理通道模式变化
+  // handle the channel mode change
   const handleChannelModeChange = (value: string) => {
     updateRadio(selectedRadio, { channelMode: value });
   };
   
-  // 禁用不允许的选项
+  // disable the disallowed options
   const disableDisallowedOptions = (radioId: string, allChannelOptions: Array<Option>): Array<Option> => {
-    // 这里可以实现禁用特定通道的逻辑
+    // here we can implement the logic to disable specific channels
     return allChannelOptions;
   };
   
-  // 创建实际的TopStore和UndoManager实例
+  // create the actual TopStore and UndoManager instances
   const actualTopStore = topStore || {
     getTopState: () => ({
       radios,

@@ -19,8 +19,8 @@ interface APTabsPanelProps {
 }
 
 /**
- * AP标签页面板组件 - Zustand版本
- * 整合所有AP相关的面板，包括网络、工具、虚拟CC和属性标签页
+ * AP tabs panel component - Zustand version
+ * integrates all AP-related panels, including network, utilities, virtual CC, and properties tabs
  */
 const APTabsPanel: React.FC<APTabsPanelProps> = ({ 
   webSocketManager, 
@@ -28,56 +28,56 @@ const APTabsPanel: React.FC<APTabsPanelProps> = ({
   topStore,
   undoManager
 }) => {
-  // 使用本地状态管理当前选中的标签页
+  // use local state to manage the currently selected tab
   const [activeTab, setActiveTab] = useState<string>('utilities');
   
-  // 处理标签页切换
+  // handle tab change
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
   };
   
-  // 如果未提供undoManager，则使用topStore中的undoManager
+  // if undoManager is not provided, use the undoManager from topStore
   const actualUndoManager = undoManager || topStore.undoManager;
   
-  // 处理需要登录密码变更的回调
+  // handle the callback for the require login password change
   const handleRequireLoginChanged = () => {
-    // 这里可以添加需要登录密码变更的处理逻辑
-    console.log('需要登录密码已变更');
+    // add the logic for the require login password change here
+    console.log('require login password has been changed');
   };
   
   return (
     <div className="ap-tabs-panel">
-      {/* 标签页导航 */}
+      {/* tab navigation */}
       <div className="tabs">
         <ul>
           <li 
             className={activeTab === 'network' ? 'active' : ''} 
             onClick={() => handleTabChange('network')}
           >
-            网络
+            Network
           </li>
           <li 
             className={activeTab === 'utilities' ? 'active' : ''} 
             onClick={() => handleTabChange('utilities')}
           >
-            工具
+            Utilities
           </li>
           <li 
             className={activeTab === 'virtualcc' ? 'active' : ''} 
             onClick={() => handleTabChange('virtualcc')}
           >
-            虚拟CC
+            Virtual CC
           </li>
           <li 
             className={activeTab === 'properties' ? 'active' : ''} 
             onClick={() => handleTabChange('properties')}
           >
-            属性
+            Properties
           </li>
         </ul>
       </div>
       
-      {/* 标签页内容 */}
+      {/* tab content */}
       <div className="tab-content">
         {activeTab === 'network' && (
           <APNetworkPanel 

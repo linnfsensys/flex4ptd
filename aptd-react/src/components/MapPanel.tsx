@@ -23,8 +23,8 @@ interface MapPanelProps {
 }
 
 /**
- * MapPanel组件 - 使用Zustand hooks管理地图设置
- * 这是InfoPanelMap的Zustand版本
+ * MapPanel component - using Zustand hooks to manage map settings
+ * this is the Zustand version of InfoPanelMap
  */
 const MapPanel: React.FC<MapPanelProps> = ({ 
   topStore,
@@ -33,21 +33,21 @@ const MapPanel: React.FC<MapPanelProps> = ({
   mapImagesManager = null,
   undoManager
 }) => {
-  // 使用Zustand hooks获取状态和操作
+  // use Zustand hooks to get the state and actions
   const { mapSettings, updateMapSettings } = useMapSettings();
   const { dispatch } = useActions();
   const { disabled } = useAppState();
   const { ap } = useAP();
   
-  // 使用ref保存最新的mapSettings值，以便在回调中访问
+  // use ref to save the latest mapSettings value, so it can be accessed in the callback
   const mapSettingsRef = useRef(mapSettings);
   
-  // 更新ref值
+  // update the ref value
   useEffect(() => {
     mapSettingsRef.current = mapSettings;
   }, [mapSettings]);
 
-  // 处理添加文本字段的操作
+  // handle the add text field operation
   const handleAddTextField = () => {
     let currentTextFields: {[id:string]: TextField} = 
       cloneDeep(mapSettings.textFields || {});
@@ -72,30 +72,30 @@ const MapPanel: React.FC<MapPanelProps> = ({
     }
 
     const newTextField: TextField = {
-      text: '新文本',
+      text: 'New Text',
       position: { x: 100, y: 100 },
       rotationDegrees: 0,
-      editText: '新文本'
+      editText: 'New Text'
     };
 
     const newTextFieldId = `${textFieldString}${nextTextFieldId}`;
     currentTextFields[newTextFieldId] = newTextField;
 
-    // 使用updateMapSettings更新地图设置
+    // use updateMapSettings to update the map settings
     updateMapSettings({
       textFields: currentTextFields
     });
   };
 
-  // 处理复选框变化
+  // handle the checkbox change
   const handleCheckboxChange = (checked: boolean, name: string) => {
-    // 使用updateMapSettings更新地图设置
+    // use updateMapSettings to update the map settings
     updateMapSettings({
       [name]: checked
     });
   };
 
-  // 创建实际的TopStore实例（如果需要）
+  // create the actual TopStore instance (if needed)
   const actualTopStore = topStore || {
     getTopState: () => ({
       ap,
@@ -104,7 +104,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
     dispatch: dispatch
   } as unknown as TopStore;
   
-  // 创建实际的UndoManager实例（如果需要）
+  // create the actual UndoManager instance (if needed)
   const actualUndoManager = undoManager || (topStore && topStore.undoManager) || {} as UndoManager;
   
   const actualHttpManager = httpManager || {} as HttpManager;
@@ -112,7 +112,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
 
   return (
     <div className="map-panel-container">
-      {/* 添加MapAndTrayPanel组件 */}
+      {/* add MapAndTrayPanel component */}
       <div className="map-and-tray-container" style={{ height: '600px', marginBottom: '20px' }}>
         <MapAndTrayPanel 
           topStore={topStore}
@@ -125,14 +125,14 @@ const MapPanel: React.FC<MapPanelProps> = ({
         />
       </div>
       
-      {/* 地图设置面板 */}
+      {/* map settings panel */}
       <div id="infoPanelMap">
-        <div id="infoPanelMapHeader" className="infoPanelHeader">地图设置</div>
+        <div id="infoPanelMapHeader" className="infoPanelHeader">Map Settings</div>
         
-        {/* 添加 TimeZoneUnitsMapDisplay 组件 */}
+        {/* add TimeZoneUnitsMapDisplay component */}
         <TimeZoneUnitsMapDisplay 
           mapChooserRowSize={3}
-          mapVerbiage="背景地图"
+          mapVerbiage="Background Map"
           apModel={ap}
           initialization={false}
           topStore={actualTopStore}
@@ -147,7 +147,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
               <tr><td><b/></td><td></td></tr>
               <tr>
                 <td colSpan={2}>
-                  <h4>地图功能</h4>
+                  <h4>Map Features</h4>
                   <hr/>
                 </td>
               </tr>
@@ -164,7 +164,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
                 </td>
                 <td className="left">
                   <label htmlFor="showRFLinks" className="cell checkboxFieldLabel left">
-                    显示RF连接&nbsp;
+                    Show RF Links&nbsp;
                   </label>
                 </td>
               </tr>
@@ -181,7 +181,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
                 </td>
                 <td className="left">
                   <label htmlFor="showCCLinks" className="cell checkboxFieldLabel left">
-                    显示CC连接&nbsp;
+                    Show CC Links&nbsp;
                   </label>
                 </td>
               </tr>
@@ -198,7 +198,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
                 </td>
                 <td className="left">
                   <label htmlFor="showLegend" className="cell checkboxFieldLabel left">
-                    显示图例&nbsp;
+                    Show Legend&nbsp;
                   </label>
                 </td>
               </tr>
@@ -215,7 +215,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
                 </td>
                 <td className="left">
                   <label htmlFor="showCabinetIcon" className="cell checkboxFieldLabel left">
-                    显示机柜图标&nbsp;
+                    Show Cabinet Icon&nbsp;
                   </label>
                 </td>
               </tr>
@@ -229,14 +229,14 @@ const MapPanel: React.FC<MapPanelProps> = ({
                   <span id="textButtonAndNote" className="buttonPane">
                     <AptdButton 
                       id="textButtonId"
-                      title="在地图上创建文本框"
+                      title="Create a text box on the map"
                       theClassName="textBox gray"
-                      text="添加文本字段"
+                      text="Add Text Field"
                       onClick={handleAddTextField}
                       disabled={disabled}
                     />
                     <span>
-                      点击此按钮向地图添加文本框
+                      Click this button to add a text box to the map
                     </span>
                   </span>
                 </td>

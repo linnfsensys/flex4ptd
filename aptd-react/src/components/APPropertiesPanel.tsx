@@ -15,9 +15,9 @@ interface APPropertiesPanelProps {
 }
 
 /**
- * 网关属性设置面板组件 - Zustand版本
- * 对应原来的InfoPanelAPProperties组件
- * 提供颜色代码和系统上下文设置
+ * gateway properties settings panel component - Zustand version
+ * corresponding to the original InfoPanelAPProperties component
+ * provides color code and system context settings
  */
 const APPropertiesPanel: React.FC<APPropertiesPanelProps> = ({ 
   topStore, 
@@ -25,14 +25,14 @@ const APPropertiesPanel: React.FC<APPropertiesPanelProps> = ({
 }) => {
   const { ap } = useMapDevices();
   
-  // 系统上下文选项
+  // system context options
   const systemContextOptions: Array<Option> = [
-    { text: '默认', value: 'DEFAULT' },
+    { text: 'Default', value: 'DEFAULT' },
     { text: 'SCOOT', value: 'SCOOT' },
     { text: 'MOVA', value: 'MOVA' },
   ];
   
-  // 十六进制数字选项
+  // hexadecimal digit options
   const HEX_NIBBLE_OPTIONS = [
     { text: '0', value: '0' },
     { text: '1', value: '1' },
@@ -52,23 +52,23 @@ const APPropertiesPanel: React.FC<APPropertiesPanelProps> = ({
     { text: 'F', value: 'F' },
   ];
   
-  // 颜色代码高位选项
+  // color code high options
   const colorCodeHighOptions = HEX_NIBBLE_OPTIONS;
   
-  // 颜色代码低位选项
+  // color code low options
   const colorCodeLowOptions = HEX_NIBBLE_OPTIONS;
   
-  // 颜色代码模式选项
+  // color code mode options
   const colorCodeModeOptions: Array<Option> = [
-    { text: '自动', value: ColorCodeMode.AUTO },
-    { text: '手动', value: ColorCodeMode.MANUAL },
+    { text: 'Auto', value: ColorCodeMode.AUTO },
+    { text: 'Manual', value: ColorCodeMode.MANUAL },
   ];
 
   if (!ap) {
-    return <div>加载中...</div>;
+    return <div>Loading...</div>;
   }
 
-  // 获取ap对象的属性，如果不存在则使用默认值
+  // get the properties of the ap object, use the default value if it does not exist
   const colorCodeMode = ap.colorCodeMode || ColorCodeMode.AUTO;
   const colorCodeHiNibbleManual = ap.colorCodeHiNibbleManual || '0';
   const colorCodeLoNibbleManual = ap.colorCodeLoNibbleManual || '0';
@@ -82,12 +82,12 @@ const APPropertiesPanel: React.FC<APPropertiesPanelProps> = ({
           <tbody>
             <tr>
               <td colSpan={2}>
-                <h4>颜色代码</h4>
+                <h4>Color Code</h4>
                 <hr />
               </td>
             </tr>
             <RadioButtonGroupField 
-              label="颜色代码模式" 
+              label="Color Code Mode" 
               idName="colorCodeMode" 
               fieldName="colorCodeMode"
               objectType={ObjectType.AP}
@@ -103,7 +103,7 @@ const APPropertiesPanel: React.FC<APPropertiesPanelProps> = ({
             {colorCodeMode === ColorCodeMode.MANUAL && (
               <>
                 <SelectField 
-                  label="颜色代码高位" 
+                  label="Color Code High Nibble" 
                   idName="colorCodeHiNibbleManual" 
                   fieldName="colorCodeHiNibbleManual"
                   objectType={ObjectType.AP}
@@ -116,7 +116,7 @@ const APPropertiesPanel: React.FC<APPropertiesPanelProps> = ({
                   key="colorCodeHiNibbleManual"
                 />
                 <SelectField 
-                  label="颜色代码低位" 
+                  label="Color Code Low Nibble" 
                   idName="colorCodeLoNibbleManual" 
                   fieldName="colorCodeLoNibbleManual"
                   objectType={ObjectType.AP}
@@ -133,12 +133,12 @@ const APPropertiesPanel: React.FC<APPropertiesPanelProps> = ({
             
             <tr>
               <td colSpan={2}>
-                <h4>系统上下文</h4>
+                <h4>System Context</h4>
                 <hr />
               </td>
             </tr>
             <SelectField 
-              label="系统上下文" 
+              label="System Context" 
               idName="systemContext" 
               fieldName="systemContext"
               objectType={ObjectType.AP}
@@ -153,22 +153,22 @@ const APPropertiesPanel: React.FC<APPropertiesPanelProps> = ({
             
             <tr>
               <td colSpan={2}>
-                <h4>地图设置</h4>
+                <h4>Map Settings</h4>
                 <hr />
               </td>
             </tr>
             <SelectField 
-              label="地图图像" 
+              label="Map Image" 
               idName="mapImageIndex" 
               fieldName="mapImageIndex"
               objectType={ObjectType.AP}
               objectId="AP"
               options={[
-                { text: '无地图', value: '-1' },
-                { text: '地图1', value: '0' },
-                { text: '地图2', value: '1' },
-                { text: '地图3', value: '2' },
-                { text: '地图4', value: '3' },
+                { text: 'No Map', value: '-1' },
+                { text: 'Map 1', value: '0' },
+                { text: 'Map 2', value: '1' },
+                { text: 'Map 3', value: '2' },
+                { text: 'Map 4', value: '3' },
               ]}
               value={mapImageIndex}
               topStore={topStore}
