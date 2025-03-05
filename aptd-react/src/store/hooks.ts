@@ -22,9 +22,8 @@ import {
 import { ReactNode } from 'react'
 import { UnitTypes, ChannelMode } from '../AptdServerTypes'
 
-/**
- * 获取应用程序的基本状态
- */
+
+//get the basic state of the application
 export const useAppState = () => {
   return {
     disabled: useAppStore(state => state.disabled),
@@ -46,31 +45,29 @@ export const useAppState = () => {
   }
 }
 
-/**
- * 获取选中的设备信息
- */
+//get the selected device information
 export const useSelection = () => {
   return {
     selected: useAppStore(state => state.selected),
     selectedLinkInfo: useAppStore(state => state.selectedLinkInfo),
     
-    // 选择设备的操作
+    // select the device operation
     selectDevice: useCallback((deviceType: ObjectType, deviceId: string) => {
       useAppStore.getState().dispatch({
         objectType: ObjectType.SELECTED,
         objectId: deviceId,
         updateType: UpdateType.UPDATE,
         newData: {
-          selected: null, // 这里需要实际的设备对象
-          selectedG: null, // 这里需要实际的SVG元素
+          selected: null, // need the actual device object
+          selectedG: null, // need the actual SVG element
           selectedDeviceType: deviceType,
           selectedDotid: deviceId,
-          selectedSzId: null // 如果是传感器区域，需要设置
+          selectedSzId: null // if it is a sensor zone, set it
         }
       })
     }, []),
     
-    // 清除选择
+    // clear the selection
     clearSelection: useCallback(() => {
       useAppStore.getState().dispatch({
         objectType: ObjectType.SELECTED,
@@ -82,9 +79,7 @@ export const useSelection = () => {
   }
 }
 
-/**
- * 获取地图上的设备
- */
+//get the devices on the map
 export const useMapDevices = () => {
   return {
     ap: useAppStore(state => state.ap),
@@ -96,7 +91,7 @@ export const useMapDevices = () => {
     ccCards: useAppStore(state => state.ccCards) as {[id: string]: GUICCInterfaceBaseClient},
     sensorDotidToSzId: useAppStore(state => state.sensorDotidToSzId),
     
-    // 获取特定设备
+    // get the specific device
     getRadio: useCallback((radioId: string): GUIRadioClient | undefined => {
       return useAppStore.getState().radios[radioId] as GUIRadioClient
     }, []),
@@ -121,7 +116,7 @@ export const useMapDevices = () => {
       return useAppStore.getState().ccCards[cardId] as GUICCInterfaceBaseClient
     }, []),
     
-    // 获取特定传感器区域中的所有传感器
+    // get all the sensors in the specific sensor zone
     getMapSensorsForSz: useCallback((szId: string): {[sensorId: string]: GUISensorClient} => {
       const state = useAppStore.getState();
       const result: {[sensorId: string]: GUISensorClient} = {};
@@ -137,9 +132,9 @@ export const useMapDevices = () => {
   }
 }
 
-/**
- * 模态框操作hooks
- */
+
+// modal operation hooks
+ 
 export const useModals = () => {
   return {
     modalStack: useAppStore(state => state.modalStack),
@@ -175,9 +170,7 @@ export const useModals = () => {
   }
 }
 
-/**
- * 操作分发hooks
- */
+// operation dispatch hooks
 export const useActions = () => {
   return {
     dispatch: useCallback((action: Action, dispatchType?: DispatchType, callback?: () => void) => {
@@ -196,7 +189,7 @@ export const useActions = () => {
       useAppStore.getState().reverse(action, callback)
     }, []),
     
-    // 常用操作的快捷方法
+    // update the AP
     updateAP: useCallback((newData: Partial<GUIAPConfigClient>, callback?: () => void) => {
       useAppStore.getState().dispatch({
         objectType: ObjectType.AP,
@@ -253,21 +246,19 @@ export const useActions = () => {
   }
 }
 
-/**
- * 验证错误hooks
- */
+// validation error hooks
 export const useValidation = () => {
   return {
     validationErrors: useAppStore(state => state.validationErrors),
     validationGlobalErrors: useAppStore(state => state.validationGlobalErrors),
     
-    // 获取特定字段的验证错误
+    // get the specific field validation errors
     getFieldErrors: useCallback((objectType: ObjectType, objectId: string, fieldName: string, fieldIndex?: number|string) => {
       const key = makeErrorKey(objectType, objectId, fieldName, fieldIndex)
       return useAppStore.getState().validationErrors[key] || []
     }, []),
     
-    // 获取特定面板的全局验证错误
+    // get the specific panel global validation errors
     getGlobalErrors: useCallback((objectType: ObjectType, objectId: string) => {
       const key = makeInfoPanelKey(objectType, objectId)
       return useAppStore.getState().validationGlobalErrors[key] || []
@@ -275,9 +266,7 @@ export const useValidation = () => {
   }
 }
 
-/**
- * 辅助函数：创建错误键
- */
+// helper function: create error key
 function makeErrorKey(objectType: ObjectType, objectId: string, fieldName: string, fieldIndex?: number|string): string {
   let key = objectType + '-' + objectId + '-' + fieldName
   if (fieldIndex !== undefined) {
@@ -286,16 +275,12 @@ function makeErrorKey(objectType: ObjectType, objectId: string, fieldName: strin
   return key
 }
 
-/**
- * 辅助函数：创建信息面板键
- */
+// helper function: create info panel key
 function makeInfoPanelKey(objectType: ObjectType, objectId: string): string {
   return objectType + '-' + objectId
 }
 
-/**
- * 配置操作hooks
- */
+// config operation hooks
 export const useConfig = () => {
   return {
     clearConfig: useCallback(() => {
@@ -312,9 +297,7 @@ export const useConfig = () => {
   }
 }
 
-/**
- * 帮助系统hooks
- */
+// help system hooks
 export const useHelp = () => {
   return {
     helpBalloons: useAppStore(state => state.helpBalloons),
@@ -324,9 +307,7 @@ export const useHelp = () => {
   }
 }
 
-/**
- * 地图设置hooks
- */
+// map settings hooks
 export const useMapSettings = () => {
   return {
     mapSettings: useAppStore(state => state.mapSettings),
@@ -342,15 +323,15 @@ export const useMapSettings = () => {
   }
 }
 
-/**
- * 传感器区域相关的 hooks
- * 提供对传感器区域的读取和操作方法
- */
+
+// sensor zone related hooks
+// provide the read and operation methods for the sensor zone
+ 
 export const useSensorZones = () => {
   const sensorZones = useAppStore(state => state.sensorZones);
   const dispatch = useAppStore(state => state.dispatch);
   
-  // 更新传感器区域
+  // update the sensor zone
   const updateSensorZone = useCallback((szId: string, data: any) => {
     dispatch({
       objectType: ObjectType.SENSOR_ZONE,
@@ -360,12 +341,12 @@ export const useSensorZones = () => {
     });
   }, [dispatch]);
   
-  // 获取特定传感器区域
+  // get the specific sensor zone
   const getSensorZone = useCallback((szId: string) => {
     return sensorZones[szId];
   }, [sensorZones]);
   
-  // 获取传感器区域内的传感器
+  // get the sensors in the specific sensor zone
   const getSensorsInZone = useCallback((szId: string) => {
     const zone = sensorZones[szId];
     if (!zone || !zone.sensorIds) return {};
@@ -390,15 +371,14 @@ export const useSensorZones = () => {
   };
 };
 
-/**
- * 无线电设备相关的 hooks
- * 提供对无线电设备的读取和操作方法
- */
+// radio related hooks
+// provide the read and operation methods for the radio
+
 export const useRadios = () => {
   const radios = useAppStore(state => state.radios);
   const dispatch = useAppStore(state => state.dispatch);
   
-  // 更新无线电设备
+  // update the radio
   const updateRadio = useCallback((radioId: string, data: any) => {
     dispatch({
       objectType: ObjectType.RADIO,
@@ -408,18 +388,18 @@ export const useRadios = () => {
     });
   }, [dispatch]);
   
-  // 获取特定无线电设备
+  // get the specific radio
   const getRadio = useCallback((radioId: string) => {
     return radios[radioId];
   }, [radios]);
   
-  // 获取可用的通道选项
+  // get the available channel options
   const getChannelOptions = useCallback((radioId: string) => {
     const radio = radios[radioId];
     if (!radio) return [];
     
-    // 这里可以实现通道选项的逻辑
-    // 例如根据无线电类型返回不同的选项
+    // here we can implement the channel options logic
+    // for example, return different options based on the radio type
     return [];
   }, [radios]);
   
@@ -431,15 +411,14 @@ export const useRadios = () => {
   };
 };
 
-/**
- * 传感器相关的 hooks
- * 提供对传感器的读取和操作方法
- */
+// sensor related hooks
+// provide the read and operation methods for the sensor
+
 export const useSensors = () => {
   const mapSensors = useAppStore(state => state.mapSensors);
   const dispatch = useAppStore(state => state.dispatch);
   
-  // 更新传感器
+  // update the sensor
   const updateSensor = useCallback((sensorId: string, data: any) => {
     dispatch({
       objectType: ObjectType.MAP_SENSOR,
@@ -449,14 +428,14 @@ export const useSensors = () => {
     });
   }, [dispatch]);
   
-  // 获取特定传感器
+  // get the specific sensor
   const getSensor = useCallback((sensorId: string) => {
     return mapSensors[sensorId];
   }, [mapSensors]);
   
-  // 替换传感器
+  // replace the sensor
   const replaceSensor = useCallback((oldSensorId: string, newSensorId: string) => {
-    // 实现替换传感器的逻辑
+    // here we can implement the replace sensor logic
     dispatch({
       objectType: ObjectType.MAP_SENSOR,
       objectId: oldSensorId,
@@ -465,7 +444,7 @@ export const useSensors = () => {
     });
   }, [dispatch]);
   
-  // 获取传感器电池状态
+  // get the sensor battery status
   const getSensorBatteryStatus = useCallback((sensorId: string) => {
     const sensor = mapSensors[sensorId];
     if (!sensor) return BatteryStatus.UNKNOWN;
@@ -493,14 +472,14 @@ export const useSensors = () => {
 };
 
 /**
- * AP 相关的 hooks
- * 提供对 AP 的读取和操作方法
+ * AP related hooks
+ * provide the read and operation methods for the AP
  */
 export const useAP = () => {
   const ap = useAppStore(state => state.ap);
   const dispatch = useAppStore(state => state.dispatch);
   
-  // 更新 AP
+  // update the AP
   const updateAP = useCallback((data: any) => {
     dispatch({
       objectType: ObjectType.AP,
@@ -510,27 +489,27 @@ export const useAP = () => {
     });
   }, [dispatch]);
   
-  // 获取系统上下文
+  // get the system context
   const getSystemContext = useCallback(() => {
     return ap?.systemContext || 'DEFAULT';
   }, [ap]);
   
-  // 获取单位类型
+  // get the unit type
   const getUnitType = useCallback(() => {
     return ap?.units || UnitTypes.METRIC;
   }, [ap]);
   
-  // 获取缩放级别
+  // get the zoom level
   const getZoomLevel = useCallback(() => {
     return ap?.zoomLevel || 1.0;
   }, [ap]);
   
-  // 获取平移偏移
+  // get the pan offset
   const getPan = useCallback(() => {
     return ap?.pan || { x: 0, y: 0 };
   }, [ap]);
   
-  // 更新缩放级别
+  // update the zoom level
   const updateZoomLevel = useCallback((newZoomLevel: number) => {
     const oldZoomLevel = ap?.zoomLevel || 1.0;
     
@@ -543,7 +522,7 @@ export const useAP = () => {
     });
   }, [dispatch, ap]);
   
-  // 更新平移偏移
+  // update the pan offset
   const updatePan = useCallback((newPan: { x: number, y: number }) => {
     const oldPan = ap?.pan || { x: 0, y: 0 };
     
@@ -569,25 +548,25 @@ export const useAP = () => {
 };
 
 /**
- * 单位转换相关的 hooks
- * 提供单位转换的工具方法
+ * unit conversion related hooks
+ * provide the unit conversion tools
  */
 export const useUnitConversion = () => {
   const ap = useAppStore(state => state.ap);
   
-  // 毫米转英寸
+  // mm to inches
   const mmToInches = useCallback((mm: string | number) => {
     const mmNum = typeof mm === 'string' ? parseFloat(mm) : mm;
     return (mmNum / 25.4).toFixed(2);
   }, []);
   
-  // 英寸转毫米
+  // inches to mm
   const inchesToMm = useCallback((inches: string | number) => {
     const inchesNum = typeof inches === 'string' ? parseFloat(inches) : inches;
     return Math.round(inchesNum * 25.4).toString();
   }, []);
   
-  // 是否使用英制单位
+  // is imperial
   const isImperial = useCallback(() => {
     return ap?.units === UnitTypes.IMPERIAL;
   }, [ap]);
@@ -600,15 +579,15 @@ export const useUnitConversion = () => {
 };
 
 /**
- * 中继器相关的 hooks
- * 提供对中继器的读取和操作方法
+ * repeater related hooks
+ * provide the read and operation methods for the repeater
  */
 export const useRepeaters = () => {
   const mapRepeaters = useAppStore(state => state.mapRepeaters);
   const dispatch = useAppStore(state => state.dispatch);
   const ap = useAppStore(state => state.ap);
   
-  // 更新中继器
+  // update the repeater
   const updateRepeater = useCallback((repeaterId: string, data: Partial<GUIRepeaterClient>) => {
     dispatch({
       objectType: ObjectType.MAP_REPEATER,
@@ -618,12 +597,12 @@ export const useRepeaters = () => {
     });
   }, [dispatch]);
   
-  // 获取特定中继器
+  // get the specific repeater
   const getRepeater = useCallback((repeaterId: string) => {
     return mapRepeaters[repeaterId] as GUIRepeaterClient;
   }, [mapRepeaters]);
   
-  // 替换中继器
+  // replace the repeater
   const replaceRepeater = useCallback((oldRepeaterId: string, newRepeaterId: string) => {
     dispatch({
       objectType: ObjectType.MAP_REPEATER,
@@ -633,7 +612,7 @@ export const useRepeaters = () => {
     });
   }, [dispatch]);
   
-  // 获取中继器电池状态
+  // get the repeater battery status
   const getRepeaterBatteryStatus = useCallback((repeaterId: string): BatteryStatus => {
     const repeater = mapRepeaters[repeaterId] as GUIRepeaterClient;
     if (!repeater) return BatteryStatus.UNKNOWN;
@@ -649,7 +628,7 @@ export const useRepeaters = () => {
     }
   }, [mapRepeaters, ap]);
   
-  // 获取中继器品牌名称
+  // get the repeater brand name
   const getRepeaterBrandName = useCallback((hwEnum: string): string => {
     const repeaterBrandNameBySNHardwareType: {[key:string]: string} = {
       "RPT1": "Original Repeater",       // no longer in production
@@ -662,7 +641,7 @@ export const useRepeaters = () => {
     return repeaterBrandNameBySNHardwareType[hwEnum] || '';
   }, []);
   
-  // 禁用不允许的通道选项
+  // disable the disallowed channel options
   const disableDisallowedOptions = useCallback((repeaterId: string, allChannelOptions: Array<{value: string, text: string}>): Array<{value: string, text: string, disabled?: boolean}> => {
     const state = useAppStore.getState();
     const thisRepeater = state.mapRepeaters[repeaterId] as GUIRepeaterClient;
@@ -720,7 +699,7 @@ export const useRepeaters = () => {
       ({...option, disabled: (allowedOptionByValue[option.value] === undefined)}));
   }, []);
   
-  // 转换下游通道值到存储格式
+  // transform the downstream channel value to the store format
   const transformDownstreamChannelValueToStore = useCallback((downstreamChannelValue: string): {[fieldName:string]: string} => {
     let newChannel: string;
     let newChannelMode: string;
@@ -744,7 +723,7 @@ export const useRepeaters = () => {
     };
   }, []);
   
-  // 计算上游通道
+  // calculate the upstream channel
   const calcDesiredUpstreamChannel = useCallback((repeaterId: string): string => {
     const state = useAppStore.getState();
     const repeaterModel = state.mapRepeaters[repeaterId] as GUIRepeaterClient;
@@ -754,7 +733,7 @@ export const useRepeaters = () => {
     let rfParent: GUIRadioClient | GUIRepeaterClient | undefined;
     
     if (repeaterModel.info.rfLink === undefined) {
-      // 这是TRAY中继器的情况，或者尚未链接到RF父设备的MAP中继器
+      // this is the case of the TRAY repeater or the MAP repeater that is not linked to the RF parent device
       if (repeaterModel.knownUpstreamChannel === undefined) {
         return '';
       }
@@ -762,12 +741,12 @@ export const useRepeaters = () => {
     } else {
       dstId = repeaterModel.info.rfLink.dstId;
       if (dstId === 'SPP0' || dstId === 'SPP1') {
-        // 父设备是无线电
+        // the parent device is the radio
         rfParent = state.radios[dstId] as GUIRadioClient;
         return (rfParent.channelMode === ChannelMode.AUTO ?
           rfParent.knownChannel : rfParent.desiredChannel);
       } else {
-        // 父设备是中继器
+        // the parent device is the repeater
         rfParent = state.mapRepeaters[dstId] as GUIRepeaterClient;
         return (rfParent.channelMode === ChannelMode.AUTO ?
           rfParent.knownDownstreamChannel : rfParent.desiredDownstreamChannel);

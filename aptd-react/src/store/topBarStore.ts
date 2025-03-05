@@ -2,32 +2,37 @@ import { create } from 'zustand';
 import { SaveColor } from '../constants/SaveColorEnum';
 import TopStore from '../TopStore';
 import { UpdateType, ObjectType } from '../AptdClientTypes';
+import { devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { useCallback } from 'react';
 
-// 定义TopBar状态接口
+/**
+ * Define TopBar state interface
+ */
 interface TopBarState {
-  // 撤销和重做状态
+  // Undo and redo state
   undoEnabled: boolean;
   redoEnabled: boolean;
   undoLabel: string;
   redoLabel: string;
   
-  // 保存状态
+  // Save state
   saveEnabled: boolean;
   saveColor: SaveColor;
   savePctComplete: number | null;
   
-  // 扫描状态
+  // Scan status
   pingScanStatus: number | null;
   pingScanSecsLeft: number | null;
   pingScanNoCancel: boolean;
   
-  // 其他状态
+  // Other states
   configuredDevicesResolved: boolean;
   awaitingSaveResult: boolean;
   thisUserInitiatedSave: boolean;
   helpEnabled: boolean;
   
-  // 动作
+  // Actions
   setUndoState: (undoEnabled: boolean, redoEnabled: boolean, undoLabel: string, redoLabel: string) => void;
   setSaveState: (saveEnabled: boolean, saveColor: SaveColor) => void;
   setSavePctComplete: (savePctComplete: number | null) => void;
@@ -39,9 +44,11 @@ interface TopBarState {
   setHelpEnabled: (enabled: boolean) => void;
 }
 
-// 创建TopBar状态存储
+/**
+ * Create TopBar state store
+ */
 export const useTopBarStore = create<TopBarState>((set) => ({
-  // 初始状态
+  // Initial state
   undoEnabled: false,
   redoEnabled: false,
   undoLabel: '',
@@ -57,7 +64,7 @@ export const useTopBarStore = create<TopBarState>((set) => ({
   thisUserInitiatedSave: false,
   helpEnabled: false,
   
-  // 动作函数
+  // Action functions
   setUndoState: (undoEnabled, redoEnabled, undoLabel, redoLabel) => 
     set({ undoEnabled, redoEnabled, undoLabel, redoLabel }),
   
@@ -86,11 +93,13 @@ export const useTopBarStore = create<TopBarState>((set) => ({
     set({ helpEnabled }),
 }));
 
-// 添加一个hooks封装，使得更方便使用
+/**
+ * Add a hooks wrapper for easier use
+ */
 export const useTopBar = () => {
   const store = useTopBarStore();
   return {
-    // 状态
+    // State
     undoEnabled: store.undoEnabled,
     redoEnabled: store.redoEnabled,
     undoLabel: store.undoLabel,
@@ -106,7 +115,7 @@ export const useTopBar = () => {
     thisUserInitiatedSave: store.thisUserInitiatedSave,
     helpEnabled: store.helpEnabled,
     
-    // 动作
+    // Actions
     setUndoState: store.setUndoState,
     setSaveState: store.setSaveState,
     setSavePctComplete: store.setSavePctComplete,
@@ -117,4 +126,6 @@ export const useTopBar = () => {
     setThisUserInitiatedSave: store.setThisUserInitiatedSave,
     setHelpEnabled: store.setHelpEnabled,
   };
-}; 
+};
+
+export default useTopBarStore; 

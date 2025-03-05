@@ -31,21 +31,25 @@ import { ReactNode } from 'react'
 import UndoManager from '../UndoManager'
 import ValidationManager from '../ValidationManager'
 
-// 内部状态接口，不暴露给外部
+/**
+ * Internal state interface, not exposed externally
+ */
 interface InternalState {
   _validationManager: ValidationManager | null
   _undoManager: UndoManager | null
 }
 
-// 主Store类型定义
+// Main Store type definition
 interface AppStore extends TopStoreState, InternalState {
-  // 操作方法
+  // Operation methods
   dispatch: (action: Action, dispatchType?: DispatchType, callback?: () => void) => void
   dispatchAll: (actions: Action[], callback?: () => void) => void
   enact: (actionGroup: ActionGroup, callback?: () => void) => void
   reverse: (action: Action, callback?: () => void) => void
   
-  // 模态框操作
+  /**
+   * Modal operations
+   */
   showModal: (
     modalType?: ModalType,
     description?: string,
@@ -58,29 +62,29 @@ interface AppStore extends TopStoreState, InternalState {
   dismissModal: (modalClass?: ModalClass | Event) => void
   dismissAllModals: () => void
   
-  // 验证错误操作
+  // Validation error operations
   dispatchValidationErrorsActions: (actions: ValidationAction[]) => void
   dispatchGlobalValidationErrorsActions: (actions: ValidationAction[]) => void
   
-  // 配置操作
+  // Configuration operations
   clearConfig: () => void
   resetConfig: () => void
   clearTray: () => void
   
-  // 初始化验证管理器和撤销管理器
+  // Initialize validation manager and undo manager
   initValidationManager: (validationManager: ValidationManager) => void
   initUndoManager: (undoManager: UndoManager) => void
   
-  // 获取状态的辅助方法
+  // Helper method to get state
   getTopState: () => TopStoreState
 }
 
-// 创建store
+// Create store
 const useAppStore = create<AppStore>()(
   subscribeWithSelector(
     devtools(
       immer((set, get) => ({
-        // 初始状态 - 从TopStoreState复制
+        // Initial state - copied from TopStoreState
         disabled: false,
         loading: false,
         selected: null,
@@ -137,14 +141,14 @@ const useAppStore = create<AppStore>()(
         rebootRequiredOnSave: false,
         configuredDevicesResolved: false,
         
-        // 内部状态 - 不在TopStoreState中
+        // Internal state - not in TopStoreState
         _validationManager: null,
         _undoManager: null,
         
-        // 获取状态的辅助方法
+        // Helper method to get state
         getTopState: () => {
           const state = get()
-          // 排除内部状态和方法
+          // Exclude internal state and methods
           const { 
             _validationManager, _undoManager, getTopState, dispatch, dispatchAll, 
             enact, reverse, showModal, dismissModal, dismissAllModals, 
@@ -155,7 +159,7 @@ const useAppStore = create<AppStore>()(
           return topState as TopStoreState
         },
         
-        // 初始化验证管理器和撤销管理器
+        // Initialize validation manager and undo manager
         initValidationManager: (validationManager: ValidationManager) => {
           set(state => {
             state._validationManager = validationManager
@@ -168,12 +172,12 @@ const useAppStore = create<AppStore>()(
           })
         },
         
-        // 操作方法 - 基本实现，后续需要完善
+        // Operation methods - basic implementation, needs to be improved later
         dispatch: (action: Action, dispatchType: DispatchType = DispatchType.ORIGINAL, callback?: () => void) => {
-          // 这里需要根据action.objectType分发到不同的处理函数
+          // Need to dispatch to different handlers based on action.objectType
           console.log('Zustand dispatch:', action, dispatchType)
           
-          // 临时实现：直接更新状态
+          // Temporary implementation: directly update state
           set(state => {
             if (action.objectType === ObjectType.AP && action.newData) {
               state.ap = { ...state.ap, ...(action.newData as Partial<GUIAPConfigClient>) }
@@ -188,14 +192,14 @@ const useAppStore = create<AppStore>()(
                 ...(action.newData as Partial<GUISensorClient>) 
               }
             } else if (action.objectType === ObjectType.MAP_SETTINGS && action.newData) {
-              // 处理地图设置更新
+              // Handle map settings update
               state.mapSettings = { 
                 ...state.mapSettings, 
                 ...(action.newData as Partial<MapSettings>) 
               }
-              console.log('更新地图设置:', state.mapSettings)
+              console.log('Update map settings:', state.mapSettings)
             }
-            // 其他类型的处理...
+            // Handling for other types...
           }, false, `dispatch/${action.objectType}`)
           
           if (callback) callback()
@@ -213,14 +217,14 @@ const useAppStore = create<AppStore>()(
         },
         
         reverse: (action: Action, callback?: () => void) => {
-          // 撤销操作的实现
+          // Implementation of the undo operation
           console.log('Zustand reverse:', action)
           
-          // 临时实现
+          // Temporary implementation
           if (callback) callback()
         },
         
-        // 模态框操作
+        // Modal operations
         showModal: (
           modalType: ModalType = ModalType.ONE_BUTTON_SUCCESS,
           description: string = '',
@@ -249,12 +253,12 @@ const useAppStore = create<AppStore>()(
         dismissModal: (modalClass?: ModalClass | Event) => {
           set(state => {
             if (!modalClass) {
-              // 移除最上面的模态框
+              // Remove the top modal
               if (state.modalStack.length > 0) {
                 state.modalStack.pop()
               }
             } else {
-              // 移除特定的模态框
+              // Remove a specific modal
               const classStr = typeof modalClass === 'string' ? modalClass : ''
               state.modalStack = state.modalStack.filter(modal => 
                 modal.modalClass !== classStr
@@ -269,7 +273,7 @@ const useAppStore = create<AppStore>()(
           }, false, 'dismissAllModals')
         },
         
-        // 验证错误操作
+        // Validation error operations
         dispatchValidationErrorsActions: (actions: ValidationAction[]) => {
           actions.forEach(action => {
             set(state => {
@@ -302,7 +306,7 @@ const useAppStore = create<AppStore>()(
           })
         },
         
-        // 配置操作
+        // Configuration operations
         clearConfig: () => {
           set(state => {
             state.ap = null
@@ -336,11 +340,11 @@ const useAppStore = create<AppStore>()(
   )
 )
 
-// 导出
+// Export
 export default useAppStore
 
-// 调试辅助方法 - 在控制台中访问
+// Debug helper method - access in console
 if (process.env.NODE_ENV === 'development') {
-  // @ts-ignore - 全局变量声明
+  // @ts-ignore - global variable declaration
   window.zustandStore = useAppStore
 }
