@@ -10,21 +10,21 @@ interface ZustandBridgeProps {
 }
 
 /**
- * ZustandBridge组件用于在TopStore和Zustand之间同步状态
- * 在重构过程中，它充当两种状态管理方式的桥梁
- * 随着重构的深入，这个组件的作用会逐渐减少，最终可能被移除
+ * The ZustandBridge component is used to synchronize state between TopStore and Zustand
+ * During the refactoring process, it serves as a bridge between the two state management approaches
+ * As the refactoring progresses, the role of this component will gradually diminish and may eventually be removed
  */
 class ZustandBridge extends React.Component<ZustandBridgeProps> {
     componentDidMount() {
-        // 初始同步
+        // Initial synchronization
         this.syncTopStoreToZustand()
         
-        // 设置定期同步
+        // Set up periodic synchronization
         this.intervalId = setInterval(() => {
             this.syncTopStoreToZustand()
-        }, 5000) // 每5秒同步一次
+        }, 5000) // Sync every 5 seconds
         
-        // 初始化验证管理器和撤销管理器
+        // Initialize validation manager and undo manager
         if (this.props.topStore.validationManager) {
             useAppStore.getState().initValidationManager(this.props.topStore.validationManager)
         }
@@ -33,34 +33,34 @@ class ZustandBridge extends React.Component<ZustandBridgeProps> {
             useAppStore.getState().initUndoManager(this.props.topStore.undoManager)
         }
         
-        // 监听Zustand的dispatch调用，将其转发到TopStore
+        // Listen for Zustand dispatch calls and forward them to TopStore
         this.unsubscribeDispatch = useAppStore.subscribe(
             state => state.dispatch,
             () => {
-                // 当Zustand的dispatch被调用时，这个回调会被触发
-                // 但我们不需要在这里做任何事情，因为dispatch本身会处理同步
+                // This callback is triggered when Zustand's dispatch is called
+                // But we don't need to do anything here because dispatch itself will handle synchronization
             }
         )
         
-        // 监听Zustand的mapSettings变化，同步到TopStore
+        // Listen for changes in Zustand's mapSettings and sync to TopStore
         this.unsubscribeMapSettings = useAppStore.subscribe(
             state => state.mapSettings,
             (mapSettings) => {
                 console.log('[ZustandBridge] mapSettings changed in Zustand, syncing to TopStore', mapSettings);
-                // 将Zustand的mapSettings同步到TopStore
+                // Sync Zustand's mapSettings to TopStore
                 this.syncZustandToTopStore();
             }
         )
         
-        // 重写TopStore的dispatch方法，使其同时更新Zustand
+        // Override TopStore's dispatch method to update Zustand simultaneously
         const originalDispatch = this.props.topStore.dispatch.bind(this.props.topStore)
         this.originalDispatch = originalDispatch;
         this.props.topStore.dispatch = (action: Action, dispatchType: DispatchType = DispatchType.ORIGINAL, callback?: () => void) => {
-            // 先调用原始的dispatch方法
+            // First call the original dispatch method
             originalDispatch(action, dispatchType, () => {
-                // 然后同步到Zustand
+                // Then sync to Zustand
                 this.syncTopStoreToZustand()
-                // 最后调用回调
+                // Finally call the callback
                 if (callback) callback()
             })
         }
@@ -79,7 +79,7 @@ class ZustandBridge extends React.Component<ZustandBridgeProps> {
             this.unsubscribeMapSettings()
         }
         
-        // 恢复原始的dispatch方法
+        // Restore the original dispatch method
         if (this.originalDispatch) {
             this.props.topStore.dispatch = this.originalDispatch
         }
@@ -94,11 +94,11 @@ class ZustandBridge extends React.Component<ZustandBridgeProps> {
         if (this.props.topStore) {
             const topState = this.props.topStore.getTopState()
             
-            // 使用immer更新Zustand状态
+            // Use immer to update Zustand state
             useAppStore.setState(state => {
-                // 复制所有TopStore状态到Zustand
+                // Copy all TopStore state to Zustand
                 Object.keys(topState).forEach(key => {
-                    // @ts-ignore - 动态键访问
+                    // @ts-ignore - Dynamic key access
                     state[key] = topState[key]
                 })
             }, false, 'syncTopStoreToZustand')
@@ -113,7 +113,7 @@ class ZustandBridge extends React.Component<ZustandBridgeProps> {
         if (this.props.topStore && this.originalDispatch) {
             const zustandState = useAppStore.getState();
             
-            // 同步mapSettings到TopStore
+            // Sync mapSettings to TopStore
             this.originalDispatch({
                 objectType: ObjectType.MAP_SETTINGS,
                 objectId: 'mapSettings',
